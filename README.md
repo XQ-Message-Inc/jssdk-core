@@ -44,10 +44,6 @@ API_KEY = <your-api-key-goes-here>;
 
 ------
 
-------
-
-------
-
 ## _Services_
 Pre-requisite: API Key
 
@@ -115,10 +111,6 @@ Exchange the temporary access token with a real access token used in all secured
 
 ------
 
-------
-
-------
-
 
 _ENCRYPT TEXT_
 
@@ -149,10 +141,6 @@ _ENCRYPT TEXT_
 
 ------
 
-------
-
-------
-
 _DECRYPT TEXT_
 
    #####  [Decrypt](/src/com/xqmsg/sdk/v2/services/Decrypt.js)
@@ -177,10 +165,6 @@ _DECRYPT TEXT_
 | ----------------- |-----|-------|
 | data |DecryptResult|  <decrypted-data-bytes> |
 
-
-------
-
-------
 
 ------
 
@@ -216,10 +200,6 @@ _ENCRYPT FILE_
 
 ------
 
-------
-
-------
-
 _DECRYPT FILE_
 
    #####  [FileDecrypt](/src/com/xqmsg/sdk/v2/services/FileDecrypt.js)
@@ -248,10 +228,6 @@ _DECRYPT FILE_
 
 ------
 
-------
-
-------
-
 
 
    #####  [CheckKeyExpiration](/src/com/xqmsg/sdk/v2/services/CheckKeyExpiration.js)
@@ -273,10 +249,6 @@ This service is used to check whether a particular key is expired or not without
 | ----------------------- | ----------------------- | ------------------------ |  ------------------------------------------------------------ |
 | expiresOn               | long        | \>=0                      |  The number of seconds before this token expires.<br> If the token is already expired, this will be zero |
 
-
-------
-
-------
 
 ------
 
@@ -304,10 +276,6 @@ This service allows a user to create a very short-lived version of their access 
 
 ------
 
-------
-
-------
-
 
 
    #####  [DeleteAuthorization](/src/com/xqmsg/sdk/v2/services/DeleteAuthorization.js)
@@ -329,10 +297,6 @@ Revokes a key using its token. Only the user who sent the message will be able t
 | -------------- | -------------- | ----------------------- | ----------- |
 | -           | -         | - |         -    |
 
-
-------
-
-------
 
 ------
 
@@ -358,10 +322,6 @@ After an account is deleted, the subscriber will be sent an email notifying them
 | -------------- | -------------- | ----------------------- | ----------- |
 | -           | -         | - |         -    |
 
-
-------
-
-------
 
 ------
 
@@ -398,10 +358,6 @@ After an account is deleted, the subscriber will be sent an email notifying them
 
 ------
 
-------
-
-------
-
 
 
    #####  [GetSettings](/src/com/xqmsg/sdk/v2/services/GetSettings.js)
@@ -424,10 +380,6 @@ Gets the notification and newsletter settings for the current user.
 | notifications     | Long | [ 0 .. 3 ] |Specifies the notifications that the user should receive  <br> 0 = No Notifications, <br> 1 = Receive Usage Reports, <br> 2 = Receive Tutorials, <br> 3 = Receive Both|
 
 
-
-------
-
-------
 
 ------
 
@@ -465,10 +417,6 @@ The merged token has three restrictions:
 
 ------
 
-------
-
-------
-
 
 
    #####  [FetchKey](/src/com/xqmsg/sdk/v2/services/FetchKey.js)
@@ -501,10 +449,6 @@ If any of these is not true, an error will be returned instead.
 
 ------
 
-------
-
-------
-
 
 
    #####  [RevokeKeyAccess](/src/com/xqmsg/sdk/v2/services/RevokeKeyAccess.js)
@@ -526,10 +470,6 @@ Only the user who sent the message will be able to revoke it.
 | Response  Name | Type | Value | Description |
 | -------------- | ---- | ----- | ----------- |
 | -              | -    | -     | -           |
-
-------
-
-------
 
 ------
 
@@ -555,10 +495,6 @@ Only the user who sent the message will be able to revoke it.
 | Response  Name | Type | Value | Description |
 | -------------- | ---- | ----- | ----------- |
 | -              | -    | -     | -           |
-
-------
-
-------
 
 ------
 
