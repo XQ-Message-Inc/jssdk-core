@@ -70,7 +70,7 @@ The service itself will return a pre-authorization token that can be exchanged f
 |data|  String  | Pre-Authorization Token. |
 
 
-   #####    [CodeValidator](xq/xq-javascipt-sdk/src/com/xqmsg/sdk/v2/services/CodeValidator.js)
+   #####    [CodeValidator](/src/com/xqmsg/sdk/v2/services/CodeValidator.js)
 
 Authenticate the PIN that was sent to a users email and return a validated temporary access token.
 
