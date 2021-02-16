@@ -271,7 +271,7 @@ This service is used to check whether a particular key is expired or not without
 
 | Response  Name | Response  Type | Response  Value |   Description                                                  |
 | ----------------------- | ----------------------- | ------------------------ |  ------------------------------------------------------------ |
-| expiresOn               | long        | \>=0                      |  The number of seconds before this token expires.<br>(should really be `expiresIn`)<br> If the token is already expired, this will be zero |
+| expiresOn               | long        | \>=0                      |  The number of seconds before this token expires.<br> If the token is already expired, this will be zero |
 
 
 ------
