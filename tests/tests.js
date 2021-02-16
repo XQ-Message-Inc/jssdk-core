@@ -94,7 +94,9 @@ oReq.addEventListener("load", function () {
                                     return serverResponse;
                                 }
                                 default: {
-                                    console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                    let error = serverResponse.payload;
+                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                    console.error("failed , reason: ", error);
                                     return serverResponse;
                                 }
 
@@ -131,7 +133,9 @@ oReq.addEventListener("load", function () {
                                     return serverResponse;
                                 }
                                 default: {
-                                    console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                    let error = serverResponse.payload;
+                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                    console.error("failed , reason: ", error);
                                     return serverResponse;
                                 }
                             }
@@ -169,7 +173,9 @@ oReq.addEventListener("load", function () {
                                     ;
                                 }
                                 default: {
-                                    console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                    let error = serverResponse.payload;
+                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                    console.error("failed , reason: ", error);
                                     return serverResponse;
                                 }
                             }
@@ -198,7 +204,9 @@ oReq.addEventListener("load", function () {
                                     return serverResponse;
                                 }
                                 default: {
-                                    console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                    let error = serverResponse.payload;
+                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                    console.error("failed , reason: ", error);
                                     return serverResponse;
                                 }
                             }
@@ -237,7 +245,9 @@ oReq.addEventListener("load", function () {
                                     return serverResponse;
                                 }
                                 default: {
-                                    console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                    let error = serverResponse.payload;
+                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                    console.error("failed , reason: ", error);
                                     return serverResponse;
                                 }
                             }
@@ -254,7 +264,9 @@ oReq.addEventListener("load", function () {
                                             return serverResponse;
                                         }
                                         default: {
-                                            console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                            let error = serverResponse.payload;
+                                            try{ error =  JSON.parse(error).status}catch (e){};
+                                            console.error("failed , reason: ", error);
                                             return serverResponse;
                                         }
                                     }
@@ -294,7 +306,9 @@ oReq.addEventListener("load", function () {
                                     return serverResponse;
                                 }
                                 default: {
-                                    console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                    let error = serverResponse.payload;
+                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                    console.error("failed , reason: ", error);
                                     return serverResponse;
                                 }
                             }
@@ -311,7 +325,9 @@ oReq.addEventListener("load", function () {
                                             return serverResponse;
                                         }
                                         default: {
-                                            console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                            let error = serverResponse.payload;
+                                            try{ error =  JSON.parse(error).status}catch (e){};
+                                            console.error("failed , reason: ", error);
                                             return serverResponse;
                                         }
                                     }
@@ -358,7 +374,9 @@ oReq.addEventListener("load", function () {
                                     return serverResponse;
                                 }
                                 default: {
-                                    console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                    let error = serverResponse.payload;
+                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                    console.error("failed , reason: ", error);
                                     return serverResponse;
                                 }
                             }
@@ -385,7 +403,9 @@ oReq.addEventListener("load", function () {
                                             return serverResponse;
                                         }
                                         default: {
-                                            console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                            let error = serverResponse.payload;
+                                            try{ error =  JSON.parse(error).status}catch (e){};
+                                            console.error("failed , reason: ", error);
                                             return serverResponse;
                                         }
                                     }
@@ -434,7 +454,9 @@ oReq.addEventListener("load", function () {
                                     return serverResponse;
                                 }
                                 default: {
-                                    console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                    let error = serverResponse.payload;
+                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                    console.error("failed , reason: ", error);
                                     return serverResponse;
                                 }
                             }
@@ -462,7 +484,9 @@ oReq.addEventListener("load", function () {
                                             return serverResponse;
                                         }
                                         default: {
-                                            console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                            let error = serverResponse.payload;
+                                            try{ error =  JSON.parse(error).status}catch (e){};
+                                            console.error("failed , reason: ", error);
                                             return serverResponse;
                                         }
                                     }
@@ -532,7 +556,9 @@ oReq.addEventListener("load", function () {
                                         });
                                 }
                                 default: {
-                                    console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                    let error = serverResponse.payload;
+                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                    console.error("failed , reason: ", error);
                                     return serverResponse;
                                 }
                             }
@@ -550,7 +576,7 @@ oReq.addEventListener("load", function () {
 
                 console.warn(label);
 
-                let testUser = `test-user-${parseInt(Math.random() * (1000 - 1) + 1)}@xqmsg.com`
+                const testUser = `test-user-${parseInt(Math.random() * (1000 - 1) + 1)}@xqmsg.com`
 
                 let payload = {
                     [AuthorizeAlias.prototype.USER]: testUser,
@@ -566,7 +592,6 @@ oReq.addEventListener("load", function () {
 
                         xqsdk.getCache().putXQAccess(testUser, testUserToken);
 
-
                         return new CombineAuthorizations(xqsdk)
                             .supplyAsync({[CombineAuthorizations.prototype.TOKENS]: [testUserToken]})
                             .then(function (serverResponse) {
@@ -577,17 +602,19 @@ oReq.addEventListener("load", function () {
                                         console.info("Merged Token: " + mergedToken);
                                         let mergeCount = data[CombineAuthorizations.prototype.MERGE_COUNT];
                                         console.info("Number of tokens combined: " + mergeCount);
+                                        xqsdk.getCache().removeProfile(testUser);
                                         return serverResponse;
                                     }
                                     default: {
-                                        console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                        let error = serverResponse.payload;
+                                        try{ error =  JSON.parse(error).status}catch (e){};
+                                        console.error("failed , reason: ", error);
+                                        xqsdk.getCache().removeProfile(testUser);
                                         return serverResponse;
                                     }
                                 }
-
-
                             });
-                    } );
+                    });
 
             }
         }
@@ -597,7 +624,7 @@ oReq.addEventListener("load", function () {
                     console.warn(`${label} (Using Alias)`);
 
                     const originaluser = xqsdk.getCache().getActiveProfile(true);
-                    let testUser = `test-user-${parseInt(Math.random() * (1000 - 1) + 1)}@xqmsg.com`
+                    const testUser = `test-user-${parseInt(Math.random() * (1000 - 1) + 1)}@xqmsg.com`
 
                     let payload = {
                         [AuthorizeAlias.prototype.USER]: testUser,
@@ -629,13 +656,14 @@ oReq.addEventListener("load", function () {
                                             return serverResponse;
                                         }
                                         default: {
-                                            console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                            let error = serverResponse.payload;
+                                            try{ error =  JSON.parse(error).status}catch (e){};
+                                            console.error("failed , reason: ", error);
+                                            xqsdk.getCache().removeProfile(testUser);
                                             return serverResponse;
                                         }
                                     }
                                 })
-
-
                         })
 
 
@@ -657,7 +685,7 @@ oReq.addEventListener("load", function () {
                     console.warn(`${label} (Using Alias)`);
 
                     const originaluser = xqsdk.getCache().getActiveProfile(true);
-                    let testUser = `test-user-${parseInt(Math.random() * (1000 - 1) + 1)}@xqmsg.com`
+                    const testUser = `test-user-${parseInt(Math.random() * (1000 - 1) + 1)}@xqmsg.com`
 
                     let payload = {
                         [AuthorizeAlias.prototype.USER]: testUser,
@@ -689,7 +717,10 @@ oReq.addEventListener("load", function () {
                                             return serverResponse;
                                         }
                                         default: {
-                                            console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                            let errorMessage = serverResponse.payload;
+                                            try{ errorMessage =  JSON.parse(errorMessage)}catch (e){};
+                                            console.error("failed , reason: ", errorMessage);
+                                            xqsdk.getCache().removeProfile(testUser);
                                             return serverResponse;
                                         }
                                     }
@@ -728,7 +759,9 @@ oReq.addEventListener("load", function () {
                                     return serverResponse
                                 }
                                 default: {
-                                    console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                    let error = serverResponse.payload;
+                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                    console.error("failed , reason: ", error);
                                     return serverResponse;
                                 }
                             }
@@ -759,7 +792,9 @@ oReq.addEventListener("load", function () {
                                     return serverResponse;
                                 }
                                 default: {
-                                    console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                    let error = serverResponse.payload;
+                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                    console.error("failed , reason: ", error);
                                     return serverResponse;
                                 }
                             }
@@ -809,7 +844,9 @@ oReq.addEventListener("load", function () {
                                                                     return serverResponse;
                                                                 }
                                                                 default: {
-                                                                    console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                                                    let error = serverResponse.payload;
+                                                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                                                    console.error("failed , reason: ", error);
                                                                     return serverResponse;
                                                                 }
                                                             }
@@ -828,7 +865,9 @@ oReq.addEventListener("load", function () {
                                                                                 return serverResponse;
                                                                             }
                                                                             default: {
-                                                                                console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                                                                let error = serverResponse.payload;
+                                                                                try{ error =  JSON.parse(error).status}catch (e){};
+                                                                                console.error("failed , reason: ", error);
                                                                                 return serverResponse;
                                                                             }
                                                                         }
@@ -849,7 +888,9 @@ oReq.addEventListener("load", function () {
                                                                                 return serverResponse;
                                                                             }
                                                                             default: {
-                                                                                console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                                                                let error = serverResponse.payload;
+                                                                                try{ error =  JSON.parse(error).status}catch (e){};
+                                                                                console.error("failed , reason: ", error);
                                                                                 return serverResponse;
                                                                             }
                                                                         }
@@ -878,7 +919,9 @@ oReq.addEventListener("load", function () {
                                                                             return serverResponse;
                                                                         }
                                                                         default: {
-                                                                            console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                                                            let error = serverResponse.payload;
+                                                                            try{ error =  JSON.parse(error).status}catch (e){};
+                                                                            console.error("failed , reason: ", error);
                                                                             return serverResponse;
                                                                         }
                                                                     }
@@ -905,7 +948,9 @@ oReq.addEventListener("load", function () {
                                                                                 return serverResponse;
                                                                             }
                                                                             default: {
-                                                                                console.error("failed , reason: ", JSON.parse(serverResponse.payload));
+                                                                                let error = serverResponse.payload;
+                                                                                try{ error =  JSON.parse(error).status}catch (e){};
+                                                                                console.error("failed , reason: ", error);
                                                                                 return serverResponse;
                                                                             }
                                                                         }
@@ -914,14 +959,18 @@ oReq.addEventListener("load", function () {
                                                         });
                                                 }
                                                 default: {
-                                                    console.error("failed , reason: " + packetValidationResponse);
+                                                    let error = packetValidationResponse.payload;
+                                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                                    console.error("failed , reason: ", error);
                                                     return packetValidationResponse;
                                                 }
                                             }
                                         });
                                 }
                                 default: {
-                                    console.error("failed , reason: " + uploadResponse);
+                                    let error = uploadResponse.payload;
+                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                    console.error("failed , reason: ", error);
                                     return uploadResponse;
                                 }
                             }
@@ -993,11 +1042,11 @@ oReq.addEventListener("load", function () {
                                     break;
                                 }
                                 default :{
-                                    let message = '';
-                                    try{message = JSON.parse(serverResponse.payload).status;} catch(e){}
-                                    $(`#cb-${mkId(test.name)}`).prop({"checked": true, "disabled": true});
+                                    let errorMessage = serverResponse.payload;
+                                    try{errorMessage=JSON.parse(serverResponse.payload).status;}catch (e) {}                                    $(`#cb-${mkId(test.name)}`).prop({"checked": true, "disabled": true});
                                     $(`#${mkId(test.name)}`).css({"font-style": "italic", "color": "#d22060"});
-                                    $(`#${mkId(test.name)}`).append(`<span style="margin: 0;"> [${message}]</span>`);
+
+                                    $(`#${mkId(test.name)}`).append(`<span style="margin: 0;"> [${errorMessage}]</span>`);
 
                                     break;
                                 }
@@ -1039,10 +1088,11 @@ oReq.addEventListener("load", function () {
                             .show();
                         return response;
                     }
-                    case ServerResponse.prototype.ERROR: {
-                        console.info(response);
+                    default: {
+                        let error = serverResponse.payload;
+                        try{ error =  JSON.parse(error).status}catch (e){};
+                        console.error("failed , reason: ", error);
                         return response;
-                        ;
                     }
                 }
             });
@@ -1067,9 +1117,11 @@ oReq.addEventListener("load", function () {
                         const accessToken = validationResponse.payload;
                         return accessToken;
                     }
-                    case ServerResponse.prototype.ERROR: {
-                        console.info(validationResponse);
-                        return ServerResponse.prototype.ERROR;
+                    default: {
+                        let error = serverResponse.payload;
+                        try{ error =  JSON.parse(error).status}catch (e){};
+                        console.error("failed , reason: ", error);
+                        return  serverResponse;
                     }
                 }
             });
