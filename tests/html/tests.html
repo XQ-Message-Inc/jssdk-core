@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" media="screen" href="../../stylesheets/core-desktop.css">
+    <link rel="shortcut icon" type="image/png" href="../../images/favicon.png"> <title>Tests</title>
+    <script src="../../vendor/jquery/dist/jquery.min.js" type="text/javascript"></script>
+    <script src="../../vendor/crypto-js/crypto-js.js" type="text/javascript"></script>
+    <!-- SDK V2 START -->
+    <script src="../../src/com/xqmsg/sdk/v2/exceptions/StatusException.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/exceptions/ValidationException.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/ServerResponse.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/algorithms/EncryptionAlgorithm.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/algorithms/OTPv2Encryption.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/algorithms/AESEncryption.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/CallMethod.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/XQSDK.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/NotificationEnum.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/Commons.js" type="text/javascript"></script>
+
+    <!-- SERVICES START -->
+    <script src="../../src/com/xqmsg/sdk/v2/services/XQModule.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/GeneratePacket.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/CheckKeyExpiration.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/AuthorizeDelegate.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/Decrypt.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/DeleteAuthorization.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/DeleteSubscriber.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/Encrypt.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/FileEncrypt.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/ExchangeForAccessToken.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/AuthorizeAlias.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/CheckApiKey.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/GrantUserAccess.js" type="module"></script>
+
+    <script src="../../src/com/xqmsg/sdk/v2/quantum/FetchQuantumEntropy.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/GetUserInfo.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/GetSettings.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/CombineAuthorizations.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/Authorize.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/FetchKey.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/RevokeKeyAccess.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/RevokeUserAccess.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/UpdateSettings.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/CodeValidator.js" type="module"></script>
+    <script src="../../src/com/xqmsg/sdk/v2/services/ValidatePacket.js" type="module"></script>
+    <script src="../tests.js" type="module"></script>
+    <!-- SERVICES END -->
+    <!-- SDK V2  END -->
+
+
+</head>
+<div class="centerBody">
+    <div class="row">
+
+        <div class="logoCell col-1-logo">
+            <img src="../../images/chatlogo.png" class="logo">
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-2-logo">
+            <div class="xqMsg"><small>Javascript SDK Test Suite</small></div>
+        </div>
+    </div>
+    <div id="label-content" class="section Row">
+        <label for="label-content" class="TertiaryText"></label>
+    </div>
+
+    <div class="section row">
+
+        <div style="padding-top:1.5em;">
+            <div class="form-group">
+                <div class="inputText"><input type="text" id="register-input" placeholder="Enter Your Email Here" value="" ></input></div>
+                <div class="inputText"><input type="text" id="recipient-input" placeholder="" value="" style="display:none"></input></div>
+                <div class="inputText"><input type="text" id="recipient-list-input" placeholder="" value="" style="display:none" ></input></div>
+                <div class="inputText"><input type="text" id="pin-input" maxlength="6" placeholder="Enter The PIN" value="" style="display:none"></input></div>
+                <div class="inputLightLine"><div></div></div>
+            </div>
+            <div class="topBoundary2 bottomSpacing">
+                <button id="register-button" type="button" class="dropbtn">Register</button>
+                <button id="confirm-button" type="button" class="dropbtn" style="display:none" >Confirm</button>
+                <button id="run-button" type="button" class="dropbtn" style="display:none" >Run Tests</button>
+                <button id="validate-access-request-button" type="button" class="dropbtn" style="display:none">Confirm</button>
+                <button id="clear-credentials-button" type="button" class="dropbtn" disabled>Clear Credentials</button>
+
+            </div>
+        </div>
+        <div id="agenda-items" class="section Row">
+            <label for="agenda-items" class="TertiaryText"></label>
+        </div>
+
+</div>
+</div>
+
+</body>
+
+
+</html>
