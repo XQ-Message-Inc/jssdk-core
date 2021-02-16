@@ -100,7 +100,7 @@ oReq.addEventListener("load", function () {
 
                             }
                         });
-                   
+
 
                 } else {
                     return new Promise((resolved, rejectied) => {
@@ -513,7 +513,7 @@ oReq.addEventListener("load", function () {
                                     const encryptedFileContent = await encryptedFile.arrayBuffer();
                                     console.warn(`Encrypted File Content: ${new TextDecoder().decode(encryptedFileContent).substr(0, 250)}...\n`);
 
-                                return new FileDecrypt(xqsdk, algorithm)
+                                    return new FileDecrypt(xqsdk, algorithm)
                                         .supplyAsync({[FileDecrypt.prototype.SOURCE_FILE]: encryptedFile})
                                         .then(async function (serverResponse) {
                                             switch (serverResponse.status) {
@@ -993,8 +993,12 @@ oReq.addEventListener("load", function () {
                                     break;
                                 }
                                 default :{
+                                    let message = '';
+                                    try{message = JSON.parse(serverResponse.payload).status;} catch(e){}
                                     $(`#cb-${mkId(test.name)}`).prop({"checked": true, "disabled": true});
                                     $(`#${mkId(test.name)}`).css({"font-style": "italic", "color": "#d22060"});
+                                    $(`#${mkId(test.name)}`).append(`<span style="margin: 0;"> [${message}]</span>`);
+
                                     break;
                                 }
                             }
