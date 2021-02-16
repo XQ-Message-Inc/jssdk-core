@@ -12,7 +12,7 @@ API_KEY = <your-api-key-goes-here>;
 
 
 ## _Demo_ 
-   Open [demo.html](demo/html/demo.html) in any browser to start the Demo.
+   Open [demo.html](/demo/html/demo.html) in any browser to start the Demo.
 
 ## _Tests_ 
    ##### Debug/Run:
@@ -51,11 +51,16 @@ API_KEY = <your-api-key-goes-here>;
 ## _Services_
 Pre-requisite: API Key
 
-   #####  [Authorize](xq/xq-javascipt-sdk/src/com/xqmsg/sdk/v2/services/Authorize.js)
+   #####  [Authorize](/src/com/xqmsg/sdk/v2/services/Authorize.js)
 
 Request an access token for a particular email address. If successful, the user will receive an email containing a PIN and a validation link. The user can choose to either click the link, or use the PIN via CodeValidator.
 
 The service itself will return a pre-authorization token that can be exchanged for a full access token once validation is complete.
+
+| Initialization Argumen Name | Type| Value                    |      |
+| :-------------------------------: | ------------------------ | ---- | ---- |
+|         xqsdk instance            | XQSDK                    |      |      |
+
 
 | Argument Name | Type | Value | Required | Description |
 | -------------- | -------------- | --------------- | -------- | ----------- |
@@ -77,8 +82,7 @@ Authenticate the PIN that was sent to a users email and return a validated tempo
 
 | Initialization Argumen Name | Type| Value                    |      |
 | :-------------------------------: | ------------------------ | ---- | ---- |
-|            accessToken           | String  | <temporary-access-token> |      |
-
+|         xqsdk instance            | XQSDK                    |      |      |
 
 | Request Argument Name | Type | Value | Required | Description |
 | -------------- | -------------- | --------------- | -------- | ----------- |
@@ -89,16 +93,15 @@ Authenticate the PIN that was sent to a users email and return a validated tempo
 | ----------------- |-----|-------|
 | - |-|-|
 
-   #####  GetAccess Token:  [ExchangeForAccessToken](./src/com/xqmsg/sdk/v2/services/ExchangeForAccessToken.js)  3/3 
+   #####  GetAccess Token:  [ExchangeForAccessToken](/src/com/xqmsg/sdk/v2/services/ExchangeForAccessToken.js)  3/3 
 
 Exchange the temporary access token with a real access token used in all secured XQ Message interactions
 
 
-| Initialization Argument Name  | Type| Value                    |      |
+
+| Initialization Argumen Name | Type| Value                    |      |
 | :-------------------------------: | ------------------------ | ---- | ---- |
-|            accessToken           | String  | <temporary-access-token> |      |
-
-
+|         xqsdk instance            | XQSDK                    |      |      
 
 | Request Argument Name | Type |Value | Required | Description         |
 | -------------- | -------------- | --------------- | -------- | ------------------------------------------------- |
@@ -119,14 +122,14 @@ Exchange the temporary access token with a real access token used in all secured
 
 _ENCRYPT TEXT_
 
-   #####  [Encrypt](./src/com/xqmsg/sdk/v2/services/Encrypt.js)
+   #####  [Encrypt](/src/com/xqmsg/sdk/v2/services/Encrypt.js)
 
    For encryption supply a piece of textual data  along with  the author's email, one or more emails of  intended<br>   recipients and the  intended life-span of the message.
 
 
 | Initialization Argument Name  | Type| Value                    |      |
 | :-------------------------------: | ------------------------ | ---- | ---- |
-|            accessToken           | String  | <access-token> |      |
+|         xqsdk instance            | XQSDK                    |      |      |
 |algorithm|AlgorithmEnum|<optv2\|aes>||
 
 
@@ -152,14 +155,14 @@ _ENCRYPT TEXT_
 
 _DECRYPT TEXT_
 
-   #####  [Decrypt](./src/com/xqmsg/sdk/v2/services/Decrypt.js)
+   #####  [Decrypt](/src/com/xqmsg/sdk/v2/services/Decrypt.js)
 
    For decryption supply a piece of textual data  along with  the locator key you received when encrypting
 
 
 | Initialization Argument Name  | Type| Value                    |      |
 | :-------------------------------: | ------------------------ | ---- | ---- |
-|            accessToken           | String  | <access-token> |      |
+|         xqsdk instance            | XQSDK                    |      |      |
 |algorithm|AlgorithmEnum|<optv2\|aes>||
 
 
@@ -185,14 +188,14 @@ _DECRYPT TEXT_
 
 _ENCRYPT FILE_
 
-   #####  [FileEncrypt](./src/com/xqmsg/sdk/v2/services/FileEncrypt.js)
+   #####  [FileEncrypt](/src/com/xqmsg/sdk/v2/services/FileEncrypt.js)
 
    For file encryption supply the path to the unencrypted  source document as well as a <br>   path to the target document to contain the encrypted data,  along with the author's email, <br>   one or more emails of  intended  recipients and the life-span of the message.
 
 
 | Initialization Argument Name | Type          | Value          |      |
 | :--------------------------: | ------------- | -------------- | ---- |
-|         accessToken          | String        | <access-token> |      |
+|         xqsdk instance       | XQSDK         |                |      |
 |          algorithm           | AlgorithmEnum | <optv2\|aes>   |      |
 
 
@@ -219,14 +222,14 @@ _ENCRYPT FILE_
 
 _DECRYPT FILE_
 
-   #####  [FileDecrypt](./src/com/xqmsg/sdk/v2/services/FileDecrypt.js)
+   #####  [FileDecrypt](/src/com/xqmsg/sdk/v2/services/FileDecrypt.js)
 
     For file decryption supply the path to the encrypted source document as well as a <br> path to the target document to contain the decryped data.
 
 
 | Initialization Argument Name | Type          | Value          |      |
 | :--------------------------: | ------------- | -------------- | ---- |
-|         accessToken          | String        | <access-token> |      |
+|         xqsdk instance       | XQSDK         |                |      |
 |          algorithm           | AlgorithmEnum | <optv2\|aes>   |      |
 
 
@@ -251,14 +254,14 @@ _DECRYPT FILE_
 
 
 
-   #####  [CheckKeyExpiration](./src/com/xqmsg/sdk/v2/services/CheckKeyExpiration.js)
+   #####  [CheckKeyExpiration](/src/com/xqmsg/sdk/v2/services/CheckKeyExpiration.js)
 
 This service is used to check whether a particular key is expired or not without actually fetching it. 
 
 
 | Initialization Argument Name | Type          | Value          |      |
 | :--------------------------: | ------------- | -------------- | ---- |
-|         accessToken          | String        | <access-token> |      |
+|         xqsdk instance       | XQSDK         |                |      |
 
 
 | Request  Argument Name | Type   | Value                        | Required | Description                                                  |
@@ -279,14 +282,14 @@ This service is used to check whether a particular key is expired or not without
 
 
 
-   #####  [AuthorizeDelegate](xq/xq-javascipt-sdk/src/com/xqmsg/sdk/v2/services/AuthorizeDelegate.js)
+   #####  [AuthorizeDelegate](/src/com/xqmsg/sdk/v2/services/AuthorizeDelegate.js)
 
 This service allows a user to create a very short-lived version of their access token in order to access certain services ( such as file encryption/decryption on the XQ website) without having to transmit their main access token.
 
 
 | Initialization Argument Name | Type          | Value          |      |
 | :--------------------------: | ------------- | -------------- | ---- |
-|         accessToken          | String        | <access-token> |      |
+|   xqsdk instance             | XQSDK         |                |      |
 
 
 | Request  Argument Name | Type | Value | Required | Description |
@@ -307,14 +310,14 @@ This service allows a user to create a very short-lived version of their access 
 
 
 
-   #####  [DeleteAuthorization](xq/xq-javascipt-sdk/src/com/xqmsg/sdk/v2/services/DeleteAuthorization.js)
+   #####  [DeleteAuthorization](/src/com/xqmsg/sdk/v2/services/DeleteAuthorization.js)
 
 Revokes a key using its token. Only the user who sent the message will be able to revoke it.
 
 
 | Initialization Argument Name | Type   | Value          |      |
 | :--------------------------: | ------ | -------------- | ---- |
-|         accessToken          | String | <access-token> |      |
+|         xqsdk instance            | XQSDK                    |      |      |
 
 
 | Request  Argument Name | Type | Value | Required | Description |
@@ -335,7 +338,7 @@ Revokes a key using its token. Only the user who sent the message will be able t
 
 
 
-   #####  [DeleteSubscriber](xq/xq-javascipt-sdk/src/com/xqmsg/sdk/v2/services/DeleteSubscriber.js)
+   #####  [DeleteSubscriber](/src/com/xqmsg/sdk/v2/services/DeleteSubscriber.js)
 
 Deletes the user specified by the access token.
 After an account is deleted, the subscriber will be sent an email notifying them of its deletion.
@@ -343,7 +346,7 @@ After an account is deleted, the subscriber will be sent an email notifying them
 
 | Initialization Argument Name | Type   | Value          |      |
 | :--------------------------: | ------ | -------------- | ---- |
-|         accessToken          | String | <access-token> |      |
+|         xqsdk instance            | XQSDK                    |      |      |
 
 
 | Request  Argument Name | Type | Value | Required | Description |
@@ -364,7 +367,7 @@ After an account is deleted, the subscriber will be sent an email notifying them
 
 
 
-   #####  [GetUserInfo](./src/com/xqmsg/sdk/v2/services/GetUserInfo.js)
+   #####  [GetUserInfo](/src/com/xqmsg/sdk/v2/services/GetUserInfo.js)
 
 Deletes the user specified by the access token.
 After an account is deleted, the subscriber will be sent an email notifying them of its deletion.
@@ -372,7 +375,7 @@ After an account is deleted, the subscriber will be sent an email notifying them
 
 | Initialization Argument Name | Type   | Value          |      |
 | :--------------------------: | ------ | -------------- | ---- |
-|         accessToken          | String | <access-token> |      |
+|         xqsdk instance            | XQSDK                    |      |      |
 
 
 | Request  Argument Name | Type | Value | Required | Description |
@@ -401,14 +404,14 @@ After an account is deleted, the subscriber will be sent an email notifying them
 
 
 
-   #####  [GetSettings](xq/xq-javascipt-sdk/src/com/xqmsg/sdk/v2/services/GetSettings.js)
+   #####  [GetSettings](/src/com/xqmsg/sdk/v2/services/GetSettings.js)
 
 Gets the notification and newsletter settings for the current user.
 
 
 | Initialization Argument Name | Type   | Value          |      |
 | :--------------------------: | ------ | -------------- | ---- |
-|         accessToken          | String | <access-token> |      |
+|         xqsdk instance            | XQSDK                    |      |      |
 
 
 | Request  Argument Name | Type | Value | Required | Description |
@@ -430,7 +433,7 @@ Gets the notification and newsletter settings for the current user.
 
 
 
-   #####  [CombineAuthorizations](xq/xq-javascipt-sdk/src/com/xqmsg/sdk/v2/services/CombineAuthorizations.js)
+   #####  [CombineAuthorizations](/src/com/xqmsg/sdk/v2/services/CombineAuthorizations.js)
 
 This endpoint is useful for merging two or more valid access tokens ( along with the access token used to make the call ) into a single one that can be used for temporary read access.
 
@@ -445,7 +448,7 @@ The merged token has three restrictions:
 
 | Initialization Argument Name | Type   | Value          |      |
 | :--------------------------: | ------ | -------------- | ---- |
-|         accessToken          | String | <access-token> |      |
+|         xqsdk instance            | XQSDK                    |      |      |
 
 
 | Request  Argument Name | Type | Value                 | Required | Description                  |
@@ -468,7 +471,7 @@ The merged token has three restrictions:
 
 
 
-   #####  [FetchKey](xq/xq-javascipt-sdk/src/com/xqmsg/sdk/v2/services/FetchKey.js)
+   #####  [FetchKey](/src/com/xqmsg/sdk/v2/services/FetchKey.js)
 
 This endpoint fetches the encryption key associated with the token provided.
 The key will only be returned if the following hold true:
@@ -485,7 +488,7 @@ If any of these is not true, an error will be returned instead.
 
 | Initialization Argument Name | Type   | Value          |      |
 | :--------------------------: | ------ | -------------- | ---- |
-|         accessToken          | String | <access-token> |      |
+|         xqsdk instance            | XQSDK                    |      |      |
 
 
 | Request  Argument Name | Type | Value                 | Required | Description                  |
@@ -504,7 +507,7 @@ If any of these is not true, an error will be returned instead.
 
 
 
-   #####  [RevokeKeyAccess](./src/com/xqmsg/sdk/v2/services/RevokeKeyAccess.js)
+   #####  [RevokeKeyAccess](/src/com/xqmsg/sdk/v2/services/RevokeKeyAccess.js)
 
 Revokes a key using its token. 
 
@@ -513,7 +516,7 @@ Only the user who sent the message will be able to revoke it.
 
 | Initialization Argument Name | Type   | Value          |      |
 | :--------------------------: | ------ | -------------- | ---- |
-|         accessToken          | String | <access-token> |      |
+|         xqsdk instance            | XQSDK                    |      |      |
 
 
 | Request  Argument Name | Type   | Value           | Required | Description                                                  |
@@ -532,7 +535,7 @@ Only the user who sent the message will be able to revoke it.
 
 
 
-   #####  [UpdateSettings](xq/xq-javascipt-sdk/src/com/xqmsg/sdk/v2/services/UpdateSettings.js)
+   #####  [UpdateSettings](/src/com/xqmsg/sdk/v2/services/UpdateSettings.js)
 
 Revokes a key using its token. 
 
@@ -541,7 +544,7 @@ Only the user who sent the message will be able to revoke it.
 
 | Initialization Argument Name | Type   | Value          |      |
 | :--------------------------: | ------ | -------------- | ---- |
-|         accessToken          | String | <access-token> |      |
+|         xqsdk instance            | XQSDK                    |      |      |
 
 
 | Request  Argument Name| Type    | Value     | Description              |
