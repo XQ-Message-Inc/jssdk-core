@@ -214,7 +214,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test OPT V2 Algorithm', enabled: true, statement: function (label) {
+            name: 'Test OTP V2 Algorithm', enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -326,14 +326,14 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Encrypt And Decrypt Text Using OPT V2', enabled: true, statement: function (label) {
+            name: 'Test Encrypt And Decrypt Text Using OTP V2', enabled: true, statement: function (label) {
 
                 if (this.enabled) {
-                    console.warn(label + 'Encrypt Using OPTv2');
+                    console.warn(label + 'Encrypt Using OTPv2');
 
                     let user = xqsdk.getCache().getActiveProfile(true);
 
-                    let text = "Hello OPTV2 Encrypt test! Here is a bit of sample text :) Übermäßig";
+                    let text = "Hello OTPV2 Encrypt test! Here is a bit of sample text :) Übermäßig";
 
                     var algorithm = xqsdk.getAlgorithm(xqsdk.OTPv2_ALGORITHM);
 
@@ -366,7 +366,7 @@ oReq.addEventListener("load", function () {
                         })
                         .then(function () {
 
-                            console.warn(label + 'Decrypt Using OPTv2');
+                            console.warn(label + 'Decrypt Using OTPv2');
 
                             var algorithm = xqsdk.getAlgorithm(xqsdk.OTPv2_ALGORITHM);
 
@@ -481,11 +481,11 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test File Encrypt And File Decrypt Text Using OPT V2', enabled: true, statement: function (label) {
+            name: 'Test File Encrypt And File Decrypt Text Using OTP V2', enabled: true, statement: function (label) {
 
                 if (this.enabled) {
 
-                    console.warn(label + 'File Encrypt Using OPTV2');
+                    console.warn(label + 'File Encrypt Using OTPV2');
 
                     console.info(`Original File Content: ${samplerFileContent.substr(0, 250)}...\n`);
                     let sourceFile = new File([samplerFileContent], "utf-8-sampler.txt");
