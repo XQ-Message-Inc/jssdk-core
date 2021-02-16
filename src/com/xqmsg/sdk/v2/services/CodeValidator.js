@@ -4,7 +4,7 @@ import ServerResponse from "../ServerResponse.js";
 import ExchangeForAccessToken from "./ExchangeForAccessToken.js";
 
 /**
- * Authenticate the PIN which resulted from the preceding {@link RequestAccess} service call.<br>
+ * Authenticate the PIN which resulted from the preceding {@link Authorize} service call.<br>
  * If successful this service returns a server response containing the access token.
  *
  */
