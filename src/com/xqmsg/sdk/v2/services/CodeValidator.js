@@ -5,7 +5,7 @@ import ExchangeForAccessToken from "./ExchangeForAccessToken.js";
 
 /**
  * Authenticate the PIN which resulted from the preceding {@link RequestAccess} service call.<br>
- * If successful this service returns a  status of 204, No Content .
+ * If successful this service returns a server response containing the access token.
  *
  */
 export default class CodeValidator extends XQModule {
@@ -22,7 +22,7 @@ export default class CodeValidator extends XQModule {
      * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
      * @param {String} maybePayLoad.pin - Pin to validate the access request
      *
-     * @returns {Promise<ServerResponse<{payload:String}>>}
+     * @returns {Promise<ServerResponse<{payload:String}>>}  the server response containing the access token
      */
     supplyAsync = function (maybePayLoad) {
 
