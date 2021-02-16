@@ -16,29 +16,30 @@ API_KEY = <your-api-key-goes-here>;
 
 ## _Tests_ 
    ##### Debug/Run:
+   
+- In oder to run the tests you will be prompted to register your email.
+  The resulting access token will be stored in the browser cache until cleared. 
 
-- Select and right click on [tests.html](tests/html/tests.html), then choose either `Debug` or `Run` to start the test.
-- When running the test suite for the first time you will be prompted for manual input before the tests are run. Some tests in themselves will also require your input upon first run, for example `Test 11: CombineAuthorizations`.
-- The results of your inputs will be saved in the browser cache until cleared. 
 
    _If you run the whole test suite the order will be as follows:_
 
-        Test   1:  testGetUserInfo
-        Test   2:  testGetUserSettings
-        Test   3:  testUpdateUserSettings
-        Test   4:  testCreateDelegateAccessToken
-        Test   5:  testOTPv2Algorithm
-        Test   6:  testAESAlgorithm
-        Test   7:  testEncryptUsingOPTV2
-        Test   8:  testDecryptUsingOPTV2
-        Test   9:  testFileEncryptUsingOPTV2
-        Test  10:  testFileDecryptUsingOPTV2        
-        Test  11:  testRetrieveKey
-        Test  12:  testCheckKeyExpiration
-        Test  13:  testRevokeKeyAccess
-        Test  14:  testMergeTokens
-        Test  15:  testDeleteAccessCredentials //Disabled
-        Test  16:  testDeleteUser //Disabled
+        Test   1:  Test Authorization (disabled)
+        Test   2:  Test Get User Info 
+        Test   3:  Test Get User Settings 
+        Test   4:  Test Update User Settings 
+        Test   5:  Test Create Delegate Access Token 
+        Test   6:  Test OPT V2 Algorithm 
+        Test   7:  Test AES Algorithm 
+        Test   8:  Test Encrypt And Decrypt Text Using OPT V2 
+        Test   9:  Test Encrypt And Decrypt Text Using AES 
+        Test  10:  Test File Encrypt And File Decrypt Text Using OPT V2 
+        Test  11:  Test Combine Authorizations 
+        Test  12:  Test Delete Authorization 
+        Test  13:  Test Delete User 
+        Test  14:  Test Authorize Alias 
+        Test  15:  Test Check API Key 
+        Test  16:  Test Key Manipulations
+        
         
 
 ------
