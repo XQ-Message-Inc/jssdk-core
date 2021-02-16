@@ -1,4 +1,4 @@
-## XQ-Javascript-SDK
+## jssdk-core
 
 A Javascript Implementation of XQ Message SDK, V.2
 
