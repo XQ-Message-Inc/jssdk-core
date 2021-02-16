@@ -200,9 +200,13 @@ function buildEncryptScreen() {
 
     $("button[id='validate-access-request-button']").hide();
     $("input[id='pin-input']").hide();
+
     $("input[id='recipient-list-input']")
         .attr('placeholder', "Enter at least one recipient email here:")
         .focus()
+        .show();
+
+    $("div[id='recipient-list-div']")
         .show();
 
     $("button[id='encrypt-button']").show();
@@ -219,6 +223,9 @@ function buildIdentifyScreen() {
     ;
 
   $("input[id='encrypt-input']")
+        .hide();
+
+    $("div[id='recipient-list-div']")
         .hide();
 
     $("input[id='recipient-list-input']")
