@@ -49,7 +49,6 @@ oReq.addEventListener("load", function () {
                             resolved(true);
                         });
 
-
                     } catch (err) {
                         const userEmail = $("#register-input").val();
                         return doAuthorize(userEmail)
@@ -68,7 +67,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Get User Info', enabled: true, statement: function (label) {
+            name: 'Test Get User Info',enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -113,7 +112,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Get User Settings', enabled: true, statement: function (label) {
+            name: 'Test Get User Settings',enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -151,7 +150,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Update User Settings', enabled: true, statement: function (label) {
+            name: 'Test Update User Settings',enabled: false, statement: function (label) {
                 if (this.enabled) {
                     console.warn(label);
 
@@ -190,7 +189,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Create Delegate Access Token', enabled: true, statement: function (label) {
+            name: 'Test Create Delegate Access Token',enabled: false, statement: function (label) {
                 if (this.enabled) {
                     console.warn(label);
 
@@ -222,7 +221,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test OTP V2 Algorithm', enabled: true, statement: function (label) {
+            name: 'Test OTP V2 Algorithm',enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -283,7 +282,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test AES Algorithm', enabled: true, statement: function (label) {
+            name: 'Test AES Algorithm',enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -342,7 +341,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Encrypt And Decrypt Text Using OTP V2', enabled: true, statement: function (label) {
+            name: 'Test Encrypt And Decrypt Text Using OTP V2',enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label + 'Encrypt Using OTPv2');
@@ -420,7 +419,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Encrypt And Decrypt Text Using AES', enabled: true, statement: function (label) {
+            name: 'Test Encrypt And Decrypt Text Using AES',enabled: false, statement: function (label) {
                 if (this.enabled) {
 
                     console.warn(label + 'Encrypt Using AES');
@@ -505,7 +504,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test File Encrypt And File Decrypt Text Using OTP V2', enabled: true, statement: function (label) {
+            name: 'Test File Encrypt And File Decrypt Text Using OTP V2',enabled: false, statement: function (label) {
 
                 if (this.enabled) {
 
@@ -572,7 +571,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Combine Authorizations', enabled: true, statement: function (label) {
+            name: 'Test Combine Authorizations',enabled: false, statement: function (label) {
 
                 console.warn(label);
 
@@ -619,7 +618,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Delete Authorization', enabled: true, statement: function (label, disabled) {
+            name: 'Test Delete Authorization',enabled: false, statement: function (label, disabled) {
                 if (this.enabled) {
                     console.warn(`${label} (Using Alias)`);
 
@@ -678,7 +677,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Delete User', enabled: true, statement: function (label, disabled) {
+            name: 'Test Delete User',enabled: false, statement: function (label, disabled) {
 
                 if (this.enabled) {
 
@@ -737,7 +736,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Authorize Alias', enabled: true, statement: function (label) {
+            name: 'Test Authorize Alias',enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -775,7 +774,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Check API Key', enabled: true, statement: function (label) {
+            name: 'Test Check API Key',enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -810,7 +809,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Key Manipulations', enabled: true, statement: function (label) {
+            name: 'Test Key Manipulations',enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -999,8 +998,25 @@ oReq.addEventListener("load", function () {
         .on("click", function (clickEvent) {
             switch (clickEvent.currentTarget.id) {
                 case 'register-button': {
+                    showInitialScreen();
                     const userEmail = $("#register-input").val();
-                    doAuthorize(userEmail);
+                   doAuthorize(userEmail)
+                       .then(function (serverResponse) {
+                       switch (serverResponse.status) {
+                           case ServerResponse.prototype.OK: {
+                               break;
+                           }
+                           default :{
+                               let errorMessage = serverResponse.payload;
+                               try{errorMessage=JSON.parse(serverResponse.payload).status;}catch (e) {}
+                               $("label[for='label-content']")
+                                   .css({"font-style": "italic", "color": "#d22060", "visibility": "visible"})
+                                   .html(errorMessage)
+                                   ;
+                               break;
+                           }
+                       }
+                   })
                     break;
                 }
                 case 'confirm-button': {
@@ -1064,8 +1080,8 @@ oReq.addEventListener("load", function () {
 
         return authorize
             .supplyAsync({[authorize.USER]: user})
-            .then(function (response) {
-                switch (response.status) {
+            .then(function (serverResponse) {
+                switch (serverResponse.status) {
                     case ServerResponse.prototype.OK: {
                         $("label[for='label-content']")
                             .empty()
@@ -1086,13 +1102,13 @@ oReq.addEventListener("load", function () {
                         $("#pin-input")
                             .val("")
                             .show();
-                        return response;
+                        return serverResponse;
                     }
                     default: {
                         let error = serverResponse.payload;
                         try{ error =  JSON.parse(error).status}catch (e){};
                         console.error("failed , reason: ", error);
-                        return response;
+                        return serverResponse;
                     }
                 }
             });
@@ -1102,8 +1118,8 @@ oReq.addEventListener("load", function () {
         let codeValidator = new CodeValidator(xqsdk);
         return codeValidator
             .supplyAsync({[codeValidator.PIN]: pin})
-            .then(function (validationResponse) {
-                switch (validationResponse.status) {
+            .then(function (serverResponse) {
+                switch (serverResponse.status) {
                     case ServerResponse.prototype.OK: {
 
                         showReadyScreen();
@@ -1114,7 +1130,7 @@ oReq.addEventListener("load", function () {
                             .css('visibility', 'visible');
 
 
-                        const accessToken = validationResponse.payload;
+                        const accessToken = serverResponse.payload;
                         return accessToken;
                     }
                     default: {
