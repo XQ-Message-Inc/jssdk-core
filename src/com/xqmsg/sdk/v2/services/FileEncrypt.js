@@ -91,6 +91,7 @@ export default class FileEncrypt extends XQModule {
                                         }
                                         case ServerResponse.prototype.ERROR: {
                                             console.error(`GeneratePacket failed, code: ${uploadResponse.statusCode}, reason: ${uploadResponse.payload}`);
+                                            return uploadResponse;
                                             break;
                                         }
                                     }
@@ -98,6 +99,7 @@ export default class FileEncrypt extends XQModule {
                         }
                         case ServerResponse.prototype.ERROR: {
                             console.error(`FetchQuantumEntropy failed, code: ${keyResponse.statusCode}, reason: ${keyResponse.payload}`);
+                            return  keyResponse;
                             break;
                         }
                             ;

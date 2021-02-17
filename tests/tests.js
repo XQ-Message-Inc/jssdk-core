@@ -112,7 +112,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Get User Settings',enabled: false, statement: function (label) {
+            name: 'Test Get User Settings',enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -150,7 +150,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Update User Settings',enabled: false, statement: function (label) {
+            name: 'Test Update User Settings',enabled: true, statement: function (label) {
                 if (this.enabled) {
                     console.warn(label);
 
@@ -189,7 +189,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Create Delegate Access Token',enabled: false, statement: function (label) {
+            name: 'Test Create Delegate Access Token',enabled: true, statement: function (label) {
                 if (this.enabled) {
                     console.warn(label);
 
@@ -221,7 +221,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test OTP V2 Algorithm',enabled: false, statement: function (label) {
+            name: 'Test OTP V2 Algorithm',enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -282,7 +282,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test AES Algorithm',enabled: false, statement: function (label) {
+            name: 'Test AES Algorithm',enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -341,7 +341,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Encrypt And Decrypt Text Using OTP V2',enabled: false, statement: function (label) {
+            name: 'Test Encrypt And Decrypt Text Using OTP V2',enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label + 'Encrypt Using OTPv2');
@@ -381,7 +381,11 @@ oReq.addEventListener("load", function () {
                             }
 
                         })
-                        .then(function () {
+                        .then(function (intermediaryResult) {
+                            if(intermediaryResult.status == ServerResponse.prototype.ERROR){
+                                return intermediaryResult;
+                            }
+
 
                             console.warn(label + 'Decrypt Using OTPv2');
 
@@ -419,7 +423,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Encrypt And Decrypt Text Using AES',enabled: false, statement: function (label) {
+            name: 'Test Encrypt And Decrypt Text Using AES',enabled: true, statement: function (label) {
                 if (this.enabled) {
 
                     console.warn(label + 'Encrypt Using AES');
@@ -461,7 +465,11 @@ oReq.addEventListener("load", function () {
                             }
 
                         })
-                        .then(function () {
+                        .then(function (intermediaryResult) {
+
+                            if(intermediaryResult.status == ServerResponse.prototype.ERROR){
+                            return intermediaryResult;
+                        }
 
                             console.warn(label + 'Decrypt Using AES');
 
@@ -504,7 +512,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test File Encrypt And File Decrypt Text Using OTP V2',enabled: false, statement: function (label) {
+            name: 'Test File Encrypt And File Decrypt Text Using OTP V2',enabled: true, statement: function (label) {
 
                 if (this.enabled) {
 
@@ -571,7 +579,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Combine Authorizations',enabled: false, statement: function (label) {
+            name: 'Test Combine Authorizations',enabled: true, statement: function (label) {
 
                 console.warn(label);
 
@@ -618,7 +626,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Delete Authorization',enabled: false, statement: function (label, disabled) {
+            name: 'Test Delete Authorization',enabled: true, statement: function (label, disabled) {
                 if (this.enabled) {
                     console.warn(`${label} (Using Alias)`);
 
@@ -677,7 +685,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Delete User',enabled: false, statement: function (label, disabled) {
+            name: 'Test Delete User',enabled: true, statement: function (label, disabled) {
 
                 if (this.enabled) {
 
@@ -736,7 +744,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Authorize Alias',enabled: false, statement: function (label) {
+            name: 'Test Authorize Alias',enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -774,7 +782,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Check API Key',enabled: false, statement: function (label) {
+            name: 'Test Check API Key',enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -809,7 +817,7 @@ oReq.addEventListener("load", function () {
             }
         }
         , {
-            name: 'Test Key Manipulations',enabled: false, statement: function (label) {
+            name: 'Test Key Manipulations',enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -998,8 +1006,8 @@ oReq.addEventListener("load", function () {
         .on("click", function (clickEvent) {
             switch (clickEvent.currentTarget.id) {
                 case 'register-button': {
-                    showInitialScreen();
                     const userEmail = $("#register-input").val();
+
                    doAuthorize(userEmail)
                        .then(function (serverResponse) {
                        switch (serverResponse.status) {
@@ -1008,7 +1016,12 @@ oReq.addEventListener("load", function () {
                            }
                            default :{
                                let errorMessage = serverResponse.payload;
-                               try{errorMessage=JSON.parse(serverResponse.payload).status;}catch (e) {}
+                               let jsonObj=JSON.parse(serverResponse.payload);
+                               if(jsonObj.reason) {
+                                   errorMessage = jsonObj.reason;
+                               }else{
+                                   errorMessage = jsonObj.status;
+                               }
                                $("label[for='label-content']")
                                    .css({"font-style": "italic", "color": "#d22060", "visibility": "visible"})
                                    .html(errorMessage)
@@ -1016,12 +1029,35 @@ oReq.addEventListener("load", function () {
                                break;
                            }
                        }
-                   })
+                   });
                     break;
                 }
                 case 'confirm-button': {
                     const pin = $("#pin-input").val();
-                    doConfirm(pin);
+                    doConfirm(pin)
+                        .then(function (serverResponse) {
+                        switch (serverResponse.status) {
+                            case ServerResponse.prototype.OK: {
+                                break;
+                            }
+                            default :{
+                                let errorMessage = serverResponse.payload;
+                                try{
+                                    let jsonObj=JSON.parse(serverResponse.payload);
+                                    if(jsonObj.reason) {
+                                        errorMessage = jsonObj.reason;
+                                    }else{
+                                        errorMessage = jsonObj.status;
+                                    }
+                                }catch (e) {}
+                                $("label[for='label-content']")
+                                    .css({"font-style": "italic", "color": "#d22060", "visibility": "visible"})
+                                    .html(errorMessage)
+                                ;
+                                break;
+                            }
+                        }
+                    });
                     break;
                 }
                 case 'run-button': {
@@ -1086,7 +1122,8 @@ oReq.addEventListener("load", function () {
                         $("label[for='label-content']")
                             .empty()
                             .html("Please check your email for the confirmation PIN we sent you. <br> Enter it below then press <span style='color: #0082FF'>Confirm</span> to continue.<br />")
-                            .css('visibility', 'visible');
+                           .css({"font-style": "normal", "color": "#000", "visibility": "visible"});
+
                         $("button[id='register-button']")
                             .hide();
                         $("button[id='run-button']")
@@ -1125,13 +1162,16 @@ oReq.addEventListener("load", function () {
                         showReadyScreen();
 
                         $("label[for='label-content']")
-                            .empty()
-                            .html("You can now run the tests.<br />If you want to fresh you credentials, please press <span style='color: #0082FF'>Refresh Credentials</span> .")
-                            .css('visibility', 'visible');
+                            .remove();
 
+                        $("div[id='label-content']")
+                            .append(`<label for="label-content" class="TertiaryText" style="font-style:normal; color:#000; visibility:visible;">
+                                       You can now run the tests.<br />If you want to fresh you credentials, please press 
+                                       <span style='color: #0082FF'>Refresh Credentials</span>
+                                    </label>`
+                            );
 
-                        const accessToken = serverResponse.payload;
-                        return accessToken;
+                        return serverResponse;
                     }
                     default: {
                         let error = serverResponse.payload;

@@ -111,7 +111,7 @@ export default class Encrypt extends XQModule{
                         }
                         case ServerResponse.prototype.ERROR: {
                             console.error(`FetchQuantumEntropy failed, code: ${keyResponse.statusCode}, reason: ${keyResponse.payload}`);
-                            return null;
+                            return keyResponse;
                         }
                     }
                 });
