@@ -386,7 +386,6 @@ oReq.addEventListener("load", function () {
                                 return intermediaryResult;
                             }
 
-
                             console.warn(label + 'Decrypt Using OTPv2');
 
                             var algorithm = xqsdk.getAlgorithm(xqsdk.OTPv2_ALGORITHM);
@@ -859,6 +858,9 @@ oReq.addEventListener("load", function () {
                                                             }
                                                         })
                                                         .then((na) => {
+                                                            if(na.status == ServerResponse.prototype.ERROR){
+                                                                return na;
+                                                            }
                                                             console.warn('Test Key Expiration');
                                                             return new CheckKeyExpiration(xqsdk)
                                                                 .supplyAsync({[Decrypt.prototype.LOCATOR_KEY]: locatorKey})
@@ -882,7 +884,9 @@ oReq.addEventListener("load", function () {
                                                                 );
                                                         })
                                                         .then((na) => {
-
+                                                            if(na.status == ServerResponse.prototype.ERROR){
+                                                                return na;
+                                                            }
                                                             console.warn('Test Revoke Key Access');
 
                                                             return new RevokeKeyAccess(xqsdk)
@@ -905,7 +909,9 @@ oReq.addEventListener("load", function () {
                                                                 )
                                                         })
                                                         .then((na) => {
-
+                                                            if(na.status == ServerResponse.prototype.ERROR){
+                                                                return na;
+                                                            }
                                                             console.warn('Test Revoke User Access');
 
                                                             let user = xqsdk.getCache().getActiveProfile(true);
@@ -935,7 +941,9 @@ oReq.addEventListener("load", function () {
                                                                 });
                                                         })
                                                         .then((na) => {
-
+                                                            if(na.status == ServerResponse.prototype.ERROR){
+                                                                return na;
+                                                            }
                                                             console.warn('Test Grant User Access');
 
                                                             let user = xqsdk.getCache().getActiveProfile(true);
