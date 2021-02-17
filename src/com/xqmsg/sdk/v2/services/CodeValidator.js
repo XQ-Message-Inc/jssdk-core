@@ -47,7 +47,7 @@ export default class CodeValidator extends XQModule {
                         }
                         case ServerResponse.prototype.ERROR: {
                             console.info(validationResponse);
-                            return ServerResponse.prototype.ERROR;
+                            return validationResponse;
                         }
                     }
                 });
