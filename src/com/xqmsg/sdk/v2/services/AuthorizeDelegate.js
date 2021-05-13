@@ -5,6 +5,8 @@ import ServerResponse from "../ServerResponse.js";
 /**
  * This service allows a user to create a very short-lived version of their access token in order to access certain <br>
  * services such as file encryption/decryption on the XQ websie without having to transmit their main access token.
+ *
+ * @class [AuthorizeDelegate]
  */
 export default class AuthorizeDelegate extends XQModule{
 

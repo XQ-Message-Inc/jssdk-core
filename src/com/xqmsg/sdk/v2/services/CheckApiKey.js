@@ -4,6 +4,8 @@ import ServerResponse from "../ServerResponse.js";
 
 /**
  * This service validates an API key and returns the scopes associated with it.
+ *
+ * @class [CheckApiKey]
  */
 export default class CheckApiKey extends XQModule {
 

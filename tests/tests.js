@@ -24,9 +24,15 @@ import EncryptionAlgorithm from "./../src/com/xqmsg/sdk/v2/algorithms/Encryption
 import XQSDK from "./../src/com/xqmsg/sdk/v2/XQSDK.js"
 import GeneratePacket from "../src/com/xqmsg/sdk/v2/services/GeneratePacket.js";
 import ValidatePacket from "../src/com/xqmsg/sdk/v2/services/ValidatePacket.js";
+import DashboardLogin from "../src/com/xqmsg/sdk/v2/services/dashboard/DashboardLogin.js";
+import GetApplications from "../src/com/xqmsg/sdk/v2/services/dashboard/GetApplications.js";
+import AddUserGroup from "../src/com/xqmsg/sdk/v2/services/dashboard/AddUserGroup.js";
+import FindUserGroup from "../src/com/xqmsg/sdk/v2/services/dashboard/FindUserGroup.js";
+import UpdateUserGroup from "../src/com/xqmsg/sdk/v2/services/dashboard/UpdateUserGroup.js";
+import RemoveUserGroup from "../src/com/xqmsg/sdk/v2/services/dashboard/RemoveUserGroup.js";
 
 
-const utf8SamplerFilePath = "./../resources/utf-8-sampler.txt";
+const utf8SamplerFilePath = "/tests/resources/utf-8-sampler.txt";
 
 const oReq = new XMLHttpRequest();
 oReq.open("GET", utf8SamplerFilePath);
@@ -36,7 +42,7 @@ oReq.addEventListener("load", function () {
 
     let tests = [
         {
-            name: 'Test Authorization', enabled: false, statement: function (label) {
+            name: 'Test XQ Authorization', enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -46,7 +52,10 @@ oReq.addEventListener("load", function () {
                         let accessToken = xqsdk.getCache().getXQAccess(user, true);
                         console.warn(`The user had already been authorized previously.\nThe authorization token is: ${accessToken}`);
                         return new Promise((resolved, rejectied) => {
-                            resolved(true);
+                            resolved(new ServerResponse(
+                                ServerResponse.prototype.OK,
+                                200,
+                                {}));
                         });
 
                     } catch (err) {
@@ -66,8 +75,276 @@ oReq.addEventListener("load", function () {
 
             }
         }
-        , {
-            name: 'Test Get User Info',enabled: true, statement: function (label) {
+        ,{
+            name: 'Test Dashboard Login', enabled: true, statement: function (label) {
+
+                if (this.enabled) {
+
+                    console.warn(label);
+                    try {
+                        let user = xqsdk.getCache().getActiveProfile(true);
+                        let dashboardAccessToken = xqsdk.getCache().getDashboardAccess(user, true);
+                        console.warn(`The user had already been authorized for dashboard usage.\nThe dashboard authorization token is: ${dashboardAccessToken}`);
+                        return new Promise((resolved, rejectied) => {
+                            resolved(new ServerResponse(
+                                ServerResponse.prototype.OK,
+                                200,
+                                {}));
+                        });
+
+                    } catch (err) {
+
+                        let payload = {[DashboardLogin.prototype.REQUEST]: "sub"};
+
+                        return new DashboardLogin(xqsdk)
+                            .supplyAsync(payload)
+                            .then(function (serverResponse) {
+                                switch (serverResponse.status) {
+                                    case ServerResponse.prototype.OK: {
+                                        let dashboardAccessToken = serverResponse.payload;
+                                        console.info("Dashboard Access Token: " + dashboardAccessToken);
+                                        return serverResponse;
+                                    }
+                                    default: {
+                                        let error = serverResponse.payload;
+                                        try {
+                                            error = JSON.parse(error).status
+                                        } catch (e) {};
+                                        console.error("failed , reason: ", error);
+                                        return serverResponse;
+                                    }
+                                }
+                            });
+                    }
+                   
+                } else {
+                    return new Promise((resolved, rejectied) => {
+                        console.warn(label + ' DISABLED');
+                        resolved(true);
+                    });
+                }
+            }
+        }
+        ,{
+            name: 'Test Get Dashboard Applications', enabled: true, statement: function (label) {
+
+                if (this.enabled) {
+                    console.warn(label);
+
+                    return new GetApplications(xqsdk)
+                        .supplyAsync(null)
+                        .then(function (serverResponse) {
+                            switch (serverResponse.status) {
+                                case ServerResponse.prototype.OK: {
+                                    let data = serverResponse.payload;
+
+                                    let apps = data[GetApplications.prototype.APPS];
+
+                                    apps.forEach(function (app) {
+                                        console.info(`Name: ${app["name"]}, Id: ${app["id"]}`);
+                                    });
+
+                                    return serverResponse;
+                                }
+                                default: {
+                                    let error = serverResponse.payload;
+                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                    console.error("failed , reason: ", error);
+                                    return serverResponse;
+                                }
+
+                            }
+                        });
+
+
+                } else {
+                    return new Promise((resolved, rejectied) => {
+                        console.warn(label + ' DISABLED');
+                        resolved(true);
+                    });
+                }
+            }
+        } 
+        ,{
+            name: 'Test Add Dashboard Group', enabled: true, statement: function (label) {
+
+                if (this.enabled) {
+                    console.warn(label);
+
+                    let payload = {
+                        [AddUserGroup.prototype.NAME]: "New Test Generated User Group",
+                        [AddUserGroup.prototype.MEMBERS]: ["jan@xqmsg.com", "jan+1@xqmsg.com" ],
+                    };
+
+                    return new AddUserGroup(xqsdk)
+                        .supplyAsync(payload)
+                        .then(function (serverResponse) {
+                            switch (serverResponse.status) {
+                                case ServerResponse.prototype.OK: {
+                                    let data = serverResponse.payload;
+
+                                    let groupId = data[AddUserGroup.prototype.ID];
+
+                                    console.info(`Group Id: ${groupId}`);
+
+                                    return serverResponse;
+                                }
+                                default: {
+                                    let error = serverResponse.payload;
+                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                    console.error("failed , reason: ", error);
+                                    return serverResponse;
+                                }
+
+                            }
+                        });
+
+
+                } else {
+                    return new Promise((resolved, rejectied) => {
+                        console.warn(label + ' DISABLED');
+                        resolved(true);
+                    });
+                }
+            }
+        }
+        ,{
+            name: 'Test Update Dashboard Group', enabled: true, statement: function (label) {
+
+                if (this.enabled) {
+                    console.warn(label);
+
+                   return new FindUserGroup(xqsdk)
+                        .supplyAsync( {[FindUserGroup.prototype.ID]: "[0-9]+"})
+                        .then(function (serverResponse) {
+                            switch (serverResponse.status) {
+                                case ServerResponse.prototype.OK: {
+
+                                    let data = serverResponse.payload;
+
+                                    let groups = data[FindUserGroup.prototype.GROUPS];
+
+                                    let found = groups.find(function (group) {
+                                        return group["name"] == 'New Test Generated User Group';
+                                    });
+
+                                    let payload = {
+                                        [UpdateUserGroup.prototype.ID]: found[FindUserGroup.prototype.ID],
+                                        [UpdateUserGroup.prototype.NAME]: "Updated Test Generated User Group",
+                                        [UpdateUserGroup.prototype.MEMBERS]: ["jan@xqmsg.com", "jan+1@xqmsg.com", "jan+2@xqmsg.com"],
+                                    };
+
+                                    return new UpdateUserGroup(xqsdk)
+                                        .supplyAsync(payload)
+                                        .then(function (serverResponse) {
+                                            switch (serverResponse.status) {
+                                                case ServerResponse.prototype.OK: {
+
+                                                    console.info(`Response Status Code: ${serverResponse.statusCode}`);
+
+                                                    return serverResponse;
+                                                }
+                                                default: {
+                                                    let error = serverResponse.payload;
+                                                    try {
+                                                        error = JSON.parse(error).status
+                                                    } catch (e) {};
+                                                    console.error("failed , reason: ", error);
+                                                    return serverResponse;
+                                                }
+
+                                            }
+                                        });
+
+                                }
+                                default: {
+                                    let error = serverResponse.payload;
+                                    try {
+                                        error = JSON.parse(error).status
+                                    } catch (e) {} ;
+                                    console.error("failed , reason: ", error);
+                                    return serverResponse;
+                                }
+                            }
+                        });
+
+
+                } else {
+                    return new Promise((resolved, rejectied) => {
+                        console.warn(label + ' DISABLED');
+                        resolved(true);
+                    });
+                }
+            }
+        }
+        ,{
+            name: 'Test Remove Dashboard Group', enabled: true, statement: function (label) {
+
+                if (this.enabled) {
+                    console.warn(label);
+
+                  return  new FindUserGroup(xqsdk)
+                        .supplyAsync( {[FindUserGroup.prototype.ID]: "[0-9]+"})
+                        .then(function (serverResponse) {
+                            switch (serverResponse.status) {
+                                case ServerResponse.prototype.OK: {
+
+                                    let data = serverResponse.payload;
+
+                                    let groups = data[FindUserGroup.prototype.GROUPS];
+
+                                    let found = groups.find(function (group) {
+                                        return group["name"] == 'Updated Test Generated User Group';
+                                    });
+
+                                    let payload = {
+                                        [RemoveUserGroup.prototype.ID]: found[FindUserGroup.prototype.ID],
+                                    };
+
+                                    return new RemoveUserGroup(xqsdk)
+                                        .supplyAsync(payload)
+                                        .then(function (serverResponse) {
+                                            switch (serverResponse.status) {
+                                                case ServerResponse.prototype.OK: {
+
+                                                    console.info(`Response Status Code: ${serverResponse.statusCode}`);
+
+                                                    return serverResponse;
+                                                }
+                                                default: {
+                                                    let error = serverResponse.payload;
+                                                    try {
+                                                        error = JSON.parse(error).status
+                                                    } catch (e) {};
+                                                    console.error("failed , reason: ", error);
+                                                    return serverResponse;
+                                                }
+
+                                            }
+                                        });
+                                }
+                                default: {
+                                    let error = serverResponse.payload;
+                                    try {
+                                        error = JSON.parse(error).status
+                                    } catch (e) {};
+                                    console.error("failed , reason: ", error);
+                                    return serverResponse;
+                                }
+                            }
+                        });
+
+
+                } else {
+                    return new Promise((resolved, rejectied) => {
+                        console.warn(label + ' DISABLED');
+                        resolved(true);
+                    });
+                }
+            }
+        } 
+        ,{
+            name: 'Test Get User Info', enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -111,8 +388,8 @@ oReq.addEventListener("load", function () {
                 }
             }
         }
-        , {
-            name: 'Test Get User Settings',enabled: true, statement: function (label) {
+        ,{
+            name: 'Test Get User Settings', enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -149,8 +426,8 @@ oReq.addEventListener("load", function () {
 
             }
         }
-        , {
-            name: 'Test Update User Settings',enabled: true, statement: function (label) {
+        ,{
+            name: 'Test Update User Settings', enabled: true, statement: function (label) {
                 if (this.enabled) {
                     console.warn(label);
 
@@ -188,8 +465,8 @@ oReq.addEventListener("load", function () {
                 }
             }
         }
-        , {
-            name: 'Test Create Delegate Access Token',enabled: true, statement: function (label) {
+        ,{
+            name: 'Test Create Delegate Access Token', enabled: true, statement: function (label) {
                 if (this.enabled) {
                     console.warn(label);
 
@@ -220,8 +497,8 @@ oReq.addEventListener("load", function () {
                 }
             }
         }
-        , {
-            name: 'Test OTP V2 Algorithm',enabled: true, statement: function (label) {
+        ,{
+            name: 'Test OTP V2 Algorithm', enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -281,8 +558,8 @@ oReq.addEventListener("load", function () {
                 }
             }
         }
-        , {
-            name: 'Test AES Algorithm',enabled: true, statement: function (label) {
+        ,{
+            name: 'Test AES Algorithm', enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -340,8 +617,8 @@ oReq.addEventListener("load", function () {
                 }
             }
         }
-        , {
-            name: 'Test Encrypt And Decrypt Text Using OTP V2',enabled: true, statement: function (label) {
+        ,{
+            name: 'Test Encrypt And Decrypt Text Using OTP V2', enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label + 'Encrypt Using OTPv2');
@@ -421,8 +698,8 @@ oReq.addEventListener("load", function () {
                 }
             }
         }
-        , {
-            name: 'Test Encrypt And Decrypt Text Using AES',enabled: true, statement: function (label) {
+        ,{
+            name: 'Test Encrypt And Decrypt Text Using AES', enabled: true, statement: function (label) {
                 if (this.enabled) {
 
                     console.warn(label + 'Encrypt Using AES');
@@ -510,8 +787,8 @@ oReq.addEventListener("load", function () {
 
             }
         }
-        , {
-            name: 'Test File Encrypt And File Decrypt Text Using OTP V2',enabled: true, statement: function (label) {
+        ,{
+            name: 'Test File Encrypt And File Decrypt Text Using OTP V2', enabled: true, statement: function (label) {
 
                 if (this.enabled) {
 
@@ -577,8 +854,8 @@ oReq.addEventListener("load", function () {
                 }
             }
         }
-        , {
-            name: 'Test Combine Authorizations',enabled: true, statement: function (label) {
+        ,{
+            name: 'Test Combine Authorizations', enabled: true, statement: function (label) {
 
                 console.warn(label);
 
@@ -624,8 +901,8 @@ oReq.addEventListener("load", function () {
 
             }
         }
-        , {
-            name: 'Test Delete Authorization',enabled: true, statement: function (label, disabled) {
+        ,{
+            name: 'Test Delete Authorization', enabled: true, statement: function (label, disabled) {
                 if (this.enabled) {
                     console.warn(`${label} (Using Alias)`);
 
@@ -683,8 +960,8 @@ oReq.addEventListener("load", function () {
 
             }
         }
-        , {
-            name: 'Test Delete User',enabled: true, statement: function (label, disabled) {
+        ,{
+            name: 'Test Delete User', enabled: true, statement: function (label, disabled) {
 
                 if (this.enabled) {
 
@@ -742,8 +1019,8 @@ oReq.addEventListener("load", function () {
 
             }
         }
-        , {
-            name: 'Test Authorize Alias',enabled: true, statement: function (label) {
+        ,{
+            name: 'Test Authorize Alias', enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -780,14 +1057,14 @@ oReq.addEventListener("load", function () {
                 }
             }
         }
-        , {
-            name: 'Test Check API Key',enabled: true, statement: function (label) {
+        ,{
+            name: 'Test Check API Key', enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
 
                     return new CheckApiKey(xqsdk)
-                        .supplyAsync({[CheckApiKey.prototype.API_KEY]: xqsdk.APPLICATION_KEY})
+                        .supplyAsync({[CheckApiKey.prototype.API_KEY]: xqsdk.XQ_API_KEY})
                         .then(function (serverResponse) {
                             switch (serverResponse.status) {
                                 case ServerResponse.prototype.OK: {
@@ -815,8 +1092,8 @@ oReq.addEventListener("load", function () {
                 }
             }
         }
-        , {
-            name: 'Test Key Manipulations',enabled: true, statement: function (label) {
+        ,{
+            name: 'Test Key Manipulations', enabled: true, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);

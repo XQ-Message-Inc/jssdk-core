@@ -2,6 +2,9 @@ import XQModule from "./XQModule.js";
 import ServerResponse from '../ServerResponse.js';
 import FetchKey from './FetchKey.js';
 
+/**
+ * @class [Decrypt]
+ */
 export default class Decrypt extends XQModule {
 
     constructor(sdk, algorithm) {

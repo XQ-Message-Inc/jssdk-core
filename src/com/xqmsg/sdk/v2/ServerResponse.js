@@ -1,10 +1,11 @@
 
 /**
- * @class ServerResponse
+ *
  * @property {Answered} status - binary reply from server.
  * @property {Number} code - A numeric representation of the actual status returned from the server. To be used for more specific error handling.
  * @property {Map<String,Any>} payload - The data that is being returned form the server
  *
+ *  @class [ServerResponse]
  */
 
 export default class ServerResponse {

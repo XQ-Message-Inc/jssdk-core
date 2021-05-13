@@ -3,6 +3,11 @@ import CallMethod from "./../CallMethod.js";
 import XQSDK from '../XQSDK.js';
 import ServerResponse from "../ServerResponse.js";
 
+/**
+ *  Validates your {@link Authorize} call.<br>
+ *  Returns 204, "No Content" if successful.
+ *  @class [ValidatePacket]
+ */
 export default class ValidatePacket extends XQModule{
 
     constructor(sdk) {

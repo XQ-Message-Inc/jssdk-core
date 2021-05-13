@@ -5,7 +5,8 @@ import ServerResponse from "../ServerResponse.js";
 /**
  * Revokes a key using its token. <br>
  * Only the user who sent the message will be able to revoke it.
- * @class
+ *
+ * @class [DeleteAuthorization]
  */
 export default class DeleteAuthorization extends XQModule {
 

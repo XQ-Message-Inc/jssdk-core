@@ -12,7 +12,7 @@ import ServerResponse from "../ServerResponse.js";
  *    2. validation Link<br>
  * The user can then choose to either click the link to complete the process or use the PIN.<br>
  * The pin servers as the input parameter of {@link ValidateAccessRequest}.<br>
- *
+ *  @class [Authorize]
  */
 export default class Authorize extends XQModule {
 

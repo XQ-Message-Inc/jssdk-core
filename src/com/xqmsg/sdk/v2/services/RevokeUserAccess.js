@@ -3,8 +3,9 @@ import CallMethod from "./../CallMethod.js";
 import ServerResponse from "../ServerResponse.js";
 
 /**
- * This service will revoke access to keys for specific recipients without revoking the entire
- * token.
+ * This service will revoke access to keys for specific recipients without revoking the entire token.
+ *
+ * @class [RevokeUserAccess]
  */
 export default class RevokeUserAccess extends XQModule{
 

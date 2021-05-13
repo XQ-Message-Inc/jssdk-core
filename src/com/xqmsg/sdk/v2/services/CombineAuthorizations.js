@@ -9,6 +9,8 @@ import ServerResponse from "../ServerResponse.js";
  * 1. It cannot be used to send messages
  * 2. It can only be created from other valid access tokens.
  * 3. It is only valid for a short amount of time.
+ *
+ * @class [CombineAuthorizations]
  */
 export default class CombineAuthorizations extends XQModule{
 

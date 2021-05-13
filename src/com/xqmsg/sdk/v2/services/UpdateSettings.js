@@ -1,8 +1,10 @@
 import XQModule from "./XQModule.js";
 import CallMethod from "./../CallMethod.js";
-import NotificationEnum from "./../NotificationEnum.js";
 import ServerResponse from "../ServerResponse.js";
 
+/**
+ * @class [UpdateSettings]
+ */
 export default class UpdateSettings extends XQModule {
 
     constructor(sdk) {

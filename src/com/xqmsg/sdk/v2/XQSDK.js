@@ -3,23 +3,29 @@ import OTPv2Encryption from './algorithms/OTPv2Encryption.js';
 import AESEncryption from './algorithms/AESEncryption.js';
 import ServerResponse from './ServerResponse.js';
 import CallMethod from "./CallMethod.js";
+import Destination from "./Destination.js";
 import ValidationException from "./exceptions/ValidationException.js";
 import StatusException from "./exceptions/StatusException.js";
 import Config from "./Config.js";
 
+/**
+ * @class [XQSDK]
+ */
 export default class XQSDK {
 
     constructor() {
 
         let config = new Config();
 
-        this.APPLICATION_KEY = config.application.API_KEY;
+        this.XQ_API_KEY = config.application.XQ_API_KEY;
+        this.DASHBOARD_API_KEY = config.application.DASHBOARD_API_KEY;
 
         this.cache = new SimpleXQCache(localStorage);
         this.OTPv2_ALGORITHM = "OTPV2";
         this.AES_ALGORITHM = "AES";
 
         this.SUBSCRIPTION_SERVER_URL = config.application.SUBSCRIPTION_SERVER_URL;
+        this.DASHBOARD_SERVER_URL = config.application.DASHBOARD_SERVER_URL;
         this.VALIDATION_SERVER_URL = config.application.VALIDATION_SERVER_URL;
         this.KEY_SERVER_URL = config.application.KEY_SERVER_URL;
 
@@ -31,46 +37,48 @@ export default class XQSDK {
     }
 
     /**
-     *
+     * Wrapper method whose purpose is to construct the complete URL before it is passing its args to the underlying {@link makeRequest}
      * @param {String} baseUrl
      * @param {String} maybeService
      * @param {CallMethod#String} method
      * @param {{}}maybeHeaderProperties
      * @param {{}}maybePayload
      * @param {boolean}requiresAPIKey
+     * @param {Destination}destination
      * @returns {Promise<ServerResponse<{}>>}
      */
-    call = function (baseUrl, maybeService, method, maybeHeaderProperties, maybePayload, requiresAPIKey) {
+    call = function (baseUrl, maybeService, method, maybeHeaderProperties, maybePayload, requiresAPIKey, destination= Destination.prototype.XQ) {
 
         this.assert(baseUrl != null, "baseUrl cannot be null");
         this.assert(method != null, "method cannot be null");
 
-        if (maybePayload && [CallMethod.prototype.POST, CallMethod.prototype.OPTIONS].includes(method)) {
+        if (maybePayload && [CallMethod.prototype.POST, CallMethod.prototype.PATCH,  CallMethod.prototype.OPTIONS].includes(method)) {
 
             const URL = baseUrl + (maybeService ? "/" + maybeService : "");
 
-            return this.makeRequest(URL, method, maybeService, maybeHeaderProperties, maybePayload, requiresAPIKey);
+            return this.makeRequest(URL, method, maybeService, maybeHeaderProperties, maybePayload, requiresAPIKey, destination);
         } else {
 
             var URL = baseUrl +
                 (maybeService ? "/" + maybeService : "") +
                 (maybePayload ? "?" + this.buildQeryParams(maybePayload) : "");
 
-            return this.makeRequest(URL, method, maybeService, maybeHeaderProperties, maybePayload, requiresAPIKey);
+            return this.makeRequest(URL, method, maybeService, maybeHeaderProperties, maybePayload, requiresAPIKey, destination);
         }
     }
 
     /**
-     *
+     * Core communication with the server happens here, via {@link XMLHttpRequest}.
      * @param {String} url
      * @param {CallMethod#String} method
      * @param {String} maybeService
      * @param {{}} maybeHeaderProperties
      * @param {{}} maybePayload
      * @param {boolean} requiresAPIKey
+     * @param {Destination}destination
      * @returns {Promise<ServerResponse<{}>>}
      */
-    makeRequest = function (url, method, maybeService, maybeHeaderProperties, maybePayload, requiresAPIKey) {
+    makeRequest = function (url, method, maybeService, maybeHeaderProperties, maybePayload, requiresAPIKey, destination) {
 
         let self = this;
 
@@ -80,8 +88,18 @@ export default class XQSDK {
             xhttp.open(method, url, ASYNC);
             xhttp.timeout = 60000;
             if (requiresAPIKey) {
-                xhttp.setRequestHeader(self.API_KEY, self.APPLICATION_KEY);
-                xhttp.setRequestHeader(self.ACCESS_CONTROL_ALLOW_ORIGIN, self.ANY);
+                switch (destination) {
+                    case Destination.prototype.XQ:{
+                        xhttp.setRequestHeader(self.API_KEY, self.XQ_API_KEY);
+                        xhttp.setRequestHeader(self.ACCESS_CONTROL_ALLOW_ORIGIN, self.ANY);
+                        break;
+                    }
+                    case Destination.prototype.DASHBOARD:{
+                        xhttp.setRequestHeader(self.API_KEY, self.DASHBOARD_API_KEY);
+                        xhttp.setRequestHeader(self.ACCESS_CONTROL_ALLOW_ORIGIN, self.ANY);
+                        break;
+                    }
+                }
             }
             if (maybeHeaderProperties) {
                 const entries = Object.entries(maybeHeaderProperties);
@@ -155,7 +173,7 @@ export default class XQSDK {
                 }
             }
         };
-        if (maybePayload && CallMethod.prototype.POST == method) {
+        if (maybePayload && [CallMethod.prototype.POST, CallMethod.prototype.PATCH].includes(method)) {
             if (maybeHeaderProperties != null && maybeHeaderProperties[self.CONTENT_TYPE] == self.TEXT_PLAIN_UTF_8) {
                 var plainTextData = maybePayload["data"];
                 xhttp.send(plainTextData);
@@ -261,13 +279,27 @@ buildQeryParams = function (paramsObject) {
         return preAuthToken;
 
     }
-
-    validateAccessToken = function () {
+    /**
+     *
+     * @param {Destination}destination
+     * @returns {string}
+     */
+    validateAccessToken = function (destination= Destination.prototype.XQ) {
 
         // Ensure that there is an active profile.
         let activeProfile = this.cache.getActiveProfile(true);
+        let accessToken = null;
 
-        let accessToken = this.cache.getXQAccess(activeProfile, true);
+        switch (destination) {
+            case Destination.prototype.XQ:{
+                accessToken =  this.cache.getXQAccess(activeProfile, true);
+                break;
+            }
+            case Destination.prototype.DASHBOARD:{
+                accessToken = this.cache.getDashboardAccess(activeProfile, true);
+                break;
+            }
+        }
         if (accessToken == null) {
             throw new StatusException(401, `Access Token not Found for ${activeProfile}`);
         }

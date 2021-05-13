@@ -6,6 +6,7 @@ import ServerResponse from "../ServerResponse.js";
  * This services adds new users to XQ system.
  * It is a variant of {@link Authorize} which adds the user without validating a given email via PIN.
  * However, its use is limited to basic encryption and decryption.
+ * @class [AuthorizeAlias]
  */
 export default class AuthorizeAlias extends XQModule{
 

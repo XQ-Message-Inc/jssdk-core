@@ -9,6 +9,8 @@ import ServerResponse from "./../ServerResponse.js";
  * The person requesting the key was listed as a valid recipient by the sender.
  * The key is either not geofenced, or is being accessed from an authorized location.
  * If any of these is not true, an error will be returned instead.
+ *
+ * @class [FetchKey]
  */
 export default class FetchKey extends XQModule{
 

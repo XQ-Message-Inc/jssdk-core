@@ -3,8 +3,10 @@ import ServerResponse from '../ServerResponse.js';
 import FetchKey from './FetchKey.js';
 
 /**
- * @class
+ *
  * Decrypts data stored in a file using the {@link EncryptionAlgorithm} provided.
+ *
+ * @class [FileDecrypt]
  */
 export default class FileDecrypt extends XQModule {
 

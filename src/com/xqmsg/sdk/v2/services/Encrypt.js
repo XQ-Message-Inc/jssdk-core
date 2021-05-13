@@ -7,8 +7,10 @@ import EncryptionAlgorithm from '../algorithms/EncryptionAlgorithm.js';
 import ExchangeForAccessToken from './ExchangeForAccessToken.js';
 
 /**
- * @class
+ *
  * Encrypts textual data using the {@link EncryptionAlgorithm} provided.
+ *
+ * @class [Encrypt]
  */
 export default class Encrypt extends XQModule{
 

@@ -3,8 +3,10 @@ import CallMethod from "./../CallMethod.js";
 import ServerResponse from "../ServerResponse.js";
 
 /**
- * @class
+ *
  * Check whether a particular key is expired or not without actually fetching it.
+ *
+ * @class [CheckKeyExpiration]
  */
 export default class CheckKeyExpiration extends XQModule{
 
