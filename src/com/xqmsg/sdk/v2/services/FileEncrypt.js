@@ -5,8 +5,10 @@ import GeneratePacket from './GeneratePacket.js';
 import ValidatePacket from './ValidatePacket.js';
 
 /**
- * @class
+ *
  * Encrypts data stored in a file using the {@link EncryptionAlgorithm} provided.
+ *
+ * @class [FileEncrypt]
  */
 export default class FileEncrypt extends XQModule {
 

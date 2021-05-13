@@ -7,6 +7,7 @@ import ExchangeForAccessToken from "./ExchangeForAccessToken.js";
  * Authenticate the PIN which resulted from the preceding {@link Authorize} service call.<br>
  * If successful this service returns a server response containing the access token.
  *
+ * @class [CodeValidator]
  */
 export default class CodeValidator extends XQModule {
 

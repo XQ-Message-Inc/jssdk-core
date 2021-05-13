@@ -2,6 +2,10 @@ import XQModule from "./XQModule.js";
 import CallMethod from "./../CallMethod.js";
 import ServerResponse from "../ServerResponse.js";
 
+/**
+ * @class [GeneratePacket]
+ */
+
 export default class GeneratePacket extends XQModule{
 
     constructor(sdk) {

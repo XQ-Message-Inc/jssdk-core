@@ -5,6 +5,8 @@ import ServerResponse from "../ServerResponse.js";
 /**
  * This services grants access for a particular user to a specified key. The
  * person granting access must be the one who owns the key.
+ *
+ * @class [GrantUserAccess]
  */
 export default class GrantUserAccess extends XQModule {
 

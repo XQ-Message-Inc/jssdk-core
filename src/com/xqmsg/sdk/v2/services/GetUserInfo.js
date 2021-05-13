@@ -4,8 +4,10 @@ import ServerResponse from "../ServerResponse.js";
 
 
 /**
- * @Class
- * Get ser information.
+ *
+ * Get User Information.
+ *
+ * @class [GetUserInfo]
  */
 export default class GetUserInfo extends XQModule {
 

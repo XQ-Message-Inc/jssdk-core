@@ -5,6 +5,8 @@ import ServerResponse from "../ServerResponse.js";
 /**
  * Revokes a key using its token.
  * Only the user who sent the message will be able to revoke it.
+ *
+ * @class [RevokeKeyAccess]
  */
 export default class RevokeKeyAccess extends XQModule{
 

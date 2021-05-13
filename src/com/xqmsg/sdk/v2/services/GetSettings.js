@@ -4,8 +4,10 @@ import ServerResponse from "../ServerResponse.js";
 import NotificationEnum from "../NotificationEnum.js";
 
 /**
- * @class
+ *
  * Gets the notification and newsletter settings for the current user.
+ *
+ * @class [GetSettings]
  */
 export default class GetSettings extends XQModule {
 

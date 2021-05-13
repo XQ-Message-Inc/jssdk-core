@@ -1,6 +1,7 @@
 /**
  * Enum to specify Notification Settings<br>
- * @class NotificationEnum
+ *
+ * @class [NotificationEnum]
  **/
 export default class  NotificationEnum {}
 

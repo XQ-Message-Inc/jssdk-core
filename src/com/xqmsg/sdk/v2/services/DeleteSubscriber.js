@@ -5,6 +5,8 @@ import ServerResponse from "../ServerResponse.js";
 /**
  * Deletes the user specified by the access token.
  * After an account is deleted, the subscriber will be sent an email notifying them of its deletion.
+ *
+ * @class [DeleteSubscriber]
  */
 export default class DeleteSubscriber extends XQModule{
 

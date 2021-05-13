@@ -1,6 +1,9 @@
 import ValidationException from "../exceptions/ValidationException.js";
 import StatusException from "../exceptions/StatusException.js";
 
+/**
+ * @class [XQModule]
+ */
 export default class XQModule {
 
     constructor(sdk) {

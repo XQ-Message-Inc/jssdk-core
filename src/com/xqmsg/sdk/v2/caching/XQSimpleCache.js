@@ -13,6 +13,7 @@ export default class XQSimpleCache {
         }
         this.storage = storage;
         this.XQ_PREFIX = "xq";
+        this.DASHBOARD_PREFIX = "dsb";
         this.EXCHANGE_PREFIX = "exchange";
         this.PROFILE_LIST_KEY = "available-profiles";
         this.ACTIVE_PROFILE_KEY = "active-profile";
@@ -39,11 +40,11 @@ export default class XQSimpleCache {
     }
 
     putXQAccess = function (user, accessToken) {
-        this.storage.setItem(this.makeAccessKey(user), accessToken);
+        this.storage.setItem(this.makeXQAccessKey(user), accessToken);
     }
 
     getXQAccess = function (user, required) {
-        const accessToken = this.storage.getItem(this.makeAccessKey(user));
+        const accessToken = this.storage.getItem(this.makeXQAccessKey(user));
         if (required && accessToken == undefined) {
             throw new StatusException(401, "401 Unauthorized");
         } else {
@@ -54,9 +55,30 @@ export default class XQSimpleCache {
     removeXQAccess = function (user) {
         let accessToken = this.getXQAccess(user);
         if (accessToken != null) {
-            let success = this.storage.removeItem(this.makeAccessKey(user));
+            let success = this.storage.removeItem(this.makeXQAccessKey(user));
         }
     }
+
+    putDashboardAccess = function (user, accessToken) {
+        this.storage.setItem(this.makeDashboardAccessKey(user), accessToken);
+    }
+
+    getDashboardAccess = function (user, required) {
+        const dashboardAccessToken = this.storage.getItem(this.makeDashboardAccessKey(user));
+        if (required && dashboardAccessToken == undefined) {
+            throw new StatusException(401, "401 Unauthorized");
+        } else {
+            return dashboardAccessToken;
+        }
+    }
+
+    removeDashboardAccess = function (user) {
+        let dashboardAccessToken = this.getDashboardAccess(user);
+        if (dashboardAccessToken != null) {
+            let success = this.storage.removeItem(this.makeDashboardAccessKey(user));
+        }
+    }
+
 
     hasProfile = function (user) {
         const availableProfiles = this.listProfiles();
@@ -114,6 +136,7 @@ export default class XQSimpleCache {
         this.storage.setItem(this.PROFILE_LIST_KEY, profilesSansUser);
         this.removeXQPreAuthToken(user);
         this.removeXQAccess(user);
+        this.removeDashboardAccess(user);
 
 
     }
@@ -126,6 +149,7 @@ export default class XQSimpleCache {
 
                 this.removeXQPreAuthToken(user);
                 this.removeXQAccess(user);
+                this.removeDashboardAccess(user);
                 break;
             }
             this.storage.removeItem(this.ACTIVE_PROFILE_KEY);
@@ -147,8 +171,13 @@ export default class XQSimpleCache {
     makeExchangeKey = function (unvalidatedUser) {
         return `${this.EXCHANGE_PREFIX}-${this.XQ_PREFIX}-${unvalidatedUser}`
     }
-    makeAccessKey = function (validatedUser) {
+
+    makeXQAccessKey = function (validatedUser) {
         return `${this.XQ_PREFIX}-${validatedUser}`
+    }
+
+  makeDashboardAccessKey = function (validatedUser) {
+        return `${this.DASHBOARD_PREFIX}-${validatedUser}`
     }
 
 

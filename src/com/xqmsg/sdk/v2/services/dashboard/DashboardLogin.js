@@ -1,19 +1,24 @@
-import XQModule from "./XQModule.js";
-import CallMethod from "./../CallMethod.js";
-import ServerResponse from "./../ServerResponse.js";
+import XQModule from "../XQModule.js";
+import CallMethod from "../../CallMethod.js";
+import Destination from "../../Destination.js";
+import ServerResponse from "../../ServerResponse.js";
 
 
 /**
- *  Exchange the temporary access token with a real access token used in all secured XQ Message interactions
- *  @class [ExchangeForAccessToken]
+ * Log into Dashboard Application<br>
+ * This requires you to previously have been authorized via <br>
+ *   * {@link Authorize}
+ *   * {@link ValidatePacket}
+ *   * {@link ExchangeForAccessToken}
+ *
+ *   @class [DashboardLogin]
  */
-export default class ExchangeForAccessToken extends XQModule{
+export default class DashboardLogin extends XQModule{
 
     constructor(sdk) {
         super(sdk);
-        this.serviceName="exchange";
-        this.requiredFields=[];
-
+        this.serviceName="login/verify";
+        this.requiredFields=["request"];
     }
 
     /**
@@ -26,26 +31,27 @@ export default class ExchangeForAccessToken extends XQModule{
         try {
 
             let self = this;
-            let preAuthToken = this.sdk.validatePreAuthToken();
+            self.sdk.validateInput(maybePayLoad, self.requiredFields);
+            let xqAccessToken = self.sdk.validateAccessToken();
 
-            let additionalHeaderProperties = {"Authorization": "Bearer " + preAuthToken};
+            let additionalHeaderProperties = {"Authorization": "Bearer " + xqAccessToken};
 
             return this
                 .sdk
-                .call(this.sdk.SUBSCRIPTION_SERVER_URL,
+                .call(this.sdk.DASHBOARD_SERVER_URL,
                     this.serviceName,
                     CallMethod.prototype.GET,
                     additionalHeaderProperties,
                     maybePayLoad,
-                    true)
+                    true,
+                    Destination.prototype.DASHBOARD)
                 .then(function (exchangeResponse){
                     switch (exchangeResponse.status) {
                         case ServerResponse.prototype.OK: {
-                            let accessToken = exchangeResponse.payload;
+                            let dashboardAccessToken = exchangeResponse.payload;
                             try {
                                 let activeProfile = self.cache.getActiveProfile(true);
-                                self.cache.putXQAccess(activeProfile, accessToken);
-                                self.cache.removeXQPreAuthToken(activeProfile);
+                                self.cache.putDashboardAccess(activeProfile, dashboardAccessToken);
                             } catch (e) {
                                 console.log(e.getMessage());
                                 return null;
@@ -67,10 +73,8 @@ export default class ExchangeForAccessToken extends XQModule{
             });
         }
 
-
-
-
     }
 
-
 }
+
+DashboardLogin.prototype.REQUEST = "request";
