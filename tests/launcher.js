@@ -22,79 +22,6 @@ oReq.addEventListener("load", function () {
     }
     showInitialTestAgenda();
 
-    $("#register-button, #confirm-button, #run-button, #clear-credentials-button")
-        .on("click", function (clickEvent) {
-            switch (clickEvent.currentTarget.id) {
-                case 'register-button': {
-                    const userEmail = $("#register-input").val();
-
-                   doAuthorize(userEmail)
-                       .then(function (serverResponse) {
-                       switch (serverResponse.status) {
-                           case ServerResponse.prototype.OK: {
-                               break;
-                           }
-                           default :{
-                               let errorMessage = serverResponse.payload;
-                               let jsonObj=JSON.parse(serverResponse.payload);
-                               if(jsonObj.reason) {
-                                   errorMessage = jsonObj.reason;
-                               }else{
-                                   errorMessage = jsonObj.status;
-                               }
-                               $("label[for='label-content']")
-                                   .css({"font-style": "italic", "color": "#d22060", "visibility": "visible"})
-                                   .html(errorMessage)
-                                   ;
-                               break;
-                           }
-                       }
-                   });
-                    break;
-                }
-                case 'confirm-button': {
-                    const pin = $("#pin-input").val();
-                    doConfirm(pin)
-                        .then(function (serverResponse) {
-                        switch (serverResponse.status) {
-                            case ServerResponse.prototype.OK: {
-                                break;
-                            }
-                            default :{
-                                let errorMessage = serverResponse.payload;
-                                try{
-                                    let jsonObj=JSON.parse(serverResponse.payload);
-                                    if(jsonObj.reason) {
-                                        errorMessage = jsonObj.reason;
-                                    }else{
-                                        errorMessage = jsonObj.status;
-                                    }
-                                }catch (e) {}
-                                $("label[for='label-content']")
-                                    .css({"font-style": "italic", "color": "#d22060", "visibility": "visible"})
-                                    .html(errorMessage)
-                                ;
-                                break;
-                            }
-                        }
-                    });
-                    break;
-                }
-                case 'run-button': {
-                    showInitialTestAgenda();
-                    runAll();
-                    break;
-                }
-                case 'clear-credentials-button': {
-                    xqsdk.getCache().clearAllProfiles();
-                    showRegistrationScreen();
-                    showInitialTestAgenda();
-                    break;
-                }
-            }
-        });
-
-
     function runAll() {
         runTest(0);
     }
@@ -129,78 +56,6 @@ oReq.addEventListener("load", function () {
                 runTest(i + 1);
             }
         }
-    }
-
-    function doAuthorize(user) {
-        let authorize = new Authorize(xqsdk);
-
-        return authorize
-            .supplyAsync({[authorize.USER]: user})
-            .then(function (serverResponse) {
-                switch (serverResponse.status) {
-                    case ServerResponse.prototype.OK: {
-                        $("label[for='label-content']")
-                            .empty()
-                            .html("Please check your email for the confirmation PIN we sent you. <br> Enter it below then press <span style='color: #0082FF'>Confirm</span> to continue.<br />")
-                           .css({"font-style": "normal", "color": "#000", "visibility": "visible"});
-
-                        $("button[id='register-button']")
-                            .hide();
-                        $("button[id='run-button']")
-                            .hide();
-                        $("button[id='confirm-button']")
-                            .show();
-
-                        $("#register-input")
-                            .val("")
-                            .hide();
-                        $("#clear-credentials-container")
-                            .hide();
-                        $("#pin-input")
-                            .val("")
-                            .show();
-                        return serverResponse;
-                    }
-                    default: {
-                        let error = serverResponse.payload;
-                        try{ error =  JSON.parse(error).status}catch (e){};
-                        console.error("failed , reason: ", error);
-                        return serverResponse;
-                    }
-                }
-            });
-    }
-
-    function doConfirm(pin) {
-        let codeValidator = new CodeValidator(xqsdk);
-        return codeValidator
-            .supplyAsync({[codeValidator.PIN]: pin})
-            .then(function (serverResponse) {
-                switch (serverResponse.status) {
-                    case ServerResponse.prototype.OK: {
-
-                        showReadyScreen();
-
-                        $("label[for='label-content']")
-                            .remove();
-
-                        $("div[id='label-content']")
-                            .append(`<label for="label-content" class="TertiaryText" style="font-style:normal; color:#000; visibility:visible;">
-                                       You can now run the tests.<br />If you want to fresh you credentials, please press 
-                                       <span style='color: #0082FF'>Refresh Credentials</span>
-                                    </label>`
-                            );
-
-                        return serverResponse;
-                    }
-                    default: {
-                        let error = serverResponse.payload;
-                        try{ error =  JSON.parse(error).status}catch (e){};
-                        console.error("failed , reason: ", error);
-                        return  serverResponse;
-                    }
-                }
-            });
     }
 
     function showRegistrationScreen(withClearCredentialsDisabled = true) {
@@ -267,5 +122,150 @@ oReq.addEventListener("load", function () {
     function mkId(label) {
         return label.replace(/\s+/g, '-').toLowerCase();
     }
+
+    function doAuthorize(user){
+        let authorize = new Authorize(xqsdk);
+
+        return authorize
+            .supplyAsync({[authorize.USER]: user, [authorize.CODE_TYPE]:"pin"})
+            .then(function (serverResponse) {
+                switch (serverResponse.status) {
+                    case ServerResponse.prototype.OK: {
+                        $("label[for='label-content']")
+                            .empty()
+                            .html("Please check your email for the confirmation PIN we sent you. <br> Enter it below then press <span style='color: #0082FF'>Confirm</span> to continue.<br />")
+                            .css({"font-style": "normal", "color": "#000", "visibility": "visible"});
+
+                        $("button[id='register-button']")
+                            .hide();
+                        $("button[id='run-button']")
+                            .hide();
+                        $("button[id='confirm-button']")
+                            .show();
+
+                        $("#register-input")
+                            .val("")
+                            .hide();
+                        $("#clear-credentials-container")
+                            .hide();
+                        $("#pin-input")
+                            .val("")
+                            .show();
+                        return serverResponse;
+                    }
+                    default: {
+                        let error = serverResponse.payload;
+                        try{ error =  JSON.parse(error).status}catch (e){};
+                        console.error("failed , reason: ", error);
+                        return serverResponse;
+                    }
+                }
+            });
+    }
+
+     function doConfirm(pin) {
+        let codeValidator = new CodeValidator(xqsdk);
+        return codeValidator
+            .supplyAsync({[codeValidator.PIN]: pin})
+            .then(function (serverResponse) {
+                switch (serverResponse.status) {
+                    case ServerResponse.prototype.OK: {
+
+                        showReadyScreen();
+
+                        $("label[for='label-content']")
+                            .remove();
+
+                        $("div[id='label-content']")
+                            .append(`<label for="label-content" class="TertiaryText" style="font-style:normal; color:#000; visibility:visible;">
+                                       You can now run the tests.<br />If you want to fresh you credentials, please press 
+                                       <span style='color: #0082FF'>Refresh Credentials</span>
+                                    </label>`
+                            );
+
+                        return serverResponse;
+                    }
+                    default: {
+                        let error = serverResponse.payload;
+                        try{ error =  JSON.parse(error).status}catch (e){};
+                        console.error("failed , reason: ", error);
+                        return  serverResponse;
+                    }
+                }
+            });
+    }
+
+    $("#register-button, #confirm-button, #run-button, #clear-credentials-button")
+        .on("click", function (clickEvent) {
+            switch (clickEvent.currentTarget.id) {
+                case 'register-button': {
+                    const userEmail = $("#register-input").val();
+
+                   doAuthorize(userEmail)
+                        .then(function (serverResponse) {
+                            switch (serverResponse.status) {
+                                case ServerResponse.prototype.OK: {
+                                    break;
+                                }
+                                default :{
+                                    let errorMessage = serverResponse.payload;
+                                    let jsonObj=JSON.parse(serverResponse.payload);
+                                    if(jsonObj.reason) {
+                                        errorMessage = jsonObj.reason;
+                                    }else{
+                                        errorMessage = jsonObj.status;
+                                    }
+                                    $("label[for='label-content']")
+                                        .css({"font-style": "italic", "color": "#d22060", "visibility": "visible"})
+                                        .html(errorMessage)
+                                    ;
+                                    break;
+                                }
+                            }
+                        });
+                    break;
+                }
+                case 'confirm-button': {
+                    const pin = $("#pin-input").val();
+                   doConfirm(pin)
+                        .then(function (serverResponse) {
+                            switch (serverResponse.status) {
+                                case ServerResponse.prototype.OK: {
+                                    break;
+                                }
+                                default :{
+                                    let errorMessage = serverResponse.payload;
+                                    try{
+                                        let jsonObj=JSON.parse(serverResponse.payload);
+                                        if(jsonObj.reason) {
+                                            errorMessage = jsonObj.reason;
+                                        }else{
+                                            errorMessage = jsonObj.status;
+                                        }
+                                    }catch (e) {}
+                                    $("label[for='label-content']")
+                                        .css({"font-style": "italic", "color": "#d22060", "visibility": "visible"})
+                                        .html(errorMessage)
+                                    ;
+                                    break;
+                                }
+                            }
+                        });
+                    break;
+                }
+                case 'run-button': {
+                    showInitialTestAgenda();
+                    runAll();
+                    break;
+                }
+                case 'clear-credentials-button': {
+                    xqsdk.getCache().clearAllProfiles();
+                    showRegistrationScreen();
+                    showInitialTestAgenda();
+                    break;
+                }
+            }
+        });
+
 });
 oReq.send();

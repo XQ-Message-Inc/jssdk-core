@@ -32,6 +32,8 @@ import CheckKeyExpiration from "../src/com/xqmsg/sdk/v2/services/CheckKeyExpirat
 import RevokeKeyAccess from "../src/com/xqmsg/sdk/v2/services/RevokeKeyAccess.js";
 import RevokeUserAccess from "../src/com/xqmsg/sdk/v2/services/RevokeUserAccess.js";
 import GrantUserAccess from "../src/com/xqmsg/sdk/v2/services/GrantUserAccess.js";
+import Authorize from "../src/com/xqmsg/sdk/v2/services/Authorize.js";
+import CodeValidator from "../src/com/xqmsg/sdk/v2/services/CodeValidator.js";
 
 /**
  * This class contains the tests.
@@ -43,13 +45,13 @@ export default class Agenda {
         this.xqsdk = aSdk;
         this.samplerFileContent = aSamplerFileContent;
     }
-
+    
     loadTests = function(){
 
      let self = this;
      return [
          {
-             name: 'Test XQ Authorization', enabled: false, statement: function (label) {
+             name: 'Test Get XQ Authorization Token From Active Profile', enabled: true, statement: function (label) {
 
                  if (this.enabled) {
                      console.warn(label);
@@ -57,7 +59,7 @@ export default class Agenda {
                      try {
                          let user = self.xqsdk.getCache().getActiveProfile(true);
                          let accessToken = self.xqsdk.getCache().getXQAccess(user, true);
-                         console.warn(`The user had already been authorized previously.\nThe authorization token is: ${accessToken}`);
+                         console.warn(`The user is authorized.\nThe authorization token is: ${accessToken}`);
                          return new Promise((resolved, rejectied) => {
                              resolved(new ServerResponse(
                                  ServerResponse.prototype.OK,
@@ -66,11 +68,7 @@ export default class Agenda {
                          });
 
                      } catch (err) {
-                         const userEmail = $("#register-input").val();
-                         return doAuthorize(userEmail)
-                             .then(function (accessToken) {
-                                 console.warn(`Authorization completed successfully.\nThe access token is: ${accessToken}`);
-                             });
+
                      }
 
                  } else {
@@ -1464,5 +1462,7 @@ export default class Agenda {
      }
      ];
  }
+
+
 
 }
