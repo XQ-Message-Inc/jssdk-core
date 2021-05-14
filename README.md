@@ -2,498 +2,283 @@
 
 A Javascript Implementation of XQ Message SDK, V.2
 
-## _API Key_ 
-   ##### An API key is required for interaction with the XQ Message backend.
-  _Once you received your key from XQ Message, insert it into [Config.js](./src/com/xqmsg/sdk/v2/Config.js)_
+## _API Keys_
+##### Two API keys are required for interaction with the XQ Message Framework and the Dashboard Application
+
+* An xq framework api key can be obtained fomr https://manage.xqmsg.com/applications
+
+*  _Once  created one, it must be insterted it into [Config.js](./src/com/xqmsg/sdk/v2/Config.js)_
 
 ````
-API_KEY = <your-api-key-goes-here>;
+	XQ_API_KEY = <xq-framework-api-key-goes-here>;
+	DASHBOARD_API_KEY = <dashboard-framework-api-key-goes-here>;
 ````
 
 
-## _Demo_ 
-   Open [demo.html](/demo/html/demo.html) in any browser to start the Demo.
+## _Tests/Demo_
+Besides the core API code, the jssdk-core  project also contains two web applications .
+They are intended to give the user a high level overview of the enctpytion and decryption flow
+as well as some sample implementations of  core components.
+*  demo web app (a minimal  example of encryping and decrypting text)
+*  tests web app (vaious tests using  the core api calls)
 
-## _Tests_ 
-   ##### Debug/Run:
-   
-- In oder to run the tests you will be prompted to register your email.
-  The resulting access token will be stored in the browser cache until cleared. 
+### Setup
+
+-configure a suitable webserver to host the web applications contained in the  jssdk-core project.
+index page for the demo web app :  jssdk-core/demo/html/demo.html  
+index page to the tests web app:  jssdk-core/tests/html/tests.html
+
+### Running Tests:
+
+- Initially the api user will need to register with the XQ Framework.
+  To do so, he clicks the "Register" button  which promts him for his email.
+  A numeric authorization  token will be sent  to that email.
+  That token is then entered into the input field and registration is oncluded once "Confirm" is   
+  pressed.At this point the user is fully  authenticated with XQ. An access token is  stored in  
+  his  local browser cache. This token is used to automatically authenticate the user with XQ  for
+  most interactions. One can press "Clear Credentials" at any time to reauthenticate.
+
+  _The  test suite has the following tests:_
+
+  Test Get XQ Authorization Token From Active Profile
+  Test Dashboard Login
+  Test Get Dashboard Applications
+  Test Add Dashboard Group
+  Test Update Dashboard Group
+  Test Remove Dashboard Group
+  Test Add Dashboard Contact
+  Test Disable Dashboard Contact
+  Test Remove Dashboard Contact
+  Test Get User Info
+  Test Get User Settings
+  Test Update User Settings
+  Test Create Delegate Access Token
+  Test OTP V2 Algorithm
+  Test AES Algorithm
+  Test Encrypt And Decrypt Text Using OTP V2
+  Test Encrypt And Decrypt Text Using AES
+  Test File Encrypt And File Decrypt Text Using OTP V2
+  Test Combine Authorizations
+  Test Delete Authorization
+  Test Delete User
+  Test Authorize Alias
+  Test Check API Key
+  Test Key Manipulations
 
 
-   _If you run the whole test suite the order will be as follows:_
-
-        Test   1:  Test Authorization (disabled)
-        Test   2:  Test Get User Info 
-        Test   3:  Test Get User Settings 
-        Test   4:  Test Update User Settings 
-        Test   5:  Test Create Delegate Access Token 
-        Test   6:  Test OPT V2 Algorithm 
-        Test   7:  Test AES Algorithm 
-        Test   8:  Test Encrypt And Decrypt Text Using OPT V2 
-        Test   9:  Test Encrypt And Decrypt Text Using AES 
-        Test  10:  Test File Encrypt And File Decrypt Text Using OPT V2 
-        Test  11:  Test Combine Authorizations 
-        Test  12:  Test Delete Authorization 
-        Test  13:  Test Delete User 
-        Test  14:  Test Authorize Alias 
-        Test  15:  Test Check API Key 
-        Test  16:  Test Key Manipulations
-        
-        
 
 ------
+## Functionality
 
-## _Services_
-Pre-requisite: API Key
+#### Encrypting a message
+For encryption supply a piece of textual data along with the author's email, one or more emails of intended
+recipients and the intended life-span of the message.
+```
+                const usr = getProperty('user');
+                const recipientsInput = $("#recipient-list-input")
+                                                .val()
+                                                .split(/,|\s+/g)
+                                                .filter(function(el){return el != "" && el != null;});
+                const text = $("#encrypt-input").val();
+                const expiresHours = 1;
+                const algorithm = $("#algorithmSelectBox").val();
+                if(!["OTPV2", "AES"].includes(algorithm)){
+                    console.error('Invalid algorithm selection : '+ algorithm + "! Select one of [OTPV2, AES]");
+                    break;
+                }
+                setProperty("algorithm", algorithm);
+                let payload = {[Encrypt.prototype.USER]: usr,
+                    [Encrypt.prototype.TEXT]: text,
+                    [Encrypt.prototype.RECIPIENTS]: recipientsInput,
+                    [Encrypt.prototype.EXPIRES_HOURS]:expiresHours}
 
-   #####  [Authorize](/src/com/xqmsg/sdk/v2/services/Authorize.js)
+               ;
+                new Encrypt(xqsdk, xqsdk.getAlgorithm(algorithm))
+                    .supplyAsync(payload)
+                    .then(function (encryptResponse) {
+                        switch (encryptResponse.status) {
+                            case ServerResponse.prototype.OK: {
 
+                                const data = encryptResponse.payload;
+
+                                const locatorKey = data[Encrypt.prototype.LOCATOR_KEY];
+                                const encryptedText = data[Encrypt.prototype.ENCRYPTED_TEXT];
+
+                                setProperty(Encrypt.prototype.LOCATOR_KEY, locatorKey);
+                                setProperty(Encrypt.prototype.ENCRYPTED_TEXT, encryptedText);
+
+                                buildIdentifyScreen();
+                                break;
+
+                            }
+                            case ServerResponse.prototype.ERROR: {
+                                console.info(encryptResponse);
+                                break;
+                            }
+                        }
+                    });
+```
+#### Decrypting a message
+For decryption supply a piece of textual data along with the locator key you received when encrypting
+```
+                const locatorKey = getProperty(Encrypt.prototype.LOCATOR_KEY);
+                const encryptedText = getProperty(Encrypt.prototype.ENCRYPTED_TEXT);
+                 new Decrypt(xqsdk, xqsdk.getAlgorithm(getProperty("algorithm")))
+                    .supplyAsync({[Decrypt.prototype.LOCATOR_KEY]: locatorKey, [Decrypt.prototype.ENCRYPTED_TEXT]: encryptedText})
+                    .then(function (decryptResponse) {
+                        switch (decryptResponse.status) {
+                            case ServerResponse.prototype.OK: {
+                                const data = decryptResponse.payload;
+                                const decryptedText = data[EncryptionAlgorithm.prototype.DECRYPTED_TEXT];
+                                setProperty("decryptedText", decryptedText);
+                                buildDecryptScreen()
+                                break;
+                            }
+                            case ServerResponse.prototype.ERROR: {
+                                console.info(decryptResponse);
+                                break;
+                            }
+                        }
+                    });
+```
+#### Encrypting a file
+For file encryption supply the path to the unencrypted source document as well as a
+path to the target document to contain the encrypted data, along with the author's email,
+one or more emails of intended recipients and the life-span of the message.
+```
+let sourceFile = new File([samplerFileContent], "utf-8-sampler.txt");
+
+               var algorithm = xqsdk.getAlgorithm(xqsdk.OTPv2_ALGORITHM);
+
+               let user = xqsdk.getCache().getActiveProfile(true);
+               let recipients = [user];
+               let expiration = 5;
+
+               return new FileEncrypt(xqsdk, algorithm)
+                   .supplyAsync(
+                       {
+                           [FileEncrypt.prototype.USER]: user,
+                           [FileEncrypt.prototype.RECIPIENTS]: recipients,
+                           [FileEncrypt.prototype.EXPIRES_HOURS]: expiration,
+                           [FileEncrypt.prototype.SOURCE_FILE]: sourceFile
+                       })
+                   .then(async function (serverResponse) {
+
+                       switch (serverResponse.status) {
+                           case ServerResponse.prototype.OK: {
+                               var encryptedFile = serverResponse.payload;
+                               console.warn(`Encrypted File: ${encryptedFile.name}, ${encryptedFile.size} bytes`);
+                               const encryptedFileContent = await encryptedFile.arrayBuffer();
+                               console.warn(`Encrypted File Content: ${new TextDecoder().decode(encryptedFileContent).substr(0, 250)}...\n`);
+
+                               return new FileDecrypt(xqsdk, algorithm)
+                                   .supplyAsync({[FileDecrypt.prototype.SOURCE_FILE]: encryptedFile})
+                                   .then(async function (serverResponse) {
+                                       switch (serverResponse.status) {
+                                           case ServerResponse.prototype.OK: {
+                                               var decryptedFile = serverResponse.payload;
+                                               console.warn(`Decrypted File: ${decryptedFile.name}, ${decryptedFile.size} bytes`);
+                                               const decryptedContent = await decryptedFile.arrayBuffer();
+                                               console.info(`Decrypted File Content: ${new TextDecoder().decode(decryptedContent)}\n`);
+                                               return serverResponse;
+                                           }
+                                           case ServerResponse.prototype.ERROR: {
+                                               console.error(serverResponse);
+                                               return serverResponse;
+                                           }
+                                       }
+                                   });
+                           }
+```
+#### Decrypting a file
+For file decryption supply the path to the encrypted source document as well as a <br> path to the target document to contain the decryped data.
+```
+
+        return new FileDecrypt(xqsdk, algorithm)
+            .supplyAsync({[FileDecrypt.prototype.SOURCE_FILE]: encryptedFile})
+            .then(async function (serverResponse) {
+                switch (serverResponse.status) {
+                    case ServerResponse.prototype.OK: {
+                        var decryptedFile = serverResponse.payload;
+                        console.warn(`Decrypted File: ${decryptedFile.name}, ${decryptedFile.size} bytes`);
+                        const decryptedContent = await decryptedFile.arrayBuffer();
+                        console.info(`Decrypted File Content: ${new TextDecoder().decode(decryptedContent)}\n`);
+                        return serverResponse;
+                    }
+                    case ServerResponse.prototype.ERROR: {
+                        console.error(serverResponse);
+                        return serverResponse;
+                    }
+                }
+            });
+```
+#### Authorizing
 Request an access token for a particular email address. If successful, the user will receive an email containing a PIN and a validation link. The user can choose to either click the link, or use the PIN via CodeValidator.
 
 The service itself will return a pre-authorization token that can be exchanged for a full access token once validation is complete.
-
-| Initialization Argumen Name | Type| Value                    | 
-| :-------------------------------: | ------------------------ | ---- | 
-|         xqsdk instance            | XQSDK                    |      | 
-
-
-| Argument Name | Type | Value | Required | Description |
-| -------------- | -------------- | --------------- | -------- | ----------- |
-|          user      |        String        |      \<user-email>          |   √       |email to be validated|
-|firstName|String|\<user-first-name>|x|first name of the user.|
-|lastName|String|\<user-last-name>|x|last name of the user|
-|newsLetter|boolean|true\|false|x|should the user receive a newsletter|
-|notifications|int | [0...3]|x|0: No Notifications <br/>1: Receive Usage Reports<br/>2: Receive Tutorials<br />3: Receive Both |
-
-| Response Name| Type |Description|
-| :-----------------: |------- |-------|
-|data|  String  | Pre-Authorization Token. |
-
-
-   #####    [CodeValidator](/src/com/xqmsg/sdk/v2/services/CodeValidator.js)
+```
+let user = $("#user-input").val();
+setProperty('user', user);
+ new Authorize(xqsdk)
+    .supplyAsync({[Authorize.prototype.USER]: user})
+    .then(function (response) {
+        switch (response.status) {
+            case ServerResponse.prototype.OK: {
+                setProperty('next', 'encryptScreen');
+                buildValidationScreen();
+                break;
+            }
+            case ServerResponse.prototype.ERROR: {
+                console.info(response);
+                break;
+            }
+        }
+    })
+```
+#### Gaining Access
 
 Authenticate the PIN that was sent to a users email and return a validated temporary access token.
+```
+                let user = $("#user-input").val();
+                setProperty('user', user);
+                 new Authorize(xqsdk)
+                    .supplyAsync({[Authorize.prototype.USER]: user})
+                    .then(function (response) {
+                        switch (response.status) {
+                            case ServerResponse.prototype.OK: {
+                                setProperty('next', 'encryptScreen');
+                                buildValidationScreen();
+                                break;
+                            }
+                            case ServerResponse.prototype.ERROR: {
+                                console.info(response);
+                                break;
+                            }
+                        }
+                    })
+```
 
 
-| Initialization Argumen Name | Type| Value                    | 
-| :-------------------------------: | ------------------------ | ---- | 
-|         xqsdk instance            | XQSDK                    |      | 
-
-| Request Argument Name | Type | Value | Required | Description |
-| -------------- | -------------- | --------------- | -------- | ----------- |
-|        pin      |        int        |      \[0-9]{6}      |   √       |the access token validation pin <br/>number received via email|
-
-
-| Response Name| Type |Value|
-| ----------------- |-----|-------|
-| - |-|-|
-
-   #####  GetAccess Token:  [ExchangeForAccessToken](/src/com/xqmsg/sdk/v2/services/ExchangeForAccessToken.js)  3/3 
-
-Exchange the temporary access token with a real access token used in all secured XQ Message interactions
-
-
-
-| Initialization Argumen Name | Type| Value                    | 
-| :-------------------------------: | ------------------------ | ---- | 
-|         xqsdk instance            | XQSDK                    |      |      
-
-| Request Argument Name | Type |Value | Required | Description         |
-| -------------- | -------------- | --------------- | -------- | ------------------------------------------------- |
-| -            | -        |-    | -    | - |
-
-| Response Name| Type |Value|
-| ----------------- |-----|-------|
-| data |String| <access-token>|
-
-
+#### Revoking Key Access
+Revokes a key using its token. Only the user who sent the message will be able to revoke it. **Note that this action is not reversible**
+```
+return new RevokeKeyAccess(xqsdk)
+           .supplyAsync({[RevokeKeyAccess.prototype.LOCATOR_KEY]: locatorKey})
+           .then(function (serverResponse) {
+                   switch (serverResponse.status) {
+                       case ServerResponse.prototype.OK: {
+                           let noContent = serverResponse.payload;
+                           console.info("Data: " + noContent);
+                           return serverResponse;
+                       }
+                       default: {
+                           let error = serverResponse.payload;
+                           try{ error =  JSON.parse(error).status}catch (e){};
+                           console.error("failed , reason: ", error);
+                           return serverResponse;
+                       }
+                   }
+               }
+           )
+```
 ------
-
-
-_ENCRYPT TEXT_
-
-   #####  [Encrypt](/src/com/xqmsg/sdk/v2/services/Encrypt.js)
-
-   For encryption supply a piece of textual data  along with  the author's email, one or more emails of  intended<br>   recipients and the  intended life-span of the message.
-
-
-| Initialization Argument Name  | Type| Value                    |
-| :-------------------------------: | ------------------------ | ---- |
-|         xqsdk instance            | XQSDK                    |      |
-|algorithm|AlgorithmEnum|<optv2\|aes>||
-
-
-
-| Request  Argument Name | Type |Value | Required | Description         | 
-| ---------------------- | ---------------------- | ----------------------- | -------- | ------------------------------------------------------------ |
-| user                  | String                | \<user-email>  | √        | The author's email |
-| recipients             | List              | \<recipient-emails>     | √        | A list of recipients who are allowed to access the key. |
-| expires                | int            | \<expiration-duration> | √        | The number of hours that this key will remain valid for. After this time, it will no longer be accessible. |
-| dor                    | boolean              | true\|false             | x        | Delete on Read If this is set to true a recipient will only be able to read a message once. Defaults to false. 
-
-
-| Response Name| Type |Value|
-| ----------------- |-----|-------|
-|data/ locatorKey |String| <locator-key>|
-| data/encryptedText |String| <encrypted-text> |
-
-------
-
-_DECRYPT TEXT_
-
-   #####  [Decrypt](/src/com/xqmsg/sdk/v2/services/Decrypt.js)
-
-   For decryption supply a piece of textual data  along with  the locator key you received when encrypting
-
-
-| Initialization Argument Name  | Type| Value                    |
-| :-------------------------------: | ------------------------ | ---- |
-|         xqsdk instance            | XQSDK                    |      |
-|algorithm|AlgorithmEnum|<optv2\|aes>||
-
-
-
-| Request  Argument Name | Type |Value | Required | Description         | 
-| ---------------------- | ---------------------- | ----------------------- | -------- | ------------------------------------------------------------ | 
-| locatorToken                   | String                |<locator-token>  | √        | The locator token needed to discover the key   |
-| encryptedText             | String                | <encrypted-text>     | √        | the encrypted textual data|
-
-
-| Response Name| Type |Value|
-| ----------------- |-----|-------|
-| data |DecryptResult|  <decrypted-data-bytes> |
-
-
-------
-
-
-
-_ENCRYPT FILE_
-
-   #####  [FileEncrypt](/src/com/xqmsg/sdk/v2/services/FileEncrypt.js)
-
-   For file encryption supply the path to the unencrypted  source document as well as a <br>   path to the target document to contain the encrypted data,  along with the author's email, <br>   one or more emails of  intended  recipients and the life-span of the message.
-
-
-| Initialization Argument Name | Type          | Value          |
-| :--------------------------: | ------------- | -------------- |
-|         xqsdk instance       | XQSDK         |                |
-|          algorithm           | AlgorithmEnum | <optv2\|aes>   |
-
-
-
-| Request  Argument Name | Type    | Value               | Required | Description                                                  |      
-| ---------------------- | ------- | ------------------- | -------- | ------------------------------------------------------------ |
-| user                   | String  | \<user-email>       | √        | The author's email     |      
-| sourceFilePath   | Path  | \<path-to-unencrypted-file>     | √    |Path to the document, which is  supposed to be encrypted  |     
-| targetFilePath | Path  | \<path-to-encrypted-file>       | √    |Path to the document, which supposed to be decrypted  |
-| recipients             | List    | \<recipient-emails> | √        | A list of recipients who are allowed to access the key.      |      
-| expires                | int     | \<expiration-duration> | √        | The number of hours that this key will remain valid for. After this time, it will no longer be accessible. |      
-| dor                    | boolean | true\|false         | x        | Delete on Read If this is set to true a recipient will only be able to read a message once. Defaults to false. |      
-
-
-| Response Name | Type              | Value            |
-| ------------- | ----------------- | ---------------- |
-| data          | Path  <path-to-encrypted-file> |
-
-------
-
-_DECRYPT FILE_
-
-   #####  [FileDecrypt](/src/com/xqmsg/sdk/v2/services/FileDecrypt.js)
-
-    For file decryption supply the path to the encrypted source document as well as a <br> path to the target document to contain the decryped data.
-
-
-| Initialization Argument Name | Type          | Value          |
-| :--------------------------: | ------------- | -------------- |
-|         xqsdk instance       | XQSDK         |                |
-|          algorithm           | AlgorithmEnum | <optv2\|aes>   |
-
-
-
-| Request  Argument Name | Type   | Value            | Required | Description                                  |
-| ---------------------- | ------ | ---------------- | -------- | -------------------------------------------- |
-| sourceFilePath | Path  | \<path-to-encrypted-file>       | √    |Path to the document, which supposed to be decrypted  |
-| targetFilePath   | Path  | \<path-to-unencrypted-file>     | √    |Path to the document, which is  supposed to be encrypted  |
-
-
-
-| Response Name | Type          | Value                                    |
-| ------------- | ------------- | ---------------------------------------- |
-| data          | Path |  <path-to-decrypted-file> |
-
-
-------
-
-
-
-   #####  [CheckKeyExpiration](/src/com/xqmsg/sdk/v2/services/CheckKeyExpiration.js)
-
-This service is used to check whether a particular key is expired or not without actually fetching it. 
-
-
-| Initialization Argument Name | Type          | Value          | 
-| :--------------------------: | ------------- | -------------- | 
-|         xqsdk instance       | XQSDK         |                | 
-
-
-| Request  Argument Name | Type   | Value                        | Required | Description                                                  |
-| ---------------------- | ------ | ---------------------------- | -------- | ------------------------------------------------------------ |
-| locatorToken           | String | \<url-encoded-locator token> | √        | A URL encoded version of the key locator token.<br>It is  is needed for key discovery. |
-
-
-| Response  Name | Response  Type | Response  Value |   Description                                                  |
-| ----------------------- | ----------------------- | ------------------------ |  ------------------------------------------------------------ |
-| expiresOn               | long        | \>=0                      |  The number of seconds before this token expires.<br> If the token is already expired, this will be zero |
-
-
-------
-
-
-
-   #####  [AuthorizeDelegate](/src/com/xqmsg/sdk/v2/services/AuthorizeDelegate.js)
-
-This service allows a user to create a very short-lived version of their access token in order to access certain services ( such as file encryption/decryption on the XQ website) without having to transmit their main access token.
-
-
-| Initialization Argument Name | Type          | Value          | 
-| :--------------------------: | ------------- | -------------- | 
-|   xqsdk instance             | XQSDK         |                | 
-
-
-| Request  Argument Name | Type | Value | Required | Description |
-| ---------------------- | ---- | ----- | -------- | ----------- |
-| -                      | -    | -     | -        | -           |
-
-
-| Response  Name | Response  Type | Response  Value |   Description                                                  |
-| ----------------------- | ----------------------- | ------------------------ |  ------------------------------------------------------------ |
-| data               | String     | <delegate-access-token>                   | |
-
-
-------
-
-
-
-   #####  [DeleteAuthorization](/src/com/xqmsg/sdk/v2/services/DeleteAuthorization.js)
-
-Revokes a key using its token. Only the user who sent the message will be able to revoke it.
-
-
-| Initialization Argument Name | Type   | Value          | 
-| :--------------------------: | ------ | -------------- | 
-|         xqsdk instance            | XQSDK                    |      |
-
-
-| Request  Argument Name | Type | Value | Required | Description |
-| ---------------------- | ---- | ----- | -------- | ----------- |
-| -                      | -    | -     | -        | -           |
-
-
-| Response  Name | Response  Type | Response  Value         | Description |
-| -------------- | -------------- | ----------------------- | ----------- |
-| -           | -         | - |         -    |
-
-
-------
-
-
-
-   #####  [DeleteSubscriber](/src/com/xqmsg/sdk/v2/services/DeleteSubscriber.js)
-
-Deletes the user specified by the access token.
-After an account is deleted, the subscriber will be sent an email notifying them of its deletion.
-
-
-| Initialization Argument Name | Type   | Value          | 
-| :--------------------------: | ------ | -------------- |
-|         xqsdk instance            | XQSDK                    |      |
-
-
-| Request  Argument Name | Type | Value | Required | Description |
-| ---------------------- | ---- | ----- | -------- | ----------- |
-| -                      | -    | -     | -        | -           |
-
-
-| Response  Name | Response  Type | Response  Value         | Description |
-| -------------- | -------------- | ----------------------- | ----------- |
-| -           | -         | - |         -    |
-
-
-------
-
-
-
-   #####  [GetUserInfo](/src/com/xqmsg/sdk/v2/services/GetUserInfo.js)
-
-Deletes the user specified by the access token.
-After an account is deleted, the subscriber will be sent an email notifying them of its deletion.
-
-
-| Initialization Argument Name | Type   | Value          | 
-| :--------------------------: | ------ | -------------- |
-|         xqsdk instance            | XQSDK                    |      |
-
-
-| Request  Argument Name | Type | Value | Required | Description |
-| ---------------------- | ---- | ----- | -------- | ----------- |
-| -                      | -    | -     | -        | -           |
-
-
-| Response  Name |   Type |   Value         | Description |
-| -------------- | -------------- | ----------------------- | ----------- |
-| id           | long      | <user-id> |        The user ID.  |
-| usr           | String      | <user-id> |        The users' email address  |
-| firstName           | String      | <user-id> |       The users first name  |
-| lastName           | String      | <user-id> |        The users last name  |
-| subscriptionStatus           | long      | <user-id> |  The user's subscription status|
-| starts           | long      | <user-id> |       The datetime ( in milliseconds ) when the subscription was activated. |
-| ends           | long      | <user-id> |       The datetime ( in milliseconds ) when the subscription will end.|
-
-
-
-
-------
-
-
-
-   #####  [GetSettings](/src/com/xqmsg/sdk/v2/services/GetSettings.js)
-
-Gets the notification and newsletter settings for the current user.
-
-
-| Initialization Argument Name | Type   | Value          | 
-| :--------------------------: | ------ | -------------- |
-|         xqsdk instance            | XQSDK                    |      |
-
-
-| Request  Argument Name | Type | Value | Required | Description |
-| ---------------------- | ---- | ----- | -------- | ----------- |
-| -                      | -    | -     | -        | -           |
-
-| Response  Name | Type    | Value     | Description              |
-| -------------- | ------- | --------- | ------------------------ |
-|  newsLetter | boolean    | true\|false | Should this user receive newsletters or not? <br>This is only valid for new users, and is ignored if the user already exists. |
-| notifications     | Long | [ 0 .. 3 ] |Specifies the notifications that the user should receive  <br> 0 = No Notifications, <br> 1 = Receive Usage Reports, <br> 2 = Receive Tutorials, <br> 3 = Receive Both|
-
-
-
-------
-
-
-
-   #####  [CombineAuthorizations](/src/com/xqmsg/sdk/v2/services/CombineAuthorizations.js)
-
-This endpoint is useful for merging two or more valid access tokens ( along with the access token used to make the call ) into a single one that can be used for temporary read access.
-
-This is useful in situations where a user who has authenticated with multiple accounts wants to get a key for a particular message without needing to know exactly which of their accounts is a valid recipient. As long as one of the accounts in the merged token have access, they will be able to get the key
-
-The merged token has three restrictions:
-
-1. It cannot be used to send messages
-2. It can only be created from other valid access tokens.
-3. It is only valid for a short amount of time.
-
-
-| Initialization Argument Name | Type   | Value          |
-| :--------------------------: | ------ | -------------- |
-|         xqsdk instance            | XQSDK                    |      |
-
-
-| Request  Argument Name | Type | Value                 | Required | Description                  |
-| ---------------------- | ---- | --------------------- | -------- | ---------------------------- |
-| tokens                 | List | (<token-string>,...)+ | √        | The list of tokens to merge. |
-
-| Response  Name | Type   | Value          | Description                                                  |
-| -------------- | ------ | -------------- | ------------------------------------------------------------ |
-| token          | String | <merged-token> | The merged token.                                            |
-| merged         | Long   | [ 0 -9 ]+      | The number of tokens that were successfully merged into the token. |
-
-
-
-
-------
-
-
-
-   #####  [FetchKey](/src/com/xqmsg/sdk/v2/services/FetchKey.js)
-
-This endpoint fetches the encryption key associated with the token provided.
-The key will only be returned if the following hold true:
- * The access token of the requesting user is valid and unexpired.
-
- * The expiration time specified for the key has not elapsed.
-
- * The person requesting the key was listed as a valid recipient by the sender.
-
- * The key is either not geofenced, or is being accessed from an authorized location.
-
-If any of these is not true, an error will be returned instead.
-
-
-| Initialization Argument Name | Type   | Value          | 
-| :--------------------------: | ------ | -------------- |
-|         xqsdk instance            | XQSDK                    |      |
-
-
-| Request  Argument Name | Type | Value                 | Required | Description                  |
-| ---------------------- | ---- | --------------------- | -------- | ---------------------------- |
-| locatorToken                 | String | <locator-token> | √        | Thr key locator token ( the token received after adding a key packet). It is used as a URL to discover the key on  the server.<br />The URL encoding part is handled internally in the service itself |
-
-| Response  Name | Type   | Value     | Description                      |
-| -------------- | ------ | --------- | -------------------------------- |
-| data           | String | <key>     | The Encryption Key obtained from the server |
-
-------
-
-
-
-   #####  [RevokeKeyAccess](/src/com/xqmsg/sdk/v2/services/RevokeKeyAccess.js)
-
-Revokes a key using its token. 
-
-Only the user who sent the message will be able to revoke it.
-
-
-| Initialization Argument Name | Type   | Value          |  
-| :--------------------------: | ------ | -------------- | 
-|         xqsdk instance            | XQSDK                    |      |
-
-
-| Request  Argument Name | Type   | Value           | Required | Description                                                  |
-| ---------------------- | ------ | --------------- | -------- | ------------------------------------------------------------ |
-| locatorToken           | String | <locator-token> | √        | Thr key locator token ( the token received after adding a key packet). It is used as a URL to discover the key on  the server.<br />The URL encoding part is handled internally in the service itself |
-
-| Response  Name | Type | Value | Description |
-| -------------- | ---- | ----- | ----------- |
-| -              | -    | -     | -           |
-
-------
-
-
-
-   #####  [UpdateSettings](/src/com/xqmsg/sdk/v2/services/UpdateSettings.js)
-
-Revokes a key using its token. 
-
-Only the user who sent the message will be able to revoke it.
-
-
-| Initialization Argument Name | Type   | Value          |  
-| :--------------------------: | ------ | -------------- | 
-|         xqsdk instance            | XQSDK                    |      |
-
-
-| Request  Argument Name| Type    | Value     | Description              |
-| -------------- | ------- | --------- | ------------------------ |
-|  newsLetter | boolean    | true\|false | Should this user receive newsletters or not? <br>This is only valid for new users, and is ignored if the user already exists. |
-| notifications     | Long | [ 0 .. 3 ] |Specifies the notifications that the user should receive  <br> 0 = No Notifications, <br> 1 = Receive Usage Reports, <br> 2 = Receive Tutorials, <br> 3 = Receive Both|
-
-| Response  Name | Type | Value | Description |
-| -------------- | ---- | ----- | ----------- |
-| -              | -    | -     | -           |
-
-------
-
