@@ -3,11 +3,13 @@
 A Javascript Implementation of XQ Message SDK, V.2
 
 ## _API Keys_
+
 ##### Two API keys are required for interaction with the XQ Message Framework and the Dashboard Application
 
-* An xq framework api key can be obtained fomr https://manage.xqmsg.com/applications
-
-*  _Once  created one, it must be insterted it into [Config.js](./src/com/xqmsg/sdk/v2/Config.js)_
+They can be created under https://manage.xqmsg.com/applications.
+Go to your application  and press "Add A New Key"
+To create an XQ framework key  select "General" To create a Dashboard key select "Dashboard".
+Once  created, add them to  [Config.js](./src/com/xqmsg/sdk/v2/Config.js)_
 
 ````
 	XQ_API_KEY = <xq-framework-api-key-goes-here>;
@@ -74,70 +76,40 @@ index page to the tests web app:  jssdk-core/tests/html/tests.html
 For encryption supply a piece of textual data along with the author's email, one or more emails of intended
 recipients and the intended life-span of the message.
 ```
-                const usr = getProperty('user');
-                const recipientsInput = $("#recipient-list-input")
-                                                .val()
-                                                .split(/,|\s+/g)
-                                                .filter(function(el){return el != "" && el != null;});
-                const text = $("#encrypt-input").val();
-                const expiresHours = 1;
-                const algorithm = $("#algorithmSelectBox").val();
-                if(!["OTPV2", "AES"].includes(algorithm)){
-                    console.error('Invalid algorithm selection : '+ algorithm + "! Select one of [OTPV2, AES]");
-                    break;
-                }
-                setProperty("algorithm", algorithm);
-                let payload = {[Encrypt.prototype.USER]: usr,
-                    [Encrypt.prototype.TEXT]: text,
-                    [Encrypt.prototype.RECIPIENTS]: recipientsInput,
-                    [Encrypt.prototype.EXPIRES_HOURS]:expiresHours}
-
-               ;
-                new Encrypt(xqsdk, xqsdk.getAlgorithm(algorithm))
-                    .supplyAsync(payload)
-                    .then(function (encryptResponse) {
-                        switch (encryptResponse.status) {
-                            case ServerResponse.prototype.OK: {
-
-                                const data = encryptResponse.payload;
-
-                                const locatorKey = data[Encrypt.prototype.LOCATOR_KEY];
-                                const encryptedText = data[Encrypt.prototype.ENCRYPTED_TEXT];
-
-                                setProperty(Encrypt.prototype.LOCATOR_KEY, locatorKey);
-                                setProperty(Encrypt.prototype.ENCRYPTED_TEXT, encryptedText);
-
-                                buildIdentifyScreen();
-                                break;
-
-                            }
-                            case ServerResponse.prototype.ERROR: {
-                                console.info(encryptResponse);
-                                break;
-                            }
-                        }
-                    });
+const xqsdk = new XQSDK();               
+let payload = {
+ [Encrypt.prototype.USER]:<some-email>,                      
+ [Encrypt.prototype.TEXT]: <some-text>,
+ [Encrypt.prototype.RECIPIENTS]:[<some-email>,<another-email>,...],
+ [Encrypt.prototype.EXPIRES_HOURS]:[0,9]+
+};
+              
+new Encrypt(xqsdk, xqsdk.getAlgorithm(algorithm))
+     .supplyAsync(payload)
+     .then(function (encryptResponse) {
+         switch (encryptResponse.status) {
+          case ServerResponse.prototype.OK: {
+            const data = encryptResponse.payload;
+            const locatorKey = data[Encrypt.prototype.LOCATOR_KEY];
+            const encryptedText =data[Encrypt.prototype.ENCRYPTED_TEXT];
+          }
+         }
+     });
 ```
 #### Decrypting a message
 For decryption supply a piece of textual data along with the locator key you received when encrypting
 ```
-                const locatorKey = getProperty(Encrypt.prototype.LOCATOR_KEY);
-                const encryptedText = getProperty(Encrypt.prototype.ENCRYPTED_TEXT);
-                 new Decrypt(xqsdk, xqsdk.getAlgorithm(getProperty("algorithm")))
-                    .supplyAsync({[Decrypt.prototype.LOCATOR_KEY]: locatorKey, [Decrypt.prototype.ENCRYPTED_TEXT]: encryptedText})
-                    .then(function (decryptResponse) {
-                        switch (decryptResponse.status) {
-                            case ServerResponse.prototype.OK: {
-                                const data = decryptResponse.payload;
-                                const decryptedText = data[EncryptionAlgorithm.prototype.DECRYPTED_TEXT];
-                                setProperty("decryptedText", decryptedText);
-                                buildDecryptScreen()
-                                break;
-                            }
-                            case ServerResponse.prototype.ERROR: {
-                                console.info(decryptResponse);
-                                break;
-                            }
+const xqsdk = new XQSDK();
+new Decrypt(xqsdk, xqsdk.getAlgorithm(<OPTV2-or-AES>))
+   .supplyAsync({
+   [Decrypt.prototype.LOCATOR_KEY]: <locator-key>,  
+   [Decrypt.prototype.ENCRYPTED_TEXT]: <some-encrypted-text>})
+           .then(function (decryptResponse) {
+               switch (decryptResponse.status) {
+                  case ServerResponse.prototype.OK: {
+                      const data = decryptResponse.payload;
+const decryptedText = data[EncryptionAlgorithm.prototype.DECRYPTED_TEXT];
+                               
                         }
                     });
 ```
@@ -146,139 +118,91 @@ For file encryption supply the path to the unencrypted source document as well a
 path to the target document to contain the encrypted data, along with the author's email,
 one or more emails of intended recipients and the life-span of the message.
 ```
-let sourceFile = new File([samplerFileContent], "utf-8-sampler.txt");
+const xqsdk = new XQSDK();
+var algorithm = xqsdk.getAlgorithm(<OPTV2-or-AES>);
 
-               var algorithm = xqsdk.getAlgorithm(xqsdk.OTPv2_ALGORITHM);
-
-               let user = xqsdk.getCache().getActiveProfile(true);
-               let recipients = [user];
-               let expiration = 5;
-
-               return new FileEncrypt(xqsdk, algorithm)
-                   .supplyAsync(
-                       {
-                           [FileEncrypt.prototype.USER]: user,
-                           [FileEncrypt.prototype.RECIPIENTS]: recipients,
-                           [FileEncrypt.prototype.EXPIRES_HOURS]: expiration,
-                           [FileEncrypt.prototype.SOURCE_FILE]: sourceFile
-                       })
-                   .then(async function (serverResponse) {
-
-                       switch (serverResponse.status) {
-                           case ServerResponse.prototype.OK: {
-                               var encryptedFile = serverResponse.payload;
-                               console.warn(`Encrypted File: ${encryptedFile.name}, ${encryptedFile.size} bytes`);
-                               const encryptedFileContent = await encryptedFile.arrayBuffer();
-                               console.warn(`Encrypted File Content: ${new TextDecoder().decode(encryptedFileContent).substr(0, 250)}...\n`);
-
-                               return new FileDecrypt(xqsdk, algorithm)
-                                   .supplyAsync({[FileDecrypt.prototype.SOURCE_FILE]: encryptedFile})
-                                   .then(async function (serverResponse) {
-                                       switch (serverResponse.status) {
-                                           case ServerResponse.prototype.OK: {
-                                               var decryptedFile = serverResponse.payload;
-                                               console.warn(`Decrypted File: ${decryptedFile.name}, ${decryptedFile.size} bytes`);
-                                               const decryptedContent = await decryptedFile.arrayBuffer();
-                                               console.info(`Decrypted File Content: ${new TextDecoder().decode(decryptedContent)}\n`);
-                                               return serverResponse;
-                                           }
-                                           case ServerResponse.prototype.ERROR: {
-                                               console.error(serverResponse);
-                                               return serverResponse;
-                                           }
-                                       }
-                                   });
-                           }
+new FileEncrypt(xqsdk, algorithm)
+         .supplyAsync({
+ [FileEncrypt.prototype.USER]: <some-email>,
+ [FileEncrypt.prototype.RECIPIENTS]: [<some-email>,<another-email>,...],
+ [FileEncrypt.prototype.EXPIRES_HOURS]: [0-9]+,
+ [FileEncrypt.prototype.SOURCE_FILE]: <some-file>
+ }).then(async function (serverResponse) {
+    switch (serverResponse.status) {
+     case ServerResponse.prototype.OK: {
+         var encryptedFile = serverResponse.payload;
+         //do sometthing with the encryptd file         
+          }
+    });
+                           
 ```
 #### Decrypting a file
 For file decryption supply the path to the encrypted source document as well as a <br> path to the target document to contain the decryped data.
 ```
+const xqsdk = new XQSDK();
+var algorithm = xqsdk.getAlgorithm(<OPTV2-or-AES>);
 
-        return new FileDecrypt(xqsdk, algorithm)
-            .supplyAsync({[FileDecrypt.prototype.SOURCE_FILE]: encryptedFile})
-            .then(async function (serverResponse) {
+ new FileDecrypt(xqsdk, algorithm)
+ .supplyAsync({[FileDecrypt.prototype.SOURCE_FILE]: <some-encrypted-file>})
+ .then(async function (serverResponse) {
                 switch (serverResponse.status) {
                     case ServerResponse.prototype.OK: {
                         var decryptedFile = serverResponse.payload;
-                        console.warn(`Decrypted File: ${decryptedFile.name}, ${decryptedFile.size} bytes`);
-                        const decryptedContent = await decryptedFile.arrayBuffer();
-                        console.info(`Decrypted File Content: ${new TextDecoder().decode(decryptedContent)}\n`);
-                        return serverResponse;
-                    }
-                    case ServerResponse.prototype.ERROR: {
-                        console.error(serverResponse);
-                        return serverResponse;
-                    }
+                     }  
                 }
-            });
+  });
 ```
 #### Authorizing
 Request an access token for a particular email address. If successful, the user will receive an email containing a PIN and a validation link. The user can choose to either click the link, or use the PIN via CodeValidator.
 
 The service itself will return a pre-authorization token that can be exchanged for a full access token once validation is complete.
 ```
-let user = $("#user-input").val();
-setProperty('user', user);
+const xqsdk = new XQSDK();
+
  new Authorize(xqsdk)
-    .supplyAsync({[Authorize.prototype.USER]: user})
+    .supplyAsync({[Authorize.prototype.USER]: <some-email>})
     .then(function (response) {
         switch (response.status) {
             case ServerResponse.prototype.OK: {
-                setProperty('next', 'encryptScreen');
-                buildValidationScreen();
-                break;
-            }
-            case ServerResponse.prototype.ERROR: {
-                console.info(response);
-                break;
+               //do something
             }
         }
     })
 ```
-#### Gaining Access
+#### Gaining Access, Validating and gettting an Access Token
 
-Authenticate the PIN that was sent to a users email and return a validated temporary access token.
+Authenticate the PIN that was sent to a users email and, if valid exchange the  temporary access token with a permanent one which is added to the active user profile
 ```
-                let user = $("#user-input").val();
-                setProperty('user', user);
-                 new Authorize(xqsdk)
-                    .supplyAsync({[Authorize.prototype.USER]: user})
-                    .then(function (response) {
-                        switch (response.status) {
-                            case ServerResponse.prototype.OK: {
-                                setProperty('next', 'encryptScreen');
-                                buildValidationScreen();
-                                break;
-                            }
-                            case ServerResponse.prototype.ERROR: {
-                                console.info(response);
-                                break;
-                            }
-                        }
-                    })
+const xqsdk = new XQSDK();
+    
+new CodeValidator(xqsdk);
+            .supplyAsync({[codeValidator.PIN]: [0-9]{5}})
+            .then(function (serverResponse) {
+                switch (serverResponse.status) {
+                    case ServerResponse.prototype.OK: {
+                    // At this point code was validiated and 
+                    //the temporary access token was exchanged 
+                    //for a permanent one which is added to the active user profile.
+                    }
+                }
+           });
 ```
 
 
 #### Revoking Key Access
 Revokes a key using its token. Only the user who sent the message will be able to revoke it. **Note that this action is not reversible**
 ```
+const xqsdk = new XQSDK();
+
 return new RevokeKeyAccess(xqsdk)
-           .supplyAsync({[RevokeKeyAccess.prototype.LOCATOR_KEY]: locatorKey})
-           .then(function (serverResponse) {
+   .supplyAsync({[RevokeKeyAccess.prototype.LOCATOR_KEY]: <a-locator-key>})
+ .then(function (serverResponse) {
                    switch (serverResponse.status) {
                        case ServerResponse.prototype.OK: {
                            let noContent = serverResponse.payload;
-                           console.info("Data: " + noContent);
-                           return serverResponse;
-                       }
-                       default: {
-                           let error = serverResponse.payload;
-                           try{ error =  JSON.parse(error).status}catch (e){};
-                           console.error("failed , reason: ", error);
-                           return serverResponse;
-                       }
+                       }  
                    }
                }
-           )
+           ));
 ```
 ------
