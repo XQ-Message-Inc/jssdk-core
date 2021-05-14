@@ -207,7 +207,7 @@ buildQeryParams = function (paramsObject) {
     var buffer = '';
     const entries = Object.entries(paramsObject);
     for (let [name, value] of entries) {
-        buffer += name + '=' + value;
+        buffer += name + '=' + encodeURIComponent(value);
         if (i < entries.length) {
             buffer += '&';
             i++;

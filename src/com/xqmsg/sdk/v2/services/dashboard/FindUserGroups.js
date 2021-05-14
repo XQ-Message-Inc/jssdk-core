@@ -7,9 +7,9 @@ import ServerResponse from "../../ServerResponse.js";
  *
  *  Find a grouping of dashboard users. Can be optionally filtered by regex on ID
  *
- * @class [FindUserGroup]
+ * @class [FindUserGroups]
  */
-export default class FindUserGroup extends XQModule {
+export default class FindUserGroups extends XQModule {
 
 
     constructor(sdk) {
@@ -56,5 +56,5 @@ export default class FindUserGroup extends XQModule {
 
 }
 
-FindUserGroup.prototype.ID = "id";
-FindUserGroup.prototype.GROUPS = "groups";
+FindUserGroups.prototype.ID = "id";
+FindUserGroups.prototype.GROUPS = "groups";

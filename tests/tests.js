@@ -27,9 +27,14 @@ import ValidatePacket from "../src/com/xqmsg/sdk/v2/services/ValidatePacket.js";
 import DashboardLogin from "../src/com/xqmsg/sdk/v2/services/dashboard/DashboardLogin.js";
 import GetApplications from "../src/com/xqmsg/sdk/v2/services/dashboard/GetApplications.js";
 import AddUserGroup from "../src/com/xqmsg/sdk/v2/services/dashboard/AddUserGroup.js";
-import FindUserGroup from "../src/com/xqmsg/sdk/v2/services/dashboard/FindUserGroup.js";
+import FindUserGroups from "../src/com/xqmsg/sdk/v2/services/dashboard/FindUserGroups.js";
 import UpdateUserGroup from "../src/com/xqmsg/sdk/v2/services/dashboard/UpdateUserGroup.js";
 import RemoveUserGroup from "../src/com/xqmsg/sdk/v2/services/dashboard/RemoveUserGroup.js";
+import AddContact from "../src/com/xqmsg/sdk/v2/services/dashboard/AddContact.js";
+import FindContacts from "../src/com/xqmsg/sdk/v2/services/dashboard/FindContacts.js";
+import RemoveContact from "../src/com/xqmsg/sdk/v2/services/dashboard/RemoveContact.js";
+import DisableContact from "../src/com/xqmsg/sdk/v2/services/dashboard/DisableContact.js";
+import RolesEnum from "../src/com/xqmsg/sdk/v2/RolesEnum.js";
 
 
 const utf8SamplerFilePath = "/tests/resources/utf-8-sampler.txt";
@@ -126,7 +131,7 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test Get Dashboard Applications', enabled: true, statement: function (label) {
+            name: 'Test Get Dashboard Applications', enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -166,7 +171,7 @@ oReq.addEventListener("load", function () {
             }
         } 
         ,{
-            name: 'Test Add Dashboard Group', enabled: true, statement: function (label) {
+            name: 'Test Add Dashboard Group', enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -209,27 +214,27 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test Update Dashboard Group', enabled: true, statement: function (label) {
+            name: 'Test Update Dashboard Group', enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
 
-                   return new FindUserGroup(xqsdk)
-                        .supplyAsync( {[FindUserGroup.prototype.ID]: "[0-9]+"})
+                   return new FindUserGroups(xqsdk)
+                        .supplyAsync( {[FindUserGroups.prototype.ID]: "[0-9]+"})
                         .then(function (serverResponse) {
                             switch (serverResponse.status) {
                                 case ServerResponse.prototype.OK: {
 
                                     let data = serverResponse.payload;
 
-                                    let groups = data[FindUserGroup.prototype.GROUPS];
+                                    let groups = data[FindUserGroups.prototype.GROUPS];
 
                                     let found = groups.find(function (group) {
                                         return group["name"] == 'New Test Generated User Group';
                                     });
 
                                     let payload = {
-                                        [UpdateUserGroup.prototype.ID]: found[FindUserGroup.prototype.ID],
+                                        [UpdateUserGroup.prototype.ID]: found[FindUserGroups.prototype.ID],
                                         [UpdateUserGroup.prototype.NAME]: "Updated Test Generated User Group",
                                         [UpdateUserGroup.prototype.MEMBERS]: ["jan@xqmsg.com", "jan+1@xqmsg.com", "jan+2@xqmsg.com"],
                                     };
@@ -278,27 +283,27 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test Remove Dashboard Group', enabled: true, statement: function (label) {
+            name: 'Test Remove Dashboard Group', enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
 
-                  return  new FindUserGroup(xqsdk)
-                        .supplyAsync( {[FindUserGroup.prototype.ID]: "[0-9]+"})
+                  return  new FindUserGroups(xqsdk)
+                        .supplyAsync( {[FindUserGroups.prototype.ID]: "[0-9]+"})
                         .then(function (serverResponse) {
                             switch (serverResponse.status) {
                                 case ServerResponse.prototype.OK: {
 
                                     let data = serverResponse.payload;
 
-                                    let groups = data[FindUserGroup.prototype.GROUPS];
+                                    let groups = data[FindUserGroups.prototype.GROUPS];
 
                                     let found = groups.find(function (group) {
                                         return group["name"] == 'Updated Test Generated User Group';
                                     });
 
                                     let payload = {
-                                        [RemoveUserGroup.prototype.ID]: found[FindUserGroup.prototype.ID],
+                                        [RemoveUserGroup.prototype.ID]: found[FindUserGroups.prototype.ID],
                                     };
 
                                     return new RemoveUserGroup(xqsdk)
@@ -342,9 +347,189 @@ oReq.addEventListener("load", function () {
                     });
                 }
             }
-        } 
+        }
         ,{
-            name: 'Test Get User Info', enabled: true, statement: function (label) {
+            name: 'Test Add Dashboard Contact', enabled: true, statement: function (label) {
+
+                if (this.enabled) {
+                    console.warn(label);
+
+                    let payload = {
+                        [AddContact.prototype.EMAIL]: "jan@xqmsg.com",
+                        [AddContact.prototype.NOTIFICATIONS]: NotificationEnum.prototype.NONE,
+                        [AddContact.prototype.ROLE]: RolesEnum.prototype.ALIAS,
+                        [AddContact.prototype.TITLE]: "Mr.",
+                        [AddContact.prototype.FIRST_NAME]: "John",
+                        [AddContact.prototype.LAST_NAME]: "Doe",
+                    };
+
+                    return new AddContact(xqsdk)
+                        .supplyAsync(payload)
+                        .then(function (serverResponse) {
+                            switch (serverResponse.status) {
+                                case ServerResponse.prototype.OK: {
+                                    let data = serverResponse.payload;
+
+                                    let contactId = data[AddContact.prototype.ID];
+
+                                    console.info(`New Contact Id: ${contactId}`);
+
+                                    return serverResponse;
+                                }
+                                default: {
+                                    let error = serverResponse.payload;
+                                    try{ error =  JSON.parse(error).status}catch (e){};
+                                    console.error("failed , reason: ", error);
+                                    return serverResponse;
+                                }
+
+                            }
+                        });
+
+
+                } else {
+                    return new Promise((resolved, rejectied) => {
+                        console.warn(label + ' DISABLED');
+                        resolved(true);
+                    });
+                }
+            }
+        }
+        ,{
+            name: 'Test Disable Dashboard Contact', enabled: true, statement: function (label) {
+
+                if (this.enabled) {
+                    console.warn(label);
+
+                    return new FindContacts(xqsdk)
+                        .supplyAsync( {[FindContacts.prototype.FILTER]: "%"})
+                        .then(function (serverResponse) {
+                            switch (serverResponse.status) {
+                                case ServerResponse.prototype.OK: {
+
+                                    let data = serverResponse.payload;
+
+                                    let contacts = data[FindContacts.prototype.CONTACTS];
+
+                                    let found = contacts.find(function (contact) {
+                                        return contact["fn"] == 'John' && contact["ln"] == 'Doe';
+                                    });
+
+                                    let payload = {
+                                        [DisableContact.prototype.ID]: found[FindContacts.prototype.ID],
+                                    };
+
+                                    return new DisableContact(xqsdk)
+                                        .supplyAsync(payload)
+                                        .then(function (serverResponse) {
+                                            switch (serverResponse.status) {
+                                                case ServerResponse.prototype.OK: {
+
+                                                    console.info(`Disable User, Status Code: ${serverResponse.statusCode}`);
+
+                                                    return serverResponse;
+                                                }
+                                                default: {
+                                                    let error = serverResponse.payload;
+                                                    try {
+                                                        error = JSON.parse(error).status
+                                                    } catch (e) {};
+                                                    console.error("failed , reason: ", error);
+                                                    return serverResponse;
+                                                }
+
+                                            }
+                                        });
+
+                                }
+                                default: {
+                                    let error = serverResponse.payload;
+                                    try {
+                                        error = JSON.parse(error).status
+                                    } catch (e) {} ;
+                                    console.error("failed , reason: ", error);
+                                    return serverResponse;
+                                }
+                            }
+                        });
+
+
+                } else {
+                    return new Promise((resolved, rejectied) => {
+                        console.warn(label + ' DISABLED');
+                        resolved(true);
+                    });
+                }
+            }
+        },{
+            name: 'Test Remove Dashboard Contact', enabled: true, statement: function (label) {
+
+                if (this.enabled) {
+                    console.warn(label);
+
+                    return new FindContacts(xqsdk)
+                        .supplyAsync( {[FindContacts.prototype.FILTER]: "%"})
+                        .then(function (serverResponse) {
+                            switch (serverResponse.status) {
+                                case ServerResponse.prototype.OK: {
+
+                                    let data = serverResponse.payload;
+
+                                    let contacts = data[FindContacts.prototype.CONTACTS];
+
+                                    let found = contacts.find(function (contact) {
+                                        return contact["fn"] == 'John' && contact["ln"] == 'Doe';
+                                    });
+
+                                    let payload = {
+                                        [DisableContact.prototype.ID]: found[FindContacts.prototype.ID],
+                                    };
+
+                                    return new RemoveContact(xqsdk)
+                                        .supplyAsync(payload)
+                                        .then(function (serverResponse) {
+                                            switch (serverResponse.status) {
+                                                case ServerResponse.prototype.OK: {
+
+                                                    console.info(`Remove User,  Status Code: ${serverResponse.statusCode}`);
+
+                                                    return serverResponse;
+                                                }
+                                                default: {
+                                                    let error = serverResponse.payload;
+                                                    try {
+                                                        error = JSON.parse(error).status
+                                                    } catch (e) {};
+                                                    console.error("failed , reason: ", error);
+                                                    return serverResponse;
+                                                }
+
+                                            }
+                                        });
+
+                                }
+                                default: {
+                                    let error = serverResponse.payload;
+                                    try {
+                                        error = JSON.parse(error).status
+                                    } catch (e) {} ;
+                                    console.error("failed , reason: ", error);
+                                    return serverResponse;
+                                }
+                            }
+                        });
+
+
+                } else {
+                    return new Promise((resolved, rejectied) => {
+                        console.warn(label + ' DISABLED');
+                        resolved(true);
+                    });
+                }
+            }
+        }
+        ,{
+            name: 'Test Get User Info', enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -389,7 +574,7 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test Get User Settings', enabled: true, statement: function (label) {
+            name: 'Test Get User Settings', enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -427,7 +612,7 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test Update User Settings', enabled: true, statement: function (label) {
+            name: 'Test Update User Settings', enabled: false, statement: function (label) {
                 if (this.enabled) {
                     console.warn(label);
 
@@ -466,7 +651,7 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test Create Delegate Access Token', enabled: true, statement: function (label) {
+            name: 'Test Create Delegate Access Token', enabled: false, statement: function (label) {
                 if (this.enabled) {
                     console.warn(label);
 
@@ -498,7 +683,7 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test OTP V2 Algorithm', enabled: true, statement: function (label) {
+            name: 'Test OTP V2 Algorithm', enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -559,7 +744,7 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test AES Algorithm', enabled: true, statement: function (label) {
+            name: 'Test AES Algorithm', enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -618,7 +803,7 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test Encrypt And Decrypt Text Using OTP V2', enabled: true, statement: function (label) {
+            name: 'Test Encrypt And Decrypt Text Using OTP V2', enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label + 'Encrypt Using OTPv2');
@@ -699,7 +884,7 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test Encrypt And Decrypt Text Using AES', enabled: true, statement: function (label) {
+            name: 'Test Encrypt And Decrypt Text Using AES', enabled: false, statement: function (label) {
                 if (this.enabled) {
 
                     console.warn(label + 'Encrypt Using AES');
@@ -788,7 +973,7 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test File Encrypt And File Decrypt Text Using OTP V2', enabled: true, statement: function (label) {
+            name: 'Test File Encrypt And File Decrypt Text Using OTP V2', enabled: false, statement: function (label) {
 
                 if (this.enabled) {
 
@@ -855,7 +1040,7 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test Combine Authorizations', enabled: true, statement: function (label) {
+            name: 'Test Combine Authorizations', enabled: false, statement: function (label) {
 
                 console.warn(label);
 
@@ -902,7 +1087,7 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test Delete Authorization', enabled: true, statement: function (label, disabled) {
+            name: 'Test Delete Authorization', enabled: false, statement: function (label, disabled) {
                 if (this.enabled) {
                     console.warn(`${label} (Using Alias)`);
 
@@ -961,7 +1146,7 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test Delete User', enabled: true, statement: function (label, disabled) {
+            name: 'Test Delete User', enabled: false, statement: function (label, disabled) {
 
                 if (this.enabled) {
 
@@ -1020,7 +1205,7 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test Authorize Alias', enabled: true, statement: function (label) {
+            name: 'Test Authorize Alias', enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -1058,7 +1243,7 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test Check API Key', enabled: true, statement: function (label) {
+            name: 'Test Check API Key', enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
@@ -1093,7 +1278,7 @@ oReq.addEventListener("load", function () {
             }
         }
         ,{
-            name: 'Test Key Manipulations', enabled: true, statement: function (label) {
+            name: 'Test Key Manipulations', enabled: false, statement: function (label) {
 
                 if (this.enabled) {
                     console.warn(label);
