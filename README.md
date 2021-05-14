@@ -169,7 +169,7 @@ const xqsdk = new XQSDK();
         }
     })
 ```
-#### Gaining Access, Validating and gettting an Access Token
+#### Validating and gettting an Access Token
 
 Authenticate the PIN that was sent to a users email and, if valid exchange the  temporary access token with a permanent one which is added to the active user profile
 ```
