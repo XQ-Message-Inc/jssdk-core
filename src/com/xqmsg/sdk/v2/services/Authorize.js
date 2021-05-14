@@ -76,6 +76,8 @@ export default class Authorize extends XQModule {
 
 /** The email of the user*/
 Authorize.prototype.USER = "user";
+/** if 'pin' is sent the validation email will only have the code and no confirmation button */
+Authorize.prototype.CODE_TYPE = "codetype";
 /** The first name of the user */
 Authorize.prototype.FIRST_NAME = "firstName";
 /** The last name of the user*/
