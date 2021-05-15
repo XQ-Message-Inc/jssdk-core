@@ -162,8 +162,8 @@ To decrypt a file, the URI to the XQ encrypted file must be provided. The user d
 ```javascript
 const algorithm = sdk.getAlgorithm("OTPv2");  // Either "AES" or "OTPv2"
 
-// A sample file object.
-let sourceFile = new File(["ENCRYPTED_CONTENT"], "encrypted.txt", {
+// A file object containing the encrypted text.
+let sourceFile = new File(["ENCRYPTED CONTENT"], "encrypted.txt", {
   type: "text/plain",
 });
 
@@ -207,9 +207,8 @@ new CodeValidator(sdk)
     .supplyAsync({[codeValidator.PIN]: "123456"})
     .then(function (response) {
       if (response.status === ServerResponse.prototype.OK) {
-        // At this point code has been validiated and 
-          //the temporary access token was exchanged 
-          //for a permanent one which is added to the active user profile.
+        // The user is now fully authorized. The new access token 
+        // is added to the active user profile.
       }
       else {
         // Something went wrong...
@@ -239,7 +238,6 @@ new ExchangeForAccessToken(sdk)
 Revokes a key using its token. Only the user who sent the message will be able to revoke it. **Note that this action is not reversible**
 
 ```javascript
-
 new RevokeKeyAccess(sdk)
   .supplyAsync({[RevokeKeyAccess.prototype.LOCATOR_KEY]: "message_locator_token"})
   .then(function (response) {
@@ -255,17 +253,18 @@ new RevokeKeyAccess(sdk)
 
 #### Granting and Revoking User Access
 
-There may be cases where a user needs to be granted grant or revoke access to a previously sent message. This can be achieved via GrantUserAccess and RevokeUserAccess respectively:
+There may be cases where additional users need to be granted access to a previously sent message, or access needs to be revoked. This can be achieved via **GrantUserAccess** and **RevokeUserAccess** respectively:
 
 ```javascript
-new RevokeKeyAccess(sdk)
+// Grant access to additional users.
+new GrantUserAccess(sdk)
    .supplyAsync({
    [GrantUserAccess.prototype.RECIPIENTS]: ["john@email.com"],
    [GrantUserAccess.prototype.LOCATOR_TOKEN]: "message_locator_token"
    })
   .then(function (response) {
     if (response.status === ServerResponse.prototype.OK) {
-      // Success. Access was revoked successfully. 
+      // Success. John will now be able to read that message. 
     }
     else {
       // Something went wrong...
@@ -274,7 +273,23 @@ new RevokeKeyAccess(sdk)
   });
 ```
 
+
 ```javascript
+// Revoke access from particular users.
+new RevokeUserAccess(sdk)
+   .supplyAsync({
+   [GrantUserAccess.prototype.RECIPIENTS]: ["jack@email.com"],
+   [GrantUserAccess.prototype.LOCATOR_TOKEN]: "message_locator_token"
+   })
+  .then(function (response) {
+    if (response.status === ServerResponse.prototype.OK) {
+      // Success - Jack will no longer be able to read that message.
+    }
+    else {
+      // Something went wrong...
+    }
+    return response;
+  });
 ```
 
 #### Connecting to the Dashboard
@@ -282,7 +297,7 @@ new RevokeKeyAccess(sdk)
 The SDK provides limited functionality for dashboard administration. Before using any dashboard-specific features, a user would perform the following after signing into XQ with an authorized email account associated with the management portal:
 
 ```javascript
-return new DashboardLogin(sdk)
+new DashboardLogin(sdk)
     .supplyAsync(null)
     .then(function (response) {
    	if (response.status === ServerResponse.prototype.OK) {
@@ -302,7 +317,7 @@ return new DashboardLogin(sdk)
 Users may group a number of emails accounts under a single alias. Doing this makes it possible to add all of the associated email accounts to an outgoing message by adding that alias as a message recipient instead. Note that changing the group members does not affect the access rights of messages that have previously been sent.
 
 ```javascript
-return new AddUserGroup(sdk)
+new AddUserGroup(sdk)
   .supplyAsync({
     [AddUserGroup.prototype.NAME]: "New Test Generated User Group",
     [AddUserGroup.prototype.MEMBERS]: ["john@email.com","jane@email.com"],
@@ -329,7 +344,7 @@ In situations where a user may want to associate an external account with an XQ 
 These type of accounts will allow user authorization using only an account ID. However, these accounts have similar restrictions to anonymous accounts: They will be incapable of account management, and also have no access to the dashboard. However - unlike basic anonymous accounts - they can be fully tracked in a dashboard portal.
 
 ```javascript
-return new AddContact(sdk)
+new AddContact(sdk)
   .supplyAsync({
     [AddContact.prototype.EMAIL]: "1234567",
     [AddContact.prototype.NOTIFICATIONS]: NotificationEnum.prototype.NONE,
@@ -354,7 +369,7 @@ After creation, a user can connect to an Alias account by using the **AuthorizeA
 
 const aliasId = "1234567"; // The external user ID.
 
-return new AuthorizeAlias(sdk)
+new AuthorizeAlias(sdk)
   .supplyAsync({
     [AuthorizeAlias.prototype.USER]: aliasId, // The external ID
   })
