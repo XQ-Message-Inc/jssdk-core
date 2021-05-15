@@ -21,7 +21,7 @@ $("#sender-access-request-button, #validate-access-request-button, #recipient-li
                 let user = $("#user-input").val();
                 setProperty('user', user);
                  new Authorize(xqsdk)
-                    .supplyAsync({[Authorize.prototype.USER]: user})
+                    .supplyAsync({[Authorize.prototype.USER]: user, [Authorize.prototype.CODE_TYPE]: 'pin'})
                     .then(function (response) {
                         switch (response.status) {
                             case ServerResponse.prototype.OK: {
