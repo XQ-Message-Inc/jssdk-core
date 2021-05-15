@@ -6,7 +6,7 @@ A Javascript Implementation of XQ Message SDK, V.2
 
 Two API keys are required for interaction with the XQ servers.
 
-1. Go to  https://manage.xqmsg.com/applications.
+1. Go to your [XQ management portal](https://manage.xqmsg.com/applications).
 2. Select or create an application.
 3. Create a `General` key for the XQ framework API.
 4. Create a `Dashboard` key for the XQ dashboard API.
