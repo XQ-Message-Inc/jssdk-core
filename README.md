@@ -30,14 +30,14 @@ They are intended to give the user a high-level overview of the encryption and d
 Configure a suitable webserver to host the web applications contained in the  jssdk-core project.
 The path to the root web page for each application is shown below:
 
-- **Demo:**  demo/html/demo.html  
+- **Demo:**  demo/html/demo.html
 - **Tests**:  tests/html/tests.html
 
 ### Running Tests:
 
 Initially the user will need to register with the XQ Framework. To do so, he clicks the **Register** button which promts him for his email. A PIN code will be sent  to that email.
 
-When the PIN is then entered into the input field and **Confirm** is pressed, the registration is concluded. At this point the user is fully  authenticated with XQ. 
+When the PIN is then entered into the input field and **Confirm** is pressed, the registration is concluded. At this point the user is fully  authenticated with XQ.
 
 Note that an access token will be stored in the local browser cache. This token is used to automatically authenticate the user with XQ  for most interactions. The **Clear Credentials** can be pressed at any time to reauthenticate.
 
@@ -87,19 +87,19 @@ let payload = {
 const algorithm = sdk.getAlgorithm("OTPv2");  // Either "AES" or "OTPv2"
               
 new Encrypt(sdk, algorithm )
-     .supplyAsync(payload)
- 		.then(async function (response) {
-   		if (response.status === ServerResponse.prototype.OK) {
-     		const data = response.payload;
-        const locatorKey = data[Encrypt.prototype.LOCATOR_KEY];
-        const encryptedText = data[Encrypt.prototype.ENCRYPTED_TEXT];
-        // Do something with the data
-   		}
-   		else {
-     		// Something went wrong...
-   		}
-   		
-   		return response;
+  .supplyAsync(payload)
+  .then(async function (response) {
+    if (response.status === ServerResponse.prototype.OK) {
+      const data = response.payload;
+      const locatorKey = data[Encrypt.prototype.LOCATOR_KEY];
+      const encryptedText = data[Encrypt.prototype.ENCRYPTED_TEXT];
+      // Do something with the data
+    }
+    else {
+      // Something went wrong...
+    }
+    
+    return response;
   }); 
 ```
 #### Decrypting a message
@@ -114,18 +114,18 @@ let payload = {
 const algorithm = sdk.getAlgorithm("OTPv2");  // Either "AES" or "OTPv2"
 
 new Decrypt(sdk, algorithm)
-   .supplyAsync(payload)
- 		.then(async function (response) {
-   		if (response.status === ServerResponse.prototype.OK) {
-     		const data = response.payload;
-        const decryptedText = data[EncryptionAlgorithm.prototype.DECRYPTED_TEXT];
-        // Do something with the data
-   		}
-   		else {
-     		// Something went wrong...
-   		}
-   		
-   		return response;
+  .supplyAsync(payload)
+  .then(async function (response) {
+    if (response.status === ServerResponse.prototype.OK) {
+      const data = response.payload;
+      const decryptedText = data[EncryptionAlgorithm.prototype.DECRYPTED_TEXT];
+      // Do something with the data
+    }
+    else {
+      // Something went wrong...
+    }
+    
+    return response;
   }); 
 ```
 #### Encrypting a file
@@ -145,15 +145,15 @@ new FileEncrypt(sdk, algorithm)
 [FileEncrypt.prototype.EXPIRES_HOURS]: 24,
 [FileEncrypt.prototype.SOURCE_FILE]: sourceFile})
  .then(async function (response) {
-   		if (response.status === ServerResponse.prototype.OK) {
-     		var encryptedFile = response.payload;
-     		// Do something with the encrypted file.
-   		}
-   		else {
-     		// Something went wrong...
-   		}
-   		
-   		return response;
+    if (response.status === ServerResponse.prototype.OK) {
+      var encryptedFile = response.payload;
+      // Do something with the encrypted file.
+    }
+    else {
+      // Something went wrong...
+    }
+    
+    return response;
   });                   
 ```
 #### Decrypting a file
@@ -170,15 +170,15 @@ let sourceFile = new File(["ENCRYPTED_CONTENT"], "encrypted.txt", {
  new FileDecrypt(sdk, algorithm)
  .supplyAsync({[FileDecrypt.prototype.SOURCE_FILE]: sourceFile })
  .then(async function (response) {
-   		if (response.status === ServerResponse.prototype.OK) {
-     		var decryptedFile = response.payload;
-     		// Do something with the decrypted file.
-   		}
-   		else {
-     		// Something went wrong...
-   		}
-   		
-   		return response;
+    if (response.status === ServerResponse.prototype.OK) {
+      var decryptedFile = response.payload;
+      // Do something with the decrypted file.
+    }
+    else {
+      // Something went wrong...
+    }
+    
+    return response;
   });
 ```
 #### Authorization
@@ -204,34 +204,34 @@ At this point,the user can submit the PIN they received using the `CodeValidator
 
 ```javascript  
 new CodeValidator(sdk)
-            .supplyAsync({[codeValidator.PIN]: "123456"})
-            .then(function (response) {
-                if (response.status === ServerResponse.prototype.OK) {
-                	// At this point code has been validiated and 
-                    //the temporary access token was exchanged 
-                    //for a permanent one which is added to the active user profile.
-                }
-                else {
-                	// Something went wrong...
-                }
-                return response;
-           });
+    .supplyAsync({[codeValidator.PIN]: "123456"})
+    .then(function (response) {
+      if (response.status === ServerResponse.prototype.OK) {
+        // At this point code has been validiated and 
+          //the temporary access token was exchanged 
+          //for a permanent one which is added to the active user profile.
+      }
+      else {
+        // Something went wrong...
+      }
+      return response;
+    });
 ```
 
 Alternatively, if the user clicks on the link in the email, they can simply exchange their pre-authorization token for a valid access token by using the `ExchangeForAccessToken` class directly. Note that the active user in the `sdk` should be the same as the one used to make the authorization call:
 
 ```javascript
 new ExchangeForAccessToken(sdk)
-            .supplyAsync( null )
-            .then(function (response) {
-                if (response.status === ServerResponse.prototype.OK) {
-    	 							// Success. A new access token has been added to the active user profile.
-    	 					}
-    	 					else {
-    	 							// Something went wrong...
-    	 					}
-    	 					return response;
-           });
+  .supplyAsync( null )
+  .then(function (response) {
+      if (response.status === ServerResponse.prototype.OK) {
+        // Success. A new access token has been added to the active user profile.
+      }
+      else {
+        // Something went wrong...
+      }
+      return response;
+  });
 ```
 
 
@@ -241,16 +241,16 @@ Revokes a key using its token. Only the user who sent the message will be able t
 ```javascript
 
 new RevokeKeyAccess(sdk)
-   .supplyAsync({[RevokeKeyAccess.prototype.LOCATOR_KEY]: "message_locator_token"})
-            .then(function (response) {
-                if (response.status === ServerResponse.prototype.OK) {
-    	 							// Success. Key was revoked successfully. 
-    	 					}
-    	 					else {
-    	 							// Something went wrong...
-    	 					}
-    	 					return response;
-           });
+  .supplyAsync({[RevokeKeyAccess.prototype.LOCATOR_KEY]: "message_locator_token"})
+  .then(function (response) {
+      if (response.status === ServerResponse.prototype.OK) {
+        // Success. Key was revoked successfully. 
+      }
+      else {
+        // Something went wrong...
+      }
+      return response;
+  });
 ```
 
 #### Granting and Revoking User Access
@@ -263,15 +263,15 @@ new RevokeKeyAccess(sdk)
    [GrantUserAccess.prototype.RECIPIENTS]: ["john@email.com"],
    [GrantUserAccess.prototype.LOCATOR_TOKEN]: "message_locator_token"
    })
-    .then(function (response) {
-        if (response.status === ServerResponse.prototype.OK) {
-                            // Success. Access was revoked successfully. 
-                    }
-                    else {
-                            // Something went wrong...
-                    }
-                    return response;
-   });
+  .then(function (response) {
+    if (response.status === ServerResponse.prototype.OK) {
+      // Success. Access was revoked successfully. 
+    }
+    else {
+      // Something went wrong...
+    }
+    return response;
+  });
 ```
 
 ```javascript
@@ -303,21 +303,21 @@ Users may group a number of emails accounts under a single alias. Doing this mak
 
 ```javascript
 return new AddUserGroup(sdk)
-    .supplyAsync({
-    	[AddUserGroup.prototype.NAME]: "New Test Generated User Group",
-    	[AddUserGroup.prototype.MEMBERS]: ["john@email.com","jane@email.com"],
-    })
-    .then(function (response) {
-   	if (response.status === ServerResponse.prototype.OK) {
-     		// Success. The new user group was created.
-     		let groupId = data[AddUserGroup.prototype.ID];
-     		// The new group email format is {groupId}@group.local
-        return response;
-     }
-     else {
-     // Something went wrong...
-     }
-     return response;
+  .supplyAsync({
+    [AddUserGroup.prototype.NAME]: "New Test Generated User Group",
+    [AddUserGroup.prototype.MEMBERS]: ["john@email.com","jane@email.com"],
+  })
+  .then(function (response) {
+  if (response.status === ServerResponse.prototype.OK) {
+      // Success. The new user group was created.
+      let groupId = data[AddUserGroup.prototype.ID];
+      // The new group email format is {groupId}@group.local
+      return response;
+    }
+    else {
+    // Something went wrong...
+    }
+    return response;
  });
 ```
 
@@ -330,22 +330,22 @@ These type of accounts will allow user authorization using only an account ID. H
 
 ```javascript
 return new AddContact(sdk)
-    .supplyAsync({
-    	[AddContact.prototype.EMAIL]: "1234567",
-    	[AddContact.prototype.NOTIFICATIONS]: NotificationEnum.prototype.NONE,
-                            [AddContact.prototype.ROLE]: RolesEnum.prototype.ALIAS,
-                            [AddContact.prototype.TITLE]: "External",
-                            [AddContact.prototype.FIRST_NAME]: "John",
-                            [AddContact.prototype.LAST_NAME]: "Doe",
-    })
-    .then(function (response) {
-   	if (response.status === ServerResponse.prototype.OK) {
-     		// Success. The contact was created.
-     }
-     else {
-     // Something went wrong...
-     }
-     return response;
+  .supplyAsync({
+    [AddContact.prototype.EMAIL]: "1234567",
+    [AddContact.prototype.NOTIFICATIONS]: NotificationEnum.prototype.NONE,
+                          [AddContact.prototype.ROLE]: RolesEnum.prototype.ALIAS,
+                          [AddContact.prototype.TITLE]: "External",
+                          [AddContact.prototype.FIRST_NAME]: "John",
+                          [AddContact.prototype.LAST_NAME]: "Doe",
+  })
+  .then(function (response) {
+  if (response.status === ServerResponse.prototype.OK) {
+      // Success. The contact was created.
+    }
+    else {
+    // Something went wrong...
+    }
+    return response;
  });
 ```
 After creation, a user can connect to an Alias account by using the **AuthorizeAlias** endpoint:
@@ -355,17 +355,17 @@ After creation, a user can connect to an Alias account by using the **AuthorizeA
 const aliasId = "1234567"; // The external user ID.
 
 return new AuthorizeAlias(sdk)
-    .supplyAsync({
-    	[AuthorizeAlias.prototype.USER]: aliasId, // The external ID
-    })
-    .then(function (response) {
-   	if (response.status === ServerResponse.prototype.OK) {
-   			// Success - The alias user was authorized.
-     }
-     else {
-     // Something went wrong...
-     }
-     return response;
+  .supplyAsync({
+    [AuthorizeAlias.prototype.USER]: aliasId, // The external ID
+  })
+  .then(function (response) {
+  if (response.status === ServerResponse.prototype.OK) {
+      // Success - The alias user was authorized.
+    }
+    else {
+    // Something went wrong...
+    }
+    return response;
  });
 ```
 
