@@ -18,7 +18,7 @@ export default class DashboardLogin extends XQModule{
     constructor(sdk) {
         super(sdk);
         this.serviceName="login/verify";
-        this.requiredFields=["request"];
+        this.requiredFields=[];
     }
 
     /**
@@ -31,7 +31,7 @@ export default class DashboardLogin extends XQModule{
         try {
 
             let self = this;
-            self.sdk.validateInput(maybePayLoad, self.requiredFields);
+
             let xqAccessToken = self.sdk.validateAccessToken();
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + xqAccessToken};
@@ -42,7 +42,7 @@ export default class DashboardLogin extends XQModule{
                     this.serviceName,
                     CallMethod.prototype.GET,
                     additionalHeaderProperties,
-                    maybePayLoad,
+                    {request:"sub"},
                     true,
                     Destination.prototype.DASHBOARD)
                 .then(function (exchangeResponse){
@@ -52,8 +52,9 @@ export default class DashboardLogin extends XQModule{
                             try {
                                 let activeProfile = self.cache.getActiveProfile(true);
                                 self.cache.putDashboardAccess(activeProfile, dashboardAccessToken);
+                                return exchangeResponse;
                             } catch (e) {
-                                console.log(e.getMessage());
+                                console.log(e.message);
                                 return null;
                             }
                         }
@@ -64,7 +65,7 @@ export default class DashboardLogin extends XQModule{
                 });
 
         } catch (exc) {
-            return new Promise(function (resolve, reject) {
+            return new Promise(function (resolve) {
                 resolve(new ServerResponse(
                     ServerResponse.prototype.ERROR,
                     exc.code,

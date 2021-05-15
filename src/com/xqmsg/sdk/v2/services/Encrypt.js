@@ -4,7 +4,6 @@ import FetchQuantumEntropy from '../quantum/FetchQuantumEntropy.js';
 import GeneratePacket from './GeneratePacket.js';
 import ValidatePacket from './ValidatePacket.js';
 import EncryptionAlgorithm from '../algorithms/EncryptionAlgorithm.js';
-import ExchangeForAccessToken from './ExchangeForAccessToken.js';
 
 /**
  *
@@ -19,13 +18,12 @@ export default class Encrypt extends XQModule{
         super(sdk);
 
         this.algorithm = algorithm;
-        this.requiredFields = [this.USER, this.RECIPIENTS, this.TEXT, this.EXPIRES_HOURS];
+        this.requiredFields = [this.RECIPIENTS, this.TEXT, this.EXPIRES_HOURS];
 
     }
 
     /**
      * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {String} maybePayLoad.user - Email of the validated user and author of the message.
      * @param {[String]} maybePayLoad.recipients  - List of emails of users intended to have read access to the encrypted content.
      * @param {String} maybePayLoad.text - Text to be encrypted.
      * @param {Long} maybePayLoad.expires - Life span of the encrypted content, measured in hours.
@@ -119,7 +117,7 @@ export default class Encrypt extends XQModule{
                 });
 
         } catch (exception) {
-        return new Promise(function (resolve, reject) {
+        return new Promise(function (resolve) {
             resolve(new ServerResponse(
                 ServerResponse.prototype.ERROR,
                 exception.code,
@@ -133,8 +131,6 @@ export default class Encrypt extends XQModule{
 }
 
 
-/** Email of the validated user and author of the message.*/
-Encrypt.prototype.USER = "user";
 /** List of emails of users intended to have read access to the encrypted content*/
 Encrypt.prototype.RECIPIENTS = "recipients";
 /** Should the content be deleted after opening*/

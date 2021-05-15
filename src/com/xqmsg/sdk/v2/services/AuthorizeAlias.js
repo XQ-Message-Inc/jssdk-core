@@ -41,7 +41,7 @@ export default class AuthorizeAlias extends XQModule{
                            true)
     }
     catch (validationException){
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve) {
         resolve(new ServerResponse(
             ServerResponse.prototype.ERROR,
             validationException.code,
@@ -57,4 +57,3 @@ export default class AuthorizeAlias extends XQModule{
 AuthorizeAlias.prototype.USER = "user";
 AuthorizeAlias.prototype.FIRST_NAME = "firstName";
 AuthorizeAlias.prototype.LAST_NAME = "lastName";
-
