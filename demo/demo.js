@@ -42,7 +42,7 @@ $("#sender-access-request-button, #validate-access-request-button, #recipient-li
                     .then(function (validationResponse) {
                         switch (validationResponse.status) {
                             case ServerResponse.prototype.OK: {
-                                if (getProperty("next") == 'encryptScreen') {
+                                if (getProperty("next") === 'encryptScreen') {
                                     buildEncryptScreen();
                                 } else {
                                     $('#decrypt-button').trigger("click", [$("#user-input").val()]);
@@ -58,11 +58,10 @@ $("#sender-access-request-button, #validate-access-request-button, #recipient-li
                     });
                 break;
             case 'encrypt-button':
-                const usr = getProperty('user');
                 const recipientsInput = $("#recipient-list-input")
                                                 .val()
                                                 .split(/,|\s+/g)
-                                                .filter(function(el){return el != "" && el != null;});
+                                                .filter(function(el){return el !== "" && el != null;});
                 const text = $("#encrypt-input").val();
                 const expiresHours = 1;
                 const algorithm = $("#algorithmSelectBox").val();
@@ -71,7 +70,7 @@ $("#sender-access-request-button, #validate-access-request-button, #recipient-li
                     break;
                 }
                 setProperty("algorithm", algorithm);
-                let payload = {[Encrypt.prototype.USER]: usr,
+                let payload = {
                     [Encrypt.prototype.TEXT]: text,
                     [Encrypt.prototype.RECIPIENTS]: recipientsInput,
                     [Encrypt.prototype.EXPIRES_HOURS]:expiresHours}
@@ -220,7 +219,6 @@ function buildIdentifyScreen() {
 
     $("div[id='algorithms']")
         .hide();
-    ;
 
   $("input[id='encrypt-input']")
         .hide();
@@ -235,15 +233,11 @@ function buildIdentifyScreen() {
         .hide();
 
     $("div[id='label-content']")
-        .css('visibility', 'visible');
-
-    $("label[for='label-content']")
+        .css('visibility', 'visible')
         .empty()
         .html("Hello Recipient! <br/>"
             +"You have received an encrypted message!<br />"
-            + "Please enter your email address in order to request access to the message.<br />");
-
-    $("label[for='label-content']")
+            + "Please enter your email address in order to request access to the message.<br />")
         .append("<span>Encrypted Message: <br /></span>")
         .append("<span><b class='client-name'>" + getProperty(Encrypt.prototype.ENCRYPTED_TEXT) + "<br /></span>");
 

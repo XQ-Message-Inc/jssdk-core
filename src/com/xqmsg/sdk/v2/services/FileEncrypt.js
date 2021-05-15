@@ -16,13 +16,12 @@ export default class FileEncrypt extends XQModule {
         super(sdk);
 
         this.algorithm = algorithm;
-        this.requiredFields = [this.USER, this.SOURCE_FILE, this.RECIPIENTS, this.EXPIRES_HOURS];
+        this.requiredFields = [this.SOURCE_FILE, this.RECIPIENTS, this.EXPIRES_HOURS];
     }
 
 
     /**
      * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {String} maybePayLoad.user - Email of the validated user and author of the message.
      * @param {File} maybePayLoad.sourceFile - The file to be encrypted.
      * @param {[String]} maybePayLoad.recipients  - List of emails of users intended to have read access to the encrypted content.
      * @param {Long} maybePayLoad.expires - Life span of the encrypted content, measured in hours.
@@ -69,15 +68,14 @@ export default class FileEncrypt extends XQModule {
                                                             const locatorToken = validateResponse.payload;
                                                             return algorithm
                                                                 .encryptFile(sourceFile, expandedKey, locatorToken)
-                                                                .then(function (fileEncrpytResponse) {
-                                                                    switch (fileEncrpytResponse.status) {
+                                                                .then(function (fileEncryptResponse) {
+                                                                    switch (fileEncryptResponse.status) {
                                                                         case ServerResponse.prototype.OK: {
-                                                                            const encryptedFile = fileEncrpytResponse.payload;
-                                                                            return fileEncrpytResponse;
+                                                                            return fileEncryptResponse;
                                                                         }
                                                                         case ServerResponse.prototype.ERROR: {
-                                                                            console.error(`${algorithm.constructor.name}.encryptFile() failed, code: ${decryptResponse.statusCode}, reason: ${decryptResponse.payload}`);
-                                                                            return fileEncrpytResponse;
+                                                                            console.error(`${algorithm.constructor.name}.encryptFile() failed, code: ${fileEncryptResponse.statusCode}, reason: ${fileEncryptResponse.payload}`);
+                                                                            return fileEncryptResponse;
                                                                         }
                                                                     }
 
@@ -94,7 +92,6 @@ export default class FileEncrypt extends XQModule {
                                         case ServerResponse.prototype.ERROR: {
                                             console.error(`GeneratePacket failed, code: ${uploadResponse.statusCode}, reason: ${uploadResponse.payload}`);
                                             return uploadResponse;
-                                            break;
                                         }
                                     }
                                 });
@@ -102,15 +99,13 @@ export default class FileEncrypt extends XQModule {
                         case ServerResponse.prototype.ERROR: {
                             console.error(`FetchQuantumEntropy failed, code: ${keyResponse.statusCode}, reason: ${keyResponse.payload}`);
                             return  keyResponse;
-                            break;
                         }
-                            ;
                     }
                 });
 
 
         } catch (validationException) {
-            return new Promise(function (resolve, reject) {
+            return new Promise(function (resolve) {
                 resolve(new ServerResponse(
                     ServerResponse.prototype.ERROR,
                     validationException.code,
@@ -130,8 +125,6 @@ export default class FileEncrypt extends XQModule {
 FileEncrypt.prototype.KEY = "key";
 /** The File to be encrypted.*/
 FileEncrypt.prototype.SOURCE_FILE = "sourceFile";
-/** Email of the validated user and author of the message.*/
-FileEncrypt.prototype.USER = "user";
 /** List of emails of users intended to have read access to the encrypted content*/
 FileEncrypt.prototype.RECIPIENTS = "recipients";
 /** Should the content be deleted after opening*/

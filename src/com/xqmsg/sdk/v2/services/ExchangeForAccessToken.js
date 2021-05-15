@@ -46,8 +46,9 @@ export default class ExchangeForAccessToken extends XQModule{
                                 let activeProfile = self.cache.getActiveProfile(true);
                                 self.cache.putXQAccess(activeProfile, accessToken);
                                 self.cache.removeXQPreAuthToken(activeProfile);
+                                return exchangeResponse;
                             } catch (e) {
-                                console.log(e.getMessage());
+                                console.log(e.message);
                                 return null;
                             }
                         }
@@ -58,7 +59,7 @@ export default class ExchangeForAccessToken extends XQModule{
                 });
 
         } catch (exc) {
-            return new Promise(function (resolve, reject) {
+            return new Promise(function (resolve) {
                 resolve(new ServerResponse(
                     ServerResponse.prototype.ERROR,
                     exc.code,
