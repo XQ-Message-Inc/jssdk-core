@@ -27,17 +27,16 @@ export default class RevokeUserAccess extends XQModule{
     supplyAsync = function (maybePayLoad) {
 
         try {
-            const self = this;
-            self.sdk.validateInput(maybePayLoad, self.requiredFields);
-            let accessToken = self.sdk.validateAccessToken();
+            this.sdk.validateInput(maybePayLoad, this.requiredFields);
+            let accessToken = this.sdk.validateAccessToken();
 
             let locatorKey = maybePayLoad[RevokeUserAccess.LOCATOR_KEY];
             maybePayLoad[RevokeUserAccess.RECIPIENTS]= maybePayLoad[RevokeUserAccess.RECIPIENTS].join(",");
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
 
-            return self.sdk.call(self.sdk.VALIDATION_SERVER_URL,
-                self.serviceName + '/' + encodeURIComponent(locatorKey),
+            return this.sdk.call(this.sdk.VALIDATION_SERVER_URL,
+                this.serviceName + '/' + encodeURIComponent(locatorKey),
                 CallMethod.OPTIONS,
                 additionalHeaderProperties,
                 maybePayLoad,

@@ -32,21 +32,22 @@ export default class GrantUserAccess extends XQModule {
   supplyAsync = function (maybePayLoad) {
 
     try {
-      let self = this;
-      self.sdk.validateInput(maybePayLoad, self.requiredFields);
-      let accessToken = self.sdk.validateAccessToken();
+
+      this.sdk.validateInput(maybePayLoad, this.requiredFields);
+      let accessToken = this.sdk.validateAccessToken();
 
       let recipientList = maybePayLoad[GrantUserAccess.RECIPIENTS];
       maybePayLoad[GrantUserAccess.RECIPIENTS]= recipientList.join(",");
 
       let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
 
-      return self.sdk.call(self.sdk.VALIDATION_SERVER_URL,
-          self.serviceName + '/' + encodeURIComponent(maybePayLoad[GrantUserAccess.LOCATOR_TOKEN]),
-          CallMethod.OPTIONS,
-          additionalHeaderProperties,
-          maybePayLoad,
-          true);
+      return this.sdk
+                 .call(this.sdk.VALIDATION_SERVER_URL,
+                       this.serviceName + '/' + encodeURIComponent(maybePayLoad[GrantUserAccess.LOCATOR_TOKEN]),
+                       CallMethod.OPTIONS,
+                       additionalHeaderProperties,
+                       maybePayLoad,
+                       true);
     }
     catch (exception){
       return new Promise(function (resolve, reject) {

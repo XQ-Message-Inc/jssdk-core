@@ -26,37 +26,37 @@ export default class ExchangeForAccessToken extends XQModule{
         try {
 
             let self = this;
+
             let preAuthToken = this.sdk.validatePreAuthToken();
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + preAuthToken};
 
-            return this
-                .sdk
-                .call(this.sdk.SUBSCRIPTION_SERVER_URL,
-                    this.serviceName,
-                    CallMethod.GET,
-                    additionalHeaderProperties,
-                    maybePayLoad,
-                    true)
-                .then(function (exchangeResponse){
-                    switch (exchangeResponse.status) {
-                        case ServerResponse.OK: {
-                            let accessToken = exchangeResponse.payload;
-                            try {
-                                let activeProfile = self.cache.getActiveProfile(true);
-                                self.cache.putXQAccess(activeProfile, accessToken);
-                                self.cache.removeXQPreAuthToken(activeProfile);
-                                return exchangeResponse;
-                            } catch (e) {
-                                console.log(e.message);
-                                return null;
-                            }
-                        }
-                        default: {
-                            return exchangeResponse;
-                        }
-                    }
-                });
+            return this.sdk
+                       .call(this.sdk.SUBSCRIPTION_SERVER_URL,
+                             this.serviceName,
+                             CallMethod.GET,
+                             additionalHeaderProperties,
+                             maybePayLoad,
+                             true)
+                       .then(function (exchangeResponse){
+                           switch (exchangeResponse.status) {
+                               case ServerResponse.OK: {
+                                   let accessToken = exchangeResponse.payload;
+                                   try {
+                                       let activeProfile = self.cache.getActiveProfile(true);
+                                       self.cache.putXQAccess(activeProfile, accessToken);
+                                       self.cache.removeXQPreAuthToken(activeProfile);
+                                       return exchangeResponse;
+                                   } catch (e) {
+                                       console.log(e.message);
+                                       return null;
+                                   }
+                               }
+                               default: {
+                                   return exchangeResponse;
+                               }
+                           }
+                       });
 
         } catch (exc) {
             return new Promise(function (resolve) {

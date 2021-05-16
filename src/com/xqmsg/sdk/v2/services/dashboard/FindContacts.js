@@ -26,20 +26,19 @@ export default class FindContacts extends XQModule {
     supplyAsync = function (maybePayLoad) {
 
         try {
-
-            let self = this;
-
-            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.DASHBOARD);
+            
+            let dashboardAccessToken = this.sdk.validateAccessToken(Destination.DASHBOARD);
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + dashboardAccessToken};
 
-            return self.sdk.call(self.sdk.DASHBOARD_SERVER_URL,
-                self.serviceName,
-                CallMethod.GET,
-                additionalHeaderProperties,
-                maybePayLoad,
-                true,
-                Destination.DASHBOARD);
+            return this.sdk
+                       .call(this.sdk.DASHBOARD_SERVER_URL,
+                             this.serviceName,
+                             CallMethod.GET,
+                             additionalHeaderProperties,
+                             maybePayLoad,
+                             true,
+                             Destination.DASHBOARD);
 
         } catch (exception) {
             return new Promise(function (resolve, reject) {

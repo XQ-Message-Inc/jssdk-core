@@ -26,12 +26,11 @@ export default class DeleteSubscriber extends XQModule{
 
         try {
 
-            const self = this;
-            let accessToken = self.sdk.validateAccessToken();
+            let accessToken = this.sdk.validateAccessToken();
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
-            return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
-                                 self.serviceName,
+            return this.sdk.call(this.sdk.SUBSCRIPTION_SERVER_URL,
+                                 this.serviceName,
                                  CallMethod.DELETE,
                                  additionalHeaderProperties,
                                  maybePayLoad,
