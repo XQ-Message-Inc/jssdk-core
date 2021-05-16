@@ -47,12 +47,12 @@ export default class XQSDK {
      * @param {Destination}destination
      * @returns {Promise<ServerResponse<{}>>}
      */
-    call = function (baseUrl, maybeService, method, maybeHeaderProperties, maybePayload, requiresAPIKey, destination= Destination.prototype.XQ) {
+    call = function (baseUrl, maybeService, method, maybeHeaderProperties, maybePayload, requiresAPIKey, destination= Destination.XQ) {
 
         this.assert(baseUrl != null, "baseUrl cannot be null");
         this.assert(method != null, "method cannot be null");
 
-        if (maybePayload && [CallMethod.prototype.POST, CallMethod.prototype.PATCH,  CallMethod.prototype.OPTIONS].includes(method)) {
+        if (maybePayload && [CallMethod.POST, CallMethod.PATCH,  CallMethod.OPTIONS].includes(method)) {
 
             const URL = baseUrl + (maybeService ? "/" + maybeService : "");
 
@@ -89,14 +89,14 @@ export default class XQSDK {
             xhttp.timeout = 60000;
             if (requiresAPIKey) {
                 switch (destination) {
-                    case Destination.prototype.XQ:{
-                        xhttp.setRequestHeader(self.API_KEY, self.XQ_API_KEY);
-                        xhttp.setRequestHeader(self.ACCESS_CONTROL_ALLOW_ORIGIN, self.ANY);
+                    case Destination.XQ:{
+                        xhttp.setRequestHeader(XQSDK.API_KEY, self.XQ_API_KEY);
+                        xhttp.setRequestHeader(XQSDK.ACCESS_CONTROL_ALLOW_ORIGIN, XQSDK.ANY);
                         break;
                     }
-                    case Destination.prototype.DASHBOARD:{
-                        xhttp.setRequestHeader(self.API_KEY, self.DASHBOARD_API_KEY);
-                        xhttp.setRequestHeader(self.ACCESS_CONTROL_ALLOW_ORIGIN, self.ANY);
+                    case Destination.DASHBOARD:{
+                        xhttp.setRequestHeader(XQSDK.API_KEY, self.DASHBOARD_API_KEY);
+                        xhttp.setRequestHeader(XQSDK.ACCESS_CONTROL_ALLOW_ORIGIN, XQSDK.ANY);
                         break;
                     }
                 }
@@ -106,22 +106,22 @@ export default class XQSDK {
                 for (let [name, value] of entries) {
                     xhttp.setRequestHeader(name, value);
                 }
-                if (!maybeHeaderProperties[self.CONTENT_TYPE]) {
-                    xhttp.setRequestHeader(self.CONTENT_TYPE, self.APPLICATION_JSON);
+                if (!maybeHeaderProperties[XQSDK.CONTENT_TYPE]) {
+                    xhttp.setRequestHeader(XQSDK.CONTENT_TYPE, XQSDK.APPLICATION_JSON);
                 }
             } else {
-                xhttp.setRequestHeader(self.CONTENT_TYPE, self.APPLICATION_JSON);
+                xhttp.setRequestHeader(XQSDK.CONTENT_TYPE, XQSDK.APPLICATION_JSON);
             }
             xhttp.ontimeout = function (e) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     this.status,
                     this.statusText
                 ));
             };
             xhttp.onerror = function (e) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     this.status,
                     this.statusText));
             };
@@ -133,7 +133,7 @@ export default class XQSDK {
                         switch (responseString) {
                             case "":
                                 return resolve(new ServerResponse(
-                                    ServerResponse.prototype.OK,
+                                    ServerResponse.OK,
                                     this.status,
                                     "No Content"
                                 ));
@@ -144,19 +144,19 @@ export default class XQSDK {
                                         dataMap = JSON.parse(responseString.replace(/\n/g, ''));
                                     } catch (e) {
                                         return resolve(new ServerResponse(
-                                            ServerResponse.prototype.ERROR,
+                                            ServerResponse.ERROR,
                                             this.status,
                                             e.errorText
                                        ));
                                     }
                                     return resolve(new ServerResponse(
-                                        ServerResponse.prototype.OK,
+                                        ServerResponse.OK,
                                         this.status,
                                         dataMap
                                     ));
                                 } else {
                                     return resolve(new ServerResponse(
-                                        ServerResponse.prototype.OK,
+                                        ServerResponse.OK,
                                         this.status,
                                         responseString
                                     ));
@@ -166,15 +166,15 @@ export default class XQSDK {
 
                 } else {
                         return resolve(new ServerResponse(
-                            ServerResponse.prototype.ERROR,
+                            ServerResponse.ERROR,
                             this.status,
                             this.responseText
                     ));
                 }
             }
         };
-        if (maybePayload && [CallMethod.prototype.POST, CallMethod.prototype.PATCH].includes(method)) {
-            if (maybeHeaderProperties != null && maybeHeaderProperties[self.CONTENT_TYPE] == self.TEXT_PLAIN_UTF_8) {
+        if (maybePayload && [CallMethod.POST, CallMethod.PATCH].includes(method)) {
+            if (maybeHeaderProperties != null && maybeHeaderProperties[XQSDK.CONTENT_TYPE] == XQSDK.TEXT_PLAIN_UTF_8) {
                 var plainTextData = maybePayload["data"];
                 xhttp.send(plainTextData);
             } else {
@@ -284,18 +284,18 @@ buildQeryParams = function (paramsObject) {
      * @param {Destination}destination
      * @returns {string}
      */
-    validateAccessToken = function (destination= Destination.prototype.XQ) {
+    validateAccessToken = function (destination= Destination.XQ) {
 
         // Ensure that there is an active profile.
         let activeProfile = this.cache.getActiveProfile(true);
         let accessToken = null;
 
         switch (destination) {
-            case Destination.prototype.XQ:{
+            case Destination.XQ:{
                 accessToken =  this.cache.getXQAccess(activeProfile, true);
                 break;
             }
-            case Destination.prototype.DASHBOARD:{
+            case Destination.DASHBOARD:{
                 accessToken = this.cache.getDashboardAccess(activeProfile, true);
                 break;
             }
@@ -309,10 +309,10 @@ buildQeryParams = function (paramsObject) {
 
 }
 
-XQSDK.prototype.API_KEY = "api-key";
-XQSDK.prototype.CONTENT_TYPE = "content-type";
-XQSDK.prototype.ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
-XQSDK.prototype.APPLICATION_JSON = "application/json";
-XQSDK.prototype.TEXT_PLAIN_UTF_8 = "text/plain;charset=UTF-8";
-XQSDK.prototype.ANY = "*";
+XQSDK.API_KEY = "api-key";
+XQSDK.CONTENT_TYPE = "content-type";
+XQSDK.ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
+XQSDK.APPLICATION_JSON = "application/json";
+XQSDK.TEXT_PLAIN_UTF_8 = "text/plain;charset=UTF-8";
+XQSDK.ANY = "*";
 

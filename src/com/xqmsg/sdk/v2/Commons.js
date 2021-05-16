@@ -72,28 +72,28 @@
 });
 
 class XQCache {constructor() {}};
-XQCache.prototype.NAME = "xq-cache";
+XQCache.NAME = "xq-cache";
 
 /** Convenience method for splicing two strings together. */
-String.prototype.splice = function (idx, rem, str) {
+String.splice = function (idx, rem, str) {
     return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
 };
 
 
-String.prototype.stringUpWith = function (separatorToken) {
+String.stringUpWith = function (separatorToken) {
     /**
      *
      * @param tokensToRemove
      * @param separatorToken
      * @returns {string} - String of items separated by the provided token
      */
-    String.prototype.joinWith = function (separatorToken) {
+    String.joinWith = function (separatorToken) {
 
         return this.joinWith([',', ':', '-', '|', ';'], separatorToken);
     }
 }
 
-String.prototype.joinWith = function (tokensToRemove, separatorToken) {
+String.joinWith = function (tokensToRemove, separatorToken) {
 
         if (!tokensToRemove || tokensToRemove.length === 0) {
             tokensToRemove = separatorToken;
@@ -127,7 +127,7 @@ async function sleep(ms) {
  */
 async function cacheFile(cacheKey, theFile) {
 
-    let theCache = caches.open(XQCache.prototype.NAME)
+    let theCache = caches.open(XQCache.NAME)
         .then(function (cache) {
             let stream = new ReadableStream({
                 async start(controller) {
@@ -159,7 +159,7 @@ async function cacheFile(cacheKey, theFile) {
  */
 async function getCachedFile(cacheKey) {
    let filename;
-    return caches.open(XQCache.prototype.NAME)
+    return caches.open(XQCache.NAME)
         .then(function (cacheStorage) {
             return cacheStorage
                 .match(cacheKey)
@@ -184,15 +184,15 @@ async function getCachedFile(cacheKey) {
  * @return {Promise<Cache>}
  */
 async function clearCache() {
-    caches.delete(XQCache.prototype.NAME)
+    caches.delete(XQCache.NAME)
         .then(function (n) {
-            console.warn("cleared cache: %s", XQCache.prototype.NAME);
+            console.warn("cleared cache: %s", XQCache.NAME);
             return new Promise(function (resolve, reject) {
                 resolve(true);
             });
         })
         .catch(function (n) {
-            console.warn("cache is already clear: %s", XQCache.prototype.NAME);
+            console.warn("cache is already clear: %s", XQCache.NAME);
             return new Promise(function (resolve, reject) {
                 resolve(false);
             });

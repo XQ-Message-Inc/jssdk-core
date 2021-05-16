@@ -27,7 +27,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
                 if (key === '' | key == undefined) {
                     console.error("OTPv2 Source Key cannot be empty.");
                     resolve(new ServerResponse(
-                        ServerResponse.prototype.ERROR,
+                        ServerResponse.ERROR,
                         500,
                         "OTPv2 Source Key cannot be empty."
                     ));
@@ -36,18 +36,18 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
                 if (expandedKey == null) {
                     console.error("Key could not be UTF8 encoded.");
                     resolve(new ServerResponse(
-                        ServerResponse.prototype.ERROR,
+                        ServerResponse.ERROR,
                         500,
                         "Key could not be UTF8 encoded."
                     ))
                 }
                 const encryptedText = self.exclusiveDisjunction(text, expandedKey);
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.OK,
+                    ServerResponse.OK,
                     200,
                     {
-                        [EncryptionAlgorithm.prototype.ENCRYPTED_TEXT]: encryptedText,
-                        [EncryptionAlgorithm.prototype.KEY]: expandedKey
+                        [EncryptionAlgorithm.ENCRYPTED_TEXT]: encryptedText,
+                        [EncryptionAlgorithm.KEY]: expandedKey
                     }
                 ));
             });
@@ -55,7 +55,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -106,7 +106,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
                 .then(function (bob) {
                         return new Promise(function (resolve, reject) {
                             resolve(new ServerResponse(
-                                ServerResponse.prototype.OK,
+                                ServerResponse.OK,
                                 200,
                                 new File([bob], `${file.name}.xqf`)
                             ));
@@ -120,7 +120,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -177,20 +177,20 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
                     try {
                         const decoded = decodeURIComponent(encoded);
                         resolve(new ServerResponse(
-                            ServerResponse.prototype.OK,
+                            ServerResponse.OK,
                             200,
-                            {[EncryptionAlgorithm.prototype.DECRYPTED_TEXT]: decoded}
+                            {[EncryptionAlgorithm.DECRYPTED_TEXT]: decoded}
                         ));
                     } catch (exception) {
                         resolve(new ServerResponse(
-                            ServerResponse.prototype.ERROR,
+                            ServerResponse.ERROR,
                             500,
                             exception.message
                         ));
                     }
                 } catch (exception) {
                     resolve(new ServerResponse(
-                        ServerResponse.prototype.ERROR,
+                        ServerResponse.ERROR,
                         500,
                         exception.message
                     ));
@@ -200,7 +200,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -272,7 +272,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
                         let file = result[0];
                         let name = result[1];
                         resolve(new ServerResponse(
-                            ServerResponse.prototype.OK,
+                            ServerResponse.OK,
                             200,
                             file
                         ));
@@ -283,7 +283,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     exception.code,
                     exception.reason
                 ));

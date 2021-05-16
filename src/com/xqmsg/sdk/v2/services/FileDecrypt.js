@@ -15,7 +15,7 @@ export default class FileDecrypt extends XQModule {
         super(sdk);
 
         this.algorithm = algorithm;
-        this.requiredFields=[this.SOURCE_FILE];
+        this.requiredFields=[FileDecrypt.SOURCE_FILE];
     }
     /**
      * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
@@ -31,7 +31,7 @@ export default class FileDecrypt extends XQModule {
         catch (validationException){
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     validationException.code,
                     validationException.reason
                 ));
@@ -40,19 +40,19 @@ export default class FileDecrypt extends XQModule {
         const algorithm = this.algorithm;
         const sdk = this.sdk;
         const accessToken = this.accessToken;
-        const sourceFile = maybePayLoad[this.SOURCE_FILE];
+        const sourceFile = maybePayLoad[FileDecrypt.SOURCE_FILE];
 
         return algorithm
             .decryptFile(sourceFile,
                 function (aLocatorToken) {
                     return new FetchKey(sdk, accessToken)
-                        .supplyAsync({[FetchKey.prototype.LOCATOR_KEY]: aLocatorToken})
+                        .supplyAsync({[FetchKey.LOCATOR_KEY]: aLocatorToken})
                         .then(function (retrieveKeyRespose) {
                             switch (retrieveKeyRespose.status) {
-                                case ServerResponse.prototype.OK: {
+                                case ServerResponse.OK: {
                                     return  retrieveKeyRespose.payload;
                                 }
-                                case ServerResponse.prototype.ERROR: {
+                                case ServerResponse.ERROR: {
                                     console.error(`${algorithm.constructor.name}.decryptFile() failed, code: ${retrieveKeyRespose.statusCode}, reason: ${retrieveKeyRespose.payload}`);
                                     return retrieveKeyRespose;
                                 }
@@ -67,4 +67,4 @@ export default class FileDecrypt extends XQModule {
 }
 
 
-FileDecrypt.prototype.SOURCE_FILE = "sourceFile";
+FileDecrypt.SOURCE_FILE = "sourceFile";
