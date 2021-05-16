@@ -32,7 +32,7 @@ export default class DeleteAuthorization extends XQModule {
 
             return this.sdk.call(this.sdk.SUBSCRIPTION_SERVER_URL,
                                  this.serviceName,
-                                 CallMethod.prototype.DELETE,
+                                 CallMethod.DELETE,
                                  additionalHeaderProperties,
                                  maybePayLoad,
                                  true);
@@ -40,7 +40,7 @@ export default class DeleteAuthorization extends XQModule {
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     exception.code,
                     exception.reason
                 ));

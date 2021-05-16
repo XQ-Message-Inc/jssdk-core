@@ -16,7 +16,7 @@ export default class FileEncrypt extends XQModule {
         super(sdk);
 
         this.algorithm = algorithm;
-        this.requiredFields = [this.SOURCE_FILE, this.RECIPIENTS, this.EXPIRES_HOURS];
+        this.requiredFields = [FileEncrypt.SOURCE_FILE, FileEncrypt.RECIPIENTS, FileEncrypt.EXPIRES_HOURS];
     }
 
 
@@ -37,43 +37,43 @@ export default class FileEncrypt extends XQModule {
 
             const algorithm = self.algorithm;
             const sdk = self.sdk;
-            const sourceFile = maybePayLoad[self.SOURCE_FILE];
-            const recipients = maybePayLoad[self.RECIPIENTS];
-            const expiration = maybePayLoad[self.EXPIRES_HOURS];
-            const deleteOnReceipt = maybePayLoad[self.DELETE_ON_RECEIPT];
+            const sourceFile = maybePayLoad[FileEncrypt.SOURCE_FILE];
+            const recipients = maybePayLoad[FileEncrypt.RECIPIENTS];
+            const expiration = maybePayLoad[FileEncrypt.EXPIRES_HOURS];
+            const deleteOnReceipt = maybePayLoad[FileEncrypt.DELETE_ON_RECEIPT];
 
             return new  FetchQuantumEntropy(sdk)
-                .supplyAsync({[FetchQuantumEntropy.prototype.KS]: FetchQuantumEntropy.prototype._256})
+                .supplyAsync({[FetchQuantumEntropy.KS]: FetchQuantumEntropy._256})
                 .then(function (keyResponse) {
                     switch (keyResponse.status) {
-                        case ServerResponse.prototype.OK: {
+                        case ServerResponse.OK: {
                             const initialKey = keyResponse.payload;
                             let expandedKey = algorithm.expandKey(initialKey, sourceFile.size > 4096 ? 4096 : Math.max(2048, sourceFile.size));
                             return new GeneratePacket(sdk)
                                 .supplyAsync({
-                                    [self.KEY]: algorithm.prefix + expandedKey,
-                                    [self.RECIPIENTS]: recipients,
-                                    [self.EXPIRES_HOURS]: expiration,
-                                    [self.DELETE_ON_RECEIPT]: deleteOnReceipt ? deleteOnReceipt : false
+                                    [FileEncrypt.KEY]: algorithm.prefix + expandedKey,
+                                    [FileEncrypt.RECIPIENTS]: recipients,
+                                    [FileEncrypt.EXPIRES_HOURS]: expiration,
+                                    [FileEncrypt.DELETE_ON_RECEIPT]: deleteOnReceipt ? deleteOnReceipt : false
                                 })
                                 .then(function (uploadResponse) {
                                     switch (uploadResponse.status) {
-                                        case ServerResponse.prototype.OK: {
+                                        case ServerResponse.OK: {
                                             const packet = uploadResponse.payload;
                                             return new ValidatePacket(sdk)
-                                                .supplyAsync({[ValidatePacket.prototype.PACKET]: packet})
+                                                .supplyAsync({[ValidatePacket.PACKET]: packet})
                                                 .then(function (validateResponse) {
                                                     switch (validateResponse.status) {
-                                                        case ServerResponse.prototype.OK: {
+                                                        case ServerResponse.OK: {
                                                             const locatorToken = validateResponse.payload;
                                                             return algorithm
                                                                 .encryptFile(sourceFile, expandedKey, locatorToken)
                                                                 .then(function (fileEncryptResponse) {
                                                                     switch (fileEncryptResponse.status) {
-                                                                        case ServerResponse.prototype.OK: {
+                                                                        case ServerResponse.OK: {
                                                                             return fileEncryptResponse;
                                                                         }
-                                                                        case ServerResponse.prototype.ERROR: {
+                                                                        case ServerResponse.ERROR: {
                                                                             console.error(`${algorithm.constructor.name}.encryptFile() failed, code: ${fileEncryptResponse.statusCode}, reason: ${fileEncryptResponse.payload}`);
                                                                             return fileEncryptResponse;
                                                                         }
@@ -81,7 +81,7 @@ export default class FileEncrypt extends XQModule {
 
                                                                 });
                                                         }
-                                                        case ServerResponse.prototype.ERROR: {
+                                                        case ServerResponse.ERROR: {
                                                             console.error(`ValidateNewKeyPacket failed, code: ${validateResponse.statusCode}, reason: ${validateResponse.payload}`);
                                                             return validateResponse;
                                                         }
@@ -89,14 +89,14 @@ export default class FileEncrypt extends XQModule {
 
                                                 });
                                         }
-                                        case ServerResponse.prototype.ERROR: {
+                                        case ServerResponse.ERROR: {
                                             console.error(`GeneratePacket failed, code: ${uploadResponse.statusCode}, reason: ${uploadResponse.payload}`);
                                             return uploadResponse;
                                         }
                                     }
                                 });
                         }
-                        case ServerResponse.prototype.ERROR: {
+                        case ServerResponse.ERROR: {
                             console.error(`FetchQuantumEntropy failed, code: ${keyResponse.statusCode}, reason: ${keyResponse.payload}`);
                             return  keyResponse;
                         }
@@ -107,7 +107,7 @@ export default class FileEncrypt extends XQModule {
         } catch (validationException) {
             return new Promise(function (resolve) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     validationException.code,
                     validationException.reason
                 ));
@@ -122,14 +122,14 @@ export default class FileEncrypt extends XQModule {
 
 
 /** Encryption Key.*/
-FileEncrypt.prototype.KEY = "key";
+FileEncrypt.KEY = "key";
 /** The File to be encrypted.*/
-FileEncrypt.prototype.SOURCE_FILE = "sourceFile";
+FileEncrypt.SOURCE_FILE = "sourceFile";
 /** List of emails of users intended to have read access to the encrypted content*/
-FileEncrypt.prototype.RECIPIENTS = "recipients";
+FileEncrypt.RECIPIENTS = "recipients";
 /** Should the content be deleted after opening*/
-FileEncrypt.prototype.DELETE_ON_RECEIPT = "dor";
+FileEncrypt.DELETE_ON_RECEIPT = "dor";
 /** Life span of the encrypted content*/
-FileEncrypt.prototype.EXPIRES_HOURS = "expires";
+FileEncrypt.EXPIRES_HOURS = "expires";
 
 

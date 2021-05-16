@@ -14,7 +14,7 @@ export default class RevokeKeyAccess extends XQModule{
         super(sdk);
 
         this.serviceName =  "key";
-        this.requiredFields = [this.LOCATOR_KEY];
+        this.requiredFields = [RevokeKeyAccess.LOCATOR_KEY];
     }
 
 
@@ -31,13 +31,13 @@ export default class RevokeKeyAccess extends XQModule{
             const self = this;
             self.sdk.validateInput(maybePayLoad, self.requiredFields);
             let accessToken = self.sdk.validateAccessToken();
-            let locatorKey = maybePayLoad[self.LOCATOR_KEY];
+            let locatorKey = maybePayLoad[RevokeKeyAccess.LOCATOR_KEY];
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
 
             return self.sdk.call(self.sdk.VALIDATION_SERVER_URL,
                                  self.serviceName + '/' + encodeURIComponent(locatorKey),
-                                 CallMethod.prototype.OPTIONS,
+                                 CallMethod.OPTIONS,
                                  additionalHeaderProperties,
                                  null,
                                  true);
@@ -46,7 +46,7 @@ export default class RevokeKeyAccess extends XQModule{
         catch (exception){
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -60,4 +60,4 @@ export default class RevokeKeyAccess extends XQModule{
 
 }
 
-RevokeKeyAccess.prototype.LOCATOR_KEY = "locatorKey";
+RevokeKeyAccess.LOCATOR_KEY = "locatorKey";

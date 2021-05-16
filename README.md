@@ -79,9 +79,9 @@ The text to be encrypted should be submitted along with the email addresses of t
 const sdk = new XQSDK();  
 
 let payload = {
- [Encrypt.prototype.TEXT]: "My message to encrypt",
-[Encrypt.prototype.RECIPIENTS]:["jane@email.com","jack@email.com"],
-[Encrypt.prototype.EXPIRES_HOURS]: 24
+ [Encrypt.TEXT]: "My message to encrypt",
+[Encrypt.RECIPIENTS]:["jane@email.com","jack@email.com"],
+[Encrypt.EXPIRES_HOURS]: 24
 };
 
 const algorithm = sdk.getAlgorithm("OTPv2");  // Either "AES" or "OTPv2"
@@ -89,10 +89,10 @@ const algorithm = sdk.getAlgorithm("OTPv2");  // Either "AES" or "OTPv2"
 new Encrypt(sdk, algorithm )
   .supplyAsync(payload)
   .then(async function (response) {
-    if (response.status === ServerResponse.prototype.OK) {
+    if (response.status === ServerResponse.OK) {
       const data = response.payload;
-      const locatorKey = data[Encrypt.prototype.LOCATOR_KEY];
-      const encryptedText = data[Encrypt.prototype.ENCRYPTED_TEXT];
+      const locatorKey = data[Encrypt.LOCATOR_KEY];
+      const encryptedText = data[Encrypt.ENCRYPTED_TEXT];
       // Do something with the data
     }
     else {
@@ -107,8 +107,8 @@ To decrypt a message, the encrypted payload must be provided, along with the loc
 
 ```javascript
 let payload = {
-	[Decrypt.prototype.LOCATOR_KEY]:"my_locator_key",  
-   [Decrypt.prototype.ENCRYPTED_TEXT]: "original_encrypted_content"
+	[Decrypt.LOCATOR_KEY]:"my_locator_key",  
+   [Decrypt.ENCRYPTED_TEXT]: "original_encrypted_content"
 };
 
 const algorithm = sdk.getAlgorithm("OTPv2");  // Either "AES" or "OTPv2"
@@ -116,9 +116,9 @@ const algorithm = sdk.getAlgorithm("OTPv2");  // Either "AES" or "OTPv2"
 new Decrypt(sdk, algorithm)
   .supplyAsync(payload)
   .then(async function (response) {
-    if (response.status === ServerResponse.prototype.OK) {
+    if (response.status === ServerResponse.OK) {
       const data = response.payload;
-      const decryptedText = data[EncryptionAlgorithm.prototype.DECRYPTED_TEXT];
+      const decryptedText = data[EncryptionAlgorithm.DECRYPTED_TEXT];
       // Do something with the data
     }
     else {
@@ -141,11 +141,11 @@ let sourceFile = new File(["Hello"], "hello.txt", {
 
 new FileEncrypt(sdk, algorithm)
          .supplyAsync({
- [FileEncrypt.prototype.RECIPIENTS]: ["jane@email.com", "jack@email.com"],
-[FileEncrypt.prototype.EXPIRES_HOURS]: 24,
-[FileEncrypt.prototype.SOURCE_FILE]: sourceFile})
+ [FileEncrypt.RECIPIENTS]: ["jane@email.com", "jack@email.com"],
+[FileEncrypt.EXPIRES_HOURS]: 24,
+[FileEncrypt.SOURCE_FILE]: sourceFile})
  .then(async function (response) {
-    if (response.status === ServerResponse.prototype.OK) {
+    if (response.status === ServerResponse.OK) {
       var encryptedFile = response.payload;
       // Do something with the encrypted file.
     }
@@ -168,9 +168,9 @@ let sourceFile = new File(["ENCRYPTED CONTENT"], "encrypted.txt", {
 });
 
  new FileDecrypt(sdk, algorithm)
- .supplyAsync({[FileDecrypt.prototype.SOURCE_FILE]: sourceFile })
+ .supplyAsync({[FileDecrypt.SOURCE_FILE]: sourceFile })
  .then(async function (response) {
-    if (response.status === ServerResponse.prototype.OK) {
+    if (response.status === ServerResponse.OK) {
       var decryptedFile = response.payload;
       // Do something with the decrypted file.
     }
@@ -188,9 +188,9 @@ The service itself will return a pre-authorization token that can be exchanged f
 
 ```javascript
  new Authorize(sdk)
-    .supplyAsync({[Authorize.prototype.USER]: "me@email.com"})
+    .supplyAsync({[Authorize.USER]: "me@email.com"})
     .then(function (response) {
-    	 if (response.status === ServerResponse.prototype.OK) {
+    	 if (response.status === ServerResponse.OK) {
     	 	// Success. A pre-authorization token should automatically be cached.
     	 }
     	 else {
@@ -206,7 +206,7 @@ At this point,the user can submit the PIN they received using the `CodeValidator
 new CodeValidator(sdk)
     .supplyAsync({[codeValidator.PIN]: "123456"})
     .then(function (response) {
-      if (response.status === ServerResponse.prototype.OK) {
+      if (response.status === ServerResponse.OK) {
         // The user is now fully authorized. The new access token 
         // is added to the active user profile.
       }
@@ -223,7 +223,7 @@ Alternatively, if the user clicks on the link in the email, they can simply exch
 new ExchangeForAccessToken(sdk)
   .supplyAsync( null )
   .then(function (response) {
-      if (response.status === ServerResponse.prototype.OK) {
+      if (response.status === ServerResponse.OK) {
         // Success. A new access token has been added to the active user profile.
       }
       else {
@@ -239,9 +239,9 @@ Revokes a key using its token. Only the user who sent the message will be able t
 
 ```javascript
 new RevokeKeyAccess(sdk)
-  .supplyAsync({[RevokeKeyAccess.prototype.LOCATOR_KEY]: "message_locator_token"})
+  .supplyAsync({[RevokeKeyAccess.LOCATOR_KEY]: "message_locator_token"})
   .then(function (response) {
-      if (response.status === ServerResponse.prototype.OK) {
+      if (response.status === ServerResponse.OK) {
         // Success. Key was revoked successfully. 
       }
       else {
@@ -259,11 +259,11 @@ There may be cases where additional users need to be granted access to a previou
 // Grant access to additional users.
 new GrantUserAccess(sdk)
    .supplyAsync({
-   [GrantUserAccess.prototype.RECIPIENTS]: ["john@email.com"],
-   [GrantUserAccess.prototype.LOCATOR_TOKEN]: "message_locator_token"
+   [GrantUserAccess.RECIPIENTS]: ["john@email.com"],
+   [GrantUserAccess.LOCATOR_TOKEN]: "message_locator_token"
    })
   .then(function (response) {
-    if (response.status === ServerResponse.prototype.OK) {
+    if (response.status === ServerResponse.OK) {
       // Success. John will now be able to read that message. 
     }
     else {
@@ -278,11 +278,11 @@ new GrantUserAccess(sdk)
 // Revoke access from particular users.
 new RevokeUserAccess(sdk)
    .supplyAsync({
-   [GrantUserAccess.prototype.RECIPIENTS]: ["jack@email.com"],
-   [GrantUserAccess.prototype.LOCATOR_TOKEN]: "message_locator_token"
+   [GrantUserAccess.RECIPIENTS]: ["jack@email.com"],
+   [GrantUserAccess.LOCATOR_TOKEN]: "message_locator_token"
    })
   .then(function (response) {
-    if (response.status === ServerResponse.prototype.OK) {
+    if (response.status === ServerResponse.OK) {
       // Success - Jack will no longer be able to read that message.
     }
     else {
@@ -300,7 +300,7 @@ The SDK provides limited functionality for dashboard administration. Before usin
 new DashboardLogin(sdk)
     .supplyAsync(null)
     .then(function (response) {
-   	if (response.status === ServerResponse.prototype.OK) {
+   	if (response.status === ServerResponse.OK) {
      		// Success. New dashboard access token will be stored
      		// for the current profile.
      		let dashboardAccessToken = response.payload;
@@ -319,13 +319,13 @@ Users may group a number of emails accounts under a single alias. Doing this mak
 ```javascript
 new AddUserGroup(sdk)
   .supplyAsync({
-    [AddUserGroup.prototype.NAME]: "New Test Generated User Group",
-    [AddUserGroup.prototype.MEMBERS]: ["john@email.com","jane@email.com"],
+    [AddUserGroup.NAME]: "New Test Generated User Group",
+    [AddUserGroup.MEMBERS]: ["john@email.com","jane@email.com"],
   })
   .then(function (response) {
-  if (response.status === ServerResponse.prototype.OK) {
+  if (response.status === ServerResponse.OK) {
       // Success. The new user group was created.
-      let groupId = data[AddUserGroup.prototype.ID];
+      let groupId = data[AddUserGroup.ID];
       // The new group email format is {groupId}@group.local
       return response;
     }
@@ -346,15 +346,15 @@ These type of accounts will allow user authorization using only an account ID. H
 ```javascript
 new AddContact(sdk)
   .supplyAsync({
-    [AddContact.prototype.EMAIL]: "1234567",
-    [AddContact.prototype.NOTIFICATIONS]: NotificationEnum.prototype.NONE,
-                          [AddContact.prototype.ROLE]: RolesEnum.prototype.ALIAS,
-                          [AddContact.prototype.TITLE]: "External",
-                          [AddContact.prototype.FIRST_NAME]: "John",
-                          [AddContact.prototype.LAST_NAME]: "Doe",
+    [AddContact.EMAIL]: "1234567",
+    [AddContact.NOTIFICATIONS]: NotificationEnum.NONE,
+                          [AddContact.ROLE]: RolesEnum.ALIAS,
+                          [AddContact.TITLE]: "External",
+                          [AddContact.FIRST_NAME]: "John",
+                          [AddContact.LAST_NAME]: "Doe",
   })
   .then(function (response) {
-  if (response.status === ServerResponse.prototype.OK) {
+  if (response.status === ServerResponse.OK) {
       // Success. The contact was created.
     }
     else {
@@ -371,10 +371,10 @@ const aliasId = "1234567"; // The external user ID.
 
 new AuthorizeAlias(sdk)
   .supplyAsync({
-    [AuthorizeAlias.prototype.USER]: aliasId, // The external ID
+    [AuthorizeAlias.USER]: aliasId, // The external ID
   })
   .then(function (response) {
-  if (response.status === ServerResponse.prototype.OK) {
+  if (response.status === ServerResponse.OK) {
       // Success - The alias user was authorized.
     }
     else {
