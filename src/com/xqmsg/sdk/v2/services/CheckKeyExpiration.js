@@ -28,15 +28,14 @@ export default class CheckKeyExpiration extends XQModule{
 
         try {
 
-            const self = this;
-            self.sdk.validateInput(maybePayLoad, self.requiredFields);
-            let accessToken = self.sdk.validateAccessToken();
+            this.sdk.validateInput(maybePayLoad, this.requiredFields);
+            let accessToken = this.sdk.validateAccessToken();
 
             let locatorKey = maybePayLoad[CheckKeyExpiration.LOCATOR_KEY];
             let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
 
-            return self.sdk.call(self.sdk.VALIDATION_SERVER_URL,
-                                 self.serviceName + '/' + encodeURIComponent(locatorKey),
+            return this.sdk.call(this.sdk.VALIDATION_SERVER_URL,
+                                 this.serviceName + '/' + encodeURIComponent(locatorKey),
                                  CallMethod.GET,
                                  additionalHeaderProperties,
                                  null,

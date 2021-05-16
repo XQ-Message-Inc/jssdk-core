@@ -25,16 +25,14 @@ export default class AddContact extends XQModule {
 
         try {
 
-            let self = this;
+            this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
-            self.sdk.validateInput(maybePayLoad, self.requiredFields);
-
-            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.DASHBOARD);
+            let dashboardAccessToken = this.sdk.validateAccessToken(Destination.DASHBOARD);
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + dashboardAccessToken};
 
-            return self.sdk.call(self.sdk.DASHBOARD_SERVER_URL,
-                self.serviceName,
+            return this.sdk.call(this.sdk.DASHBOARD_SERVER_URL,
+                this.serviceName,
                 CallMethod.POST,
                 additionalHeaderProperties,
                 maybePayLoad,

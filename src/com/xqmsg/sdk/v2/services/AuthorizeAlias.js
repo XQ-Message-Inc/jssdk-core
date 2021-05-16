@@ -30,11 +30,10 @@ export default class AuthorizeAlias extends XQModule{
 
     try {
 
-      const self = this;
-      self.sdk.validateInput(maybePayLoad, self.requiredFields);
+      this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
-      return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
-                           self.serviceName,
+      return this.sdk.call(this.sdk.SUBSCRIPTION_SERVER_URL,
+                           this.serviceName,
                            CallMethod.POST,
                            null,
                            maybePayLoad,

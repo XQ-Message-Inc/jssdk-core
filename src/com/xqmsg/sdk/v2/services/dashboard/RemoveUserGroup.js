@@ -10,8 +10,7 @@ import ServerResponse from "../../ServerResponse.js";
  * @class [RemoveUserGroup]
  */
 export default class RemoveUserGroup extends XQModule {
-
-
+    
     constructor(sdk) {
         super(sdk);
         this.serviceName = "usergroup";
@@ -26,22 +25,21 @@ export default class RemoveUserGroup extends XQModule {
     supplyAsync = function (maybePayLoad) {
 
         try {
+            
+            this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
-            let self = this;
-
-            self.sdk.validateInput(maybePayLoad, self.requiredFields);
-
-            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.DASHBOARD);
+            let dashboardAccessToken = this.sdk.validateAccessToken(Destination.DASHBOARD);
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + dashboardAccessToken};
 
-            return self.sdk.call(self.sdk.DASHBOARD_SERVER_URL,
-                            self.serviceName + '/' + maybePayLoad[RemoveUserGroup.ID],
-                            CallMethod.DELETE,
-                            additionalHeaderProperties,
-                            null,
-                            true,
-                            Destination.DASHBOARD);
+            return this.sdk
+                       .call(this.sdk.DASHBOARD_SERVER_URL,
+                             this.serviceName + '/' + maybePayLoad[RemoveUserGroup.ID],
+                             CallMethod.DELETE,
+                             additionalHeaderProperties,
+                             null,
+                             true,
+                             Destination.DASHBOARD);
 
         } catch (exception) {
             return new Promise(function (resolve, reject) {
