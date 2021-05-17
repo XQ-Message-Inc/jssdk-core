@@ -1,122 +1,110 @@
-import EncryptionAlgorithm from '../algorithms/EncryptionAlgorithm.js';
-import ServerResponse from '../ServerResponse.js';
+import EncryptionAlgorithm from "../algorithms/EncryptionAlgorithm.js";
+import ServerResponse from "../ServerResponse.js";
 
 export default class AESEncryption extends EncryptionAlgorithm {
+  constructor(sdk) {
+    super(sdk);
+    this.prefix = ".X";
+  }
 
-    constructor(sdk) {
-        super(sdk);
-        this.prefix = ".X"
+  /**
+   * Takes a string and AES encrypts it using the provided quantum key.
+   *
+   * @param  {String} text The text to encrypt.
+   * @param  {String} key The encryption key.
+   * @return {Promise<ServerResponse>} The encrypted text.
+   */
+  encryptText = function (text, key) {
+    try {
+      const self = this;
+      self.sdk.validateAccessToken();
 
-    }
-
-    /**
-     * Takes a string and AES encrypts it using the provided quantum key.
-     *
-     * @param  {String} text The text to encrypt.
-     * @param  {String} key The encryption key.
-     * @return {Promise<ServerResponse>} The encrypted text.
-     */
-    encryptText = function (text, key) {
+      return new Promise(function (resolve, reject) {
         try {
-            const self = this;
-            self.sdk.validateAccessToken();
+          if ((key === "") | (key == undefined)) {
+            console.error("AES Source Key cannot be empty.");
+            resolve(
+              new ServerResponse(
+                ServerResponse.ERROR,
+                500,
+                "AES Source Key cannot be empty."
+              )
+            );
+          }
 
-            return new Promise(function (resolve, reject) {
+          var encryptedText = CryptoJS.AES.encrypt(text, key).toString();
 
-                try {
-                    if (key === '' | key == undefined) {
-                        console.error("AES Source Key cannot be empty.");
-                        resolve(new ServerResponse(
-                            ServerResponse.ERROR,
-                            500,
-                            "AES Source Key cannot be empty."
-                        ));
-                    }
+          resolve(
+            new ServerResponse(ServerResponse.OK, 200, {
+              [EncryptionAlgorithm.ENCRYPTED_TEXT]: encryptedText,
+              [EncryptionAlgorithm.KEY]: key,
+            })
+          );
+        } catch (error) {
+          console.error(error.message);
 
-                    var encryptedText = CryptoJS.AES.encrypt(text, key).toString();
-
-                    resolve(new ServerResponse(
-                        ServerResponse.OK,
-                        200,
-                        {
-                            [EncryptionAlgorithm.ENCRYPTED_TEXT]: encryptedText,
-                            [EncryptionAlgorithm.KEY]: key
-                        }
-                    ));
-
-                } catch (error) {
-                    console.error(error.message);
-
-                    resolve(new ServerResponse(
-                        ServerResponse.ERROR,
-                        500,
-                        error.message
-                    ));
-                }
-            });
-        } catch (exception) {
-            return new Promise(function (resolve, reject) {
-                resolve(new ServerResponse(
-                    ServerResponse.ERROR,
-                    exception.code,
-                    exception.reason
-                ));
-            });
+          resolve(new ServerResponse(ServerResponse.ERROR, 500, error.message));
         }
-
+      });
+    } catch (exception) {
+      return new Promise(function (resolve, reject) {
+        resolve(
+          new ServerResponse(
+            ServerResponse.ERROR,
+            exception.code,
+            exception.reason
+          )
+        );
+      });
     }
+  };
 
-    /**
-     * Takes an encrypted AES text string and attempts to decrypt with the provided key.
-     * @param  {String} text The text to decrypt.
-     * @param  {String} key The encryption key.
-     * @return {Promise<ServerResponse<{payload:{decryptedText:string}}>>} A Promise of the Response containing the decrypted text.
-     */
-    decryptText = function (text, key) {
+  /**
+   * Takes an encrypted AES text string and attempts to decrypt with the provided key.
+   * @param  {String} text The text to decrypt.
+   * @param  {String} key The encryption key.
+   * @return {Promise<ServerResponse<{payload:{decryptedText:string}}>>} A Promise of the Response containing the decrypted text.
+   */
+  decryptText = function (text, key) {
+    try {
+      const self = this;
+      self.sdk.validateAccessToken();
 
+      return new Promise(function (resolve, reject) {
         try {
-            const self = this;
-            self.sdk.validateAccessToken();
+          if ((key === "") | (key == undefined)) {
+            console.error("AES Source Key cannot be empty.");
+            resolve(
+              new ServerResponse(
+                ServerResponse.ERROR,
+                500,
+                "AES Source Key cannot be empty."
+              )
+            );
+          }
+          var bytes = CryptoJS.AES.decrypt(text, key);
+          var decryptedText = bytes.toString(CryptoJS.enc.Utf8);
 
-            return new Promise(function (resolve, reject) {
-                try {
-                    if (key === '' | key == undefined) {
-                        console.error("AES Source Key cannot be empty.");
-                        resolve(new ServerResponse(
-                            ServerResponse.ERROR,
-                            500,
-                            "AES Source Key cannot be empty."
-                        ));
-                    }
-                    var bytes = CryptoJS.AES.decrypt(text, key);
-                    var decryptedText = bytes.toString(CryptoJS.enc.Utf8);
-
-                    resolve(new ServerResponse(
-                        ServerResponse.OK,
-                        200,
-                        {
-                            [EncryptionAlgorithm.DECRYPTED_TEXT]: decryptedText
-                        }
-                    ));
-                } catch (error) {
-                    console.error(error.message);
-                    resolve(new ServerResponse(
-                        ServerResponse.ERROR,
-                        500,
-                        error.message
-                    ));
-                }
-            });
-        } catch (exception) {
-            return new Promise(function (resolve, reject) {
-                resolve(new ServerResponse(
-                    ServerResponse.ERROR,
-                    exception.code,
-                    exception.reason
-                ));
-            });
+          resolve(
+            new ServerResponse(ServerResponse.OK, 200, {
+              [EncryptionAlgorithm.DECRYPTED_TEXT]: decryptedText,
+            })
+          );
+        } catch (error) {
+          console.error(error.message);
+          resolve(new ServerResponse(ServerResponse.ERROR, 500, error.message));
         }
-
+      });
+    } catch (exception) {
+      return new Promise(function (resolve, reject) {
+        resolve(
+          new ServerResponse(
+            ServerResponse.ERROR,
+            exception.code,
+            exception.reason
+          )
+        );
+      });
     }
-
+  };
 }

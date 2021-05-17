@@ -1,0 +1,20 @@
+{
+    "plugins": ["prettier"],
+    "parser": "@babel/eslint-parser",
+    "extends": ["eslint:recommended", "prettier"],
+    "parserOptions": {
+      "sourceType": "module",
+    },
+    "env": {
+      "browser": true,
+      "jest": true,
+      "es6": true,
+      "node": true,
+    },
+    "rules": {
+      "prettier/prettier": "warn",
+      "no-unused-vars": 0,
+    },
+    "ignorePatterns": ["**/Commons.js", "**/demo.js"]
+  }
+  

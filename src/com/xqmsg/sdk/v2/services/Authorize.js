@@ -16,65 +16,64 @@ import ServerResponse from "../ServerResponse.js";
  */
 
 export default class Authorize extends XQModule {
+  constructor(sdk) {
+    super(sdk);
 
-    constructor(sdk) {
-        super(sdk);
+    this.serviceName = "authorize";
+    this.requiredFields = [Authorize.USER];
+  }
 
-        this.serviceName = "authorize";
-        this.requiredFields = [Authorize.USER];
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {String} maybePayLoad.user - Email of the user to be validated.
+   * @param {String} [maybePayLoad.firstName]  - First name of the user.
+   * @param {String} [maybePayLoad.lastName] - Last name of the user.
+   * @param {Boolean} [maybePayLoad.newsLetter=false] - Should the user receive a newsletter.
+   * @param {NotificationEnum} [maybePayLoad.notifications=0] Enum Value to specify Notification Settings
+   *
+   * @returns {Promise<ServerResponse<{payload:string}>>}
+   */
+  supplyAsync = function (maybePayLoad) {
+    try {
+      let self = this;
+      this.sdk.validateInput(maybePayLoad, this.requiredFields);
+      let user = maybePayLoad[Authorize.USER];
 
+      return this.sdk
+        .call(
+          this.sdk.SUBSCRIPTION_SERVER_URL,
+          this.serviceName,
+          CallMethod.POST,
+          null,
+          maybePayLoad,
+          true
+        )
+        .then(function (response) {
+          switch (response.status) {
+            case ServerResponse.OK: {
+              const temporaryAccessToken = response.payload;
+              self.cache.putXQPreAuthToken(user, temporaryAccessToken);
+              self.cache.putActiveProfile(user);
+              break;
+            }
+            default: {
+              return response;
+            }
+          }
+        });
+    } catch (exception) {
+      return new Promise(function (resolve, reject) {
+        resolve(
+          new ServerResponse(
+            ServerResponse.ERROR,
+            exception.code,
+            exception.reason
+          )
+        );
+      });
     }
-
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {String} maybePayLoad.user - Email of the user to be validated.
-     * @param {String} [maybePayLoad.firstName]  - First name of the user.
-     * @param {String} [maybePayLoad.lastName] - Last name of the user.
-     * @param {Boolean} [maybePayLoad.newsLetter=false] - Should the user receive a newsletter.
-     * @param {NotificationEnum} [maybePayLoad.notifications=0] Enum Value to specify Notification Settings
-     *
-     * @returns {Promise<ServerResponse<{payload:string}>>}
-     */
-    supplyAsync = function (maybePayLoad) {
-
-        try {
-            let self = this;
-            this.sdk.validateInput(maybePayLoad, this.requiredFields);
-            let user = maybePayLoad[Authorize.USER];
-
-            return this.sdk.call(this.sdk.SUBSCRIPTION_SERVER_URL,
-                                 this.serviceName,
-                                 CallMethod.POST,
-                                 null,
-                                 maybePayLoad,
-                                 true)
-                            .then(function (response) {
-                                switch (response.status) {
-                                    case ServerResponse.OK: {
-                                        const temporaryAccessToken = response.payload;
-                                        self.cache.putXQPreAuthToken(user, temporaryAccessToken);
-                                        self.cache.putActiveProfile(user);
-                                    }
-                                    default: {
-                                        return response;
-                                    }
-                                }
-                            });
-
-        } catch (exception) {
-            return new Promise(function (resolve, reject) {
-                resolve(new ServerResponse(
-                    ServerResponse.ERROR,
-                    exception.code,
-                    exception.reason
-                ));
-            });
-        }
-
-    }
-
+  };
 }
-
 
 /** The email of the user*/
 Authorize.USER = "user";
@@ -88,4 +87,3 @@ Authorize.LAST_NAME = "lastName";
 Authorize.NEWS_LETTER = "newsLetter";
 /** The name of this service*/
 Authorize.NOTIFICATIONS = "notifications";
-

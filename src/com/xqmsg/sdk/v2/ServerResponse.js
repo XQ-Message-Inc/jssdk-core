@@ -1,4 +1,3 @@
-
 /**
  *
  * @property {Answered} status - binary reply from server.
@@ -9,20 +8,16 @@
  */
 
 export default class ServerResponse {
-
-
-    /**
-     * @param {Answered} status
-     * @param {Number}  code
-     * @param {Map|Object} data
-     */
-    constructor(status, code, data) {
-
-        this.status = status
-        this.statusCode = code
-        this.payload = data;
-    }
-
+  /**
+   * @param {Answered} status
+   * @param {Number}  code
+   * @param {Map|Object} data
+   */
+  constructor(status, code, data) {
+    this.status = status;
+    this.statusCode = code;
+    this.payload = data;
+  }
 }
 
 ServerResponse.OK = "OK";
