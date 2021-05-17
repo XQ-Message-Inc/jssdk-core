@@ -179,7 +179,7 @@ oReq.addEventListener("load", function () {
                         $("div[id='label-content']")
                             .append(`<label for="label-content" class="TertiaryText" style="font-style:normal; color:#000; visibility:visible;">
                                        You can now run the tests.<br />If you want to fresh you credentials, please press 
-                                       <span style='color: #0082FF'>Refresh Credentials</span>
+                                       <span style='color: #0082FF'>Clear Credentials</span>
                                     </label>`
                             );
 
