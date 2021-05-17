@@ -13,7 +13,7 @@ export default class RevokeUserAccess extends XQModule{
         super(sdk);
 
         this.serviceName =  "revoke";
-        this.requiredFields = [RevokeUserAccess.RECIPIENTS, RevokeUserAccess.LOCATOR_KEY];
+        this.requiredFields = [this.RECIPIENTS, this.LOCATOR_KEY];
     }
 
     /**
@@ -31,14 +31,14 @@ export default class RevokeUserAccess extends XQModule{
             self.sdk.validateInput(maybePayLoad, self.requiredFields);
             let accessToken = self.sdk.validateAccessToken();
 
-            let locatorKey = maybePayLoad[RevokeUserAccess.LOCATOR_KEY];
-            maybePayLoad[RevokeUserAccess.RECIPIENTS]= maybePayLoad[RevokeUserAccess.RECIPIENTS].join(",");
+            let locatorKey = maybePayLoad[self.LOCATOR_KEY];
+            maybePayLoad[self.RECIPIENTS]= maybePayLoad[self.RECIPIENTS].join(",");
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
 
             return self.sdk.call(self.sdk.VALIDATION_SERVER_URL,
                 self.serviceName + '/' + encodeURIComponent(locatorKey),
-                CallMethod.OPTIONS,
+                CallMethod.prototype.OPTIONS,
                 additionalHeaderProperties,
                 maybePayLoad,
                 true);
@@ -47,7 +47,7 @@ export default class RevokeUserAccess extends XQModule{
         catch (validationException){
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     validationException.code,
                     validationException.reason
                 ));
@@ -61,6 +61,6 @@ export default class RevokeUserAccess extends XQModule{
 
 }
 
-RevokeUserAccess.LOCATOR_KEY = "locatorKey";
-RevokeUserAccess.RECIPIENTS = "recipients";
+RevokeUserAccess.prototype.LOCATOR_KEY = "locatorKey";
+RevokeUserAccess.prototype.RECIPIENTS = "recipients";
 

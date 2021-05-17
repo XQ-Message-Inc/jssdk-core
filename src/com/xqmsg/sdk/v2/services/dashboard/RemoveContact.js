@@ -14,7 +14,7 @@ export default class RemoveContact extends XQModule {
     constructor(sdk) {
         super(sdk);
         this.serviceName = "contact";
-        this.requiredFields = [RemoveContact.ID];
+        this.requiredFields = [this.ID];
     }
 
     /**
@@ -29,22 +29,22 @@ export default class RemoveContact extends XQModule {
 
             self.sdk.validateInput(maybePayLoad, self.requiredFields);
 
-            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.DASHBOARD);
+            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.prototype.DASHBOARD);
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + dashboardAccessToken};
 
             return self.sdk.call(self.sdk.DASHBOARD_SERVER_URL,
-                `${self.serviceName}/${maybePayLoad[RemoveContact.ID]}?delete=true`,
-                CallMethod.DELETE,
+                `${self.serviceName}/${maybePayLoad[this.ID]}?delete=true`,
+                CallMethod.prototype.DELETE,
                 additionalHeaderProperties,
                 null,
                 true,
-                Destination.DASHBOARD);
+                Destination.prototype.DASHBOARD);
 
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -56,4 +56,4 @@ export default class RemoveContact extends XQModule {
 
 }
 
-RemoveContact.ID = "id";
+RemoveContact.prototype.ID = "id";

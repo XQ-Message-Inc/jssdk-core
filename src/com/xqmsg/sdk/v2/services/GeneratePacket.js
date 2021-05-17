@@ -12,7 +12,7 @@ export default class GeneratePacket extends XQModule{
         super(sdk);
 
         this.serviceName="packet";
-        this.requiredFields=[GeneratePacket.KEY, GeneratePacket.RECIPIENTS, GeneratePacket.EXPIRES_HOURS];
+        this.requiredFields=[this.KEY, this.RECIPIENTS, this.EXPIRES_HOURS];
     }
 
     /**
@@ -32,11 +32,11 @@ export default class GeneratePacket extends XQModule{
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
 
-            maybePayLoad[GeneratePacket.RECIPIENTS]= maybePayLoad[GeneratePacket.RECIPIENTS].join(",");
+            maybePayLoad[self.RECIPIENTS]= maybePayLoad[self.RECIPIENTS].join(",");
 
             return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
                                  self.serviceName,
-                                 CallMethod.POST,
+                                 CallMethod.prototype.POST,
                                  additionalHeaderProperties,
                                  maybePayLoad,
                                  true);
@@ -44,7 +44,7 @@ export default class GeneratePacket extends XQModule{
         catch (validationException){
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     validationException.code,
                     validationException.reason
                 ));
@@ -57,8 +57,8 @@ export default class GeneratePacket extends XQModule{
 
 }
 
-GeneratePacket.KEY = "key";
-GeneratePacket.RECIPIENTS = "recipients";
-GeneratePacket.EXPIRES_HOURS = "expires";
-GeneratePacket.DELETE_ON_RECEIPT = "dor";
-GeneratePacket.TYPE = "type";
+GeneratePacket.prototype.KEY = "key";
+GeneratePacket.prototype.RECIPIENTS = "recipients";
+GeneratePacket.prototype.EXPIRES_HOURS = "expires";
+GeneratePacket.prototype.DELETE_ON_RECEIPT = "dor";
+GeneratePacket.prototype.TYPE = "type";

@@ -21,15 +21,15 @@ $("#sender-access-request-button, #validate-access-request-button, #recipient-li
                 let user = $("#user-input").val();
                 setProperty('user', user);
                  new Authorize(xqsdk)
-                    .supplyAsync({[Authorize.USER]: user, [Authorize.CODE_TYPE]: 'pin'})
+                    .supplyAsync({[Authorize.prototype.USER]: user, [Authorize.prototype.CODE_TYPE]: 'pin'})
                     .then(function (response) {
                         switch (response.status) {
-                            case ServerResponse.OK: {
+                            case ServerResponse.prototype.OK: {
                                 setProperty('next', 'encryptScreen');
                                 buildValidationScreen();
                                 break;
                             }
-                            case ServerResponse.ERROR: {
+                            case ServerResponse.prototype.ERROR: {
                                 console.info(response);
                                 break;
                             }
@@ -38,10 +38,10 @@ $("#sender-access-request-button, #validate-access-request-button, #recipient-li
                 break;
             case 'validate-access-request-button':
                  new CodeValidator(xqsdk)
-                    .supplyAsync({[CodeValidator.PIN]: $("#pin-input").val()})
+                    .supplyAsync({[CodeValidator.prototype.PIN]: $("#pin-input").val()})
                     .then(function (validationResponse) {
                         switch (validationResponse.status) {
-                            case ServerResponse.OK: {
+                            case ServerResponse.prototype.OK: {
                                 if (getProperty("next") === 'encryptScreen') {
                                     buildEncryptScreen();
                                 } else {
@@ -49,7 +49,7 @@ $("#sender-access-request-button, #validate-access-request-button, #recipient-li
                                 }
                                 break;
                             }
-                            case ServerResponse.ERROR: {
+                            case ServerResponse.prototype.ERROR: {
                                 console.info(validationResponse);
                                 removeProperty("tempToken");
                                 break;
@@ -71,30 +71,30 @@ $("#sender-access-request-button, #validate-access-request-button, #recipient-li
                 }
                 setProperty("algorithm", algorithm);
                 let payload = {
-                    [Encrypt.TEXT]: text,
-                    [Encrypt.RECIPIENTS]: recipientsInput,
-                    [Encrypt.EXPIRES_HOURS]:expiresHours}
+                    [Encrypt.prototype.TEXT]: text,
+                    [Encrypt.prototype.RECIPIENTS]: recipientsInput,
+                    [Encrypt.prototype.EXPIRES_HOURS]:expiresHours}
 
                ;
                 new Encrypt(xqsdk, xqsdk.getAlgorithm(algorithm))
                     .supplyAsync(payload)
                     .then(function (encryptResponse) {
                         switch (encryptResponse.status) {
-                            case ServerResponse.OK: {
+                            case ServerResponse.prototype.OK: {
 
                                 const data = encryptResponse.payload;
 
-                                const locatorKey = data[Encrypt.LOCATOR_KEY];
-                                const encryptedText = data[Encrypt.ENCRYPTED_TEXT];
+                                const locatorKey = data[Encrypt.prototype.LOCATOR_KEY];
+                                const encryptedText = data[Encrypt.prototype.ENCRYPTED_TEXT];
 
-                                setProperty(Encrypt.LOCATOR_KEY, locatorKey);
-                                setProperty(Encrypt.ENCRYPTED_TEXT, encryptedText);
+                                setProperty(Encrypt.prototype.LOCATOR_KEY, locatorKey);
+                                setProperty(Encrypt.prototype.ENCRYPTED_TEXT, encryptedText);
 
                                 buildIdentifyScreen();
                                 break;
 
                             }
-                            case ServerResponse.ERROR: {
+                            case ServerResponse.prototype.ERROR: {
                                 console.info(encryptResponse);
                                 break;
                             }
@@ -105,15 +105,15 @@ $("#sender-access-request-button, #validate-access-request-button, #recipient-li
                 let recipient = $("#recipient-input").val();
                 setProperty('user', recipient);
                 new  Authorize(xqsdk)
-                    .supplyAsync({[Authorize.USER]: recipient})
+                    .supplyAsync({[Authorize.prototype.USER]: recipient})
                     .then(function (response) {
                         switch (response.status) {
-                            case ServerResponse.OK: {
+                            case ServerResponse.prototype.OK: {
                                 replaceProperty('next', 'enryptScreen', 'decryptScreen');
                                 buildValidationScreen();
                                 break;
                             }
-                            case ServerResponse.ERROR: {
+                            case ServerResponse.prototype.ERROR: {
                                 console.info(response);
                                 break;
                             }
@@ -121,20 +121,20 @@ $("#sender-access-request-button, #validate-access-request-button, #recipient-li
                     })
                 break;
             case 'decrypt-button':
-                const locatorKey = getProperty(Encrypt.LOCATOR_KEY);
-                const encryptedText = getProperty(Encrypt.ENCRYPTED_TEXT);
+                const locatorKey = getProperty(Encrypt.prototype.LOCATOR_KEY);
+                const encryptedText = getProperty(Encrypt.prototype.ENCRYPTED_TEXT);
                  new Decrypt(xqsdk, xqsdk.getAlgorithm(getProperty("algorithm")))
-                    .supplyAsync({[Decrypt.LOCATOR_KEY]: locatorKey, [Decrypt.ENCRYPTED_TEXT]: encryptedText})
+                    .supplyAsync({[Decrypt.prototype.LOCATOR_KEY]: locatorKey, [Decrypt.prototype.ENCRYPTED_TEXT]: encryptedText})
                     .then(function (decryptResponse) {
                         switch (decryptResponse.status) {
-                            case ServerResponse.OK: {
+                            case ServerResponse.prototype.OK: {
                                 const data = decryptResponse.payload;
-                                const decryptedText = data[EncryptionAlgorithm.DECRYPTED_TEXT];
+                                const decryptedText = data[EncryptionAlgorithm.prototype.DECRYPTED_TEXT];
                                 setProperty("decryptedText", decryptedText);
                                 buildDecryptScreen()
                                 break;
                             }
-                            case ServerResponse.ERROR: {
+                            case ServerResponse.prototype.ERROR: {
                                 console.info(decryptResponse);
                                 break;
                             }
@@ -239,7 +239,7 @@ function buildIdentifyScreen() {
             +"You have received an encrypted message!<br />"
             + "Please enter your email address in order to request access to the message.<br />")
         .append("<span>Encrypted Message: <br /></span>")
-        .append("<span><b class='client-name'>" + getProperty(Encrypt.ENCRYPTED_TEXT) + "<br /></span>");
+        .append("<span><b class='client-name'>" + getProperty(Encrypt.prototype.ENCRYPTED_TEXT) + "<br /></span>");
 
     $("button[id='recipient-access-request-button']")
         .show();

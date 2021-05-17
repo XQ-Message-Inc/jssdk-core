@@ -25,5 +25,5 @@ export default class ServerResponse {
 
 }
 
-ServerResponse.OK = "OK";
-ServerResponse.ERROR = "ERROR";
+ServerResponse.prototype.OK = "OK";
+ServerResponse.prototype.ERROR = "ERROR";

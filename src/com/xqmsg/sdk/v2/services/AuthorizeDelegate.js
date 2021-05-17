@@ -33,7 +33,7 @@ export default class AuthorizeDelegate extends XQModule{
 
             return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
               this.serviceName,
-                CallMethod.GET,
+                CallMethod.prototype.GET,
                 additionalHeaderProperties,
                 maybePayLoad,
                 true);
@@ -41,7 +41,7 @@ export default class AuthorizeDelegate extends XQModule{
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     exception.code,
                     exception.reason
                 ));

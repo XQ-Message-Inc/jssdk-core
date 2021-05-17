@@ -34,13 +34,13 @@ export default class ExchangeForAccessToken extends XQModule{
                 .sdk
                 .call(this.sdk.SUBSCRIPTION_SERVER_URL,
                     this.serviceName,
-                    CallMethod.GET,
+                    CallMethod.prototype.GET,
                     additionalHeaderProperties,
                     maybePayLoad,
                     true)
                 .then(function (exchangeResponse){
                     switch (exchangeResponse.status) {
-                        case ServerResponse.OK: {
+                        case ServerResponse.prototype.OK: {
                             let accessToken = exchangeResponse.payload;
                             try {
                                 let activeProfile = self.cache.getActiveProfile(true);
@@ -61,7 +61,7 @@ export default class ExchangeForAccessToken extends XQModule{
         } catch (exc) {
             return new Promise(function (resolve) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     exc.code,
                     exc.reason
                 ));

@@ -34,7 +34,7 @@ export default class GetSettings extends XQModule {
 
             return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
                 self.serviceName,
-                CallMethod.GET,
+                CallMethod.prototype.GET,
                 additionalHeaderProperties,
                 maybePayLoad,
                 true);
@@ -42,7 +42,7 @@ export default class GetSettings extends XQModule {
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -55,6 +55,6 @@ export default class GetSettings extends XQModule {
 }
 
 /**Specifies the  notifications that the user should receive  */
-GetSettings.NOTIFICATIONS = "notifications";
+GetSettings.prototype.NOTIFICATIONS = "notifications";
 /**Should this user receive newsletters or not? <br>This is only valid for new users, and is ignored if the user already exists.*/
-GetSettings.NEWSLETTER = "newsletter"
+GetSettings.prototype.NEWSLETTER = "newsletter"

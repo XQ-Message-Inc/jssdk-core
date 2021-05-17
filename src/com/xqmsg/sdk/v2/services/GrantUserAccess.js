@@ -14,7 +14,7 @@ export default class GrantUserAccess extends XQModule {
     super(sdk);
 
     this.serviceName = "grant";
-    this.requiredFields = [GrantUserAccess.LOCATOR_TOKEN, GrantUserAccess.RECIPIENTS];
+    this.requiredFields = [this.LOCATOR_TOKEN, this.RECIPIENTS];
 
   }
 
@@ -36,14 +36,14 @@ export default class GrantUserAccess extends XQModule {
       self.sdk.validateInput(maybePayLoad, self.requiredFields);
       let accessToken = self.sdk.validateAccessToken();
 
-      let recipientList = maybePayLoad[GrantUserAccess.RECIPIENTS];
-      maybePayLoad[GrantUserAccess.RECIPIENTS]= recipientList.join(",");
+      let recipientList = maybePayLoad[self.RECIPIENTS];
+      maybePayLoad[self.RECIPIENTS]= recipientList.join(",");
 
       let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
 
       return self.sdk.call(self.sdk.VALIDATION_SERVER_URL,
-          self.serviceName + '/' + encodeURIComponent(maybePayLoad[GrantUserAccess.LOCATOR_TOKEN]),
-          CallMethod.OPTIONS,
+          self.serviceName + '/' + encodeURIComponent(maybePayLoad[self.LOCATOR_TOKEN]),
+          CallMethod.prototype.OPTIONS,
           additionalHeaderProperties,
           maybePayLoad,
           true);
@@ -51,7 +51,7 @@ export default class GrantUserAccess extends XQModule {
     catch (exception){
       return new Promise(function (resolve, reject) {
         resolve(new ServerResponse(
-            ServerResponse.ERROR,
+            ServerResponse.prototype.ERROR,
             exception.code,
             exception.reason
         ));
@@ -65,5 +65,5 @@ export default class GrantUserAccess extends XQModule {
 }
 
 
-GrantUserAccess.RECIPIENTS = "recipients";
-GrantUserAccess.LOCATOR_TOKEN = "locatorToken";
+GrantUserAccess.prototype.RECIPIENTS = "recipients";
+GrantUserAccess.prototype.LOCATOR_TOKEN = "locatorToken";

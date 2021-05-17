@@ -34,7 +34,7 @@ export default class GetUserInfo extends XQModule {
 
             return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
                 self.serviceName,
-                CallMethod.GET,
+                CallMethod.prototype.GET,
                 additionalHeaderProperties,
                 maybePayLoad,
                 true);
@@ -42,7 +42,7 @@ export default class GetUserInfo extends XQModule {
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -54,13 +54,13 @@ export default class GetUserInfo extends XQModule {
 }
 
 
-GetUserInfo.ID = "id";
-GetUserInfo.FIRST_NAME = "firstName";
-GetUserInfo.LAST_NAME = "lastName";
+GetUserInfo.prototype.ID = "id";
+GetUserInfo.prototype.FIRST_NAME = "firstName";
+GetUserInfo.prototype.LAST_NAME = "lastName";
 /** The user's email asddress.*/
-GetUserInfo.USER = "user";
-GetUserInfo.SUBSCRIPTION_STATUS = "sub";
+GetUserInfo.prototype.USER = "user";
+GetUserInfo.prototype.SUBSCRIPTION_STATUS = "sub";
 /**The datetime (in milliseconds) when the subscription was activated.*/
-GetUserInfo.STARTS = "starts";
+GetUserInfo.prototype.STARTS = "starts";
 /**The datetime (in milliseconds) when the subscription will end*/
-GetUserInfo.ENDS = "ends";
+GetUserInfo.prototype.ENDS = "ends";

@@ -35,7 +35,7 @@ oReq.addEventListener("load", function () {
                         function (serverResponse) {
 
                             switch (serverResponse.status) {
-                                case ServerResponse.OK: {
+                                case ServerResponse.prototype.OK: {
                                     $(`#cb-${mkId(test.name)}`).prop({"checked": true, "disabled": true});
                                     $(`#${mkId(test.name)}`).css({"font-style": "italic", "color": "#72ec77"});
                                     break;
@@ -127,10 +127,10 @@ oReq.addEventListener("load", function () {
         let authorize = new Authorize(xqsdk);
 
         return authorize
-            .supplyAsync({[Authorize.USER]: user, [Authorize.CODE_TYPE]:"pin"})
+            .supplyAsync({[authorize.USER]: user, [authorize.CODE_TYPE]:"pin"})
             .then(function (serverResponse) {
                 switch (serverResponse.status) {
-                    case ServerResponse.OK: {
+                    case ServerResponse.prototype.OK: {
                         $("label[for='label-content']")
                             .empty()
                             .html("Please check your email for the confirmation PIN we sent you. <br> Enter it below then press <span style='color: #0082FF'>Confirm</span> to continue.<br />")
@@ -166,10 +166,10 @@ oReq.addEventListener("load", function () {
      function doConfirm(pin) {
         let codeValidator = new CodeValidator(xqsdk);
         return codeValidator
-            .supplyAsync({[CodeValidator.PIN]: pin})
+            .supplyAsync({[codeValidator.PIN]: pin})
             .then(function (serverResponse) {
                 switch (serverResponse.status) {
-                    case ServerResponse.OK: {
+                    case ServerResponse.prototype.OK: {
 
                         showReadyScreen();
 
@@ -204,7 +204,7 @@ oReq.addEventListener("load", function () {
                    doAuthorize(userEmail)
                         .then(function (serverResponse) {
                             switch (serverResponse.status) {
-                                case ServerResponse.OK: {
+                                case ServerResponse.prototype.OK: {
                                     break;
                                 }
                                 default :{
@@ -230,7 +230,7 @@ oReq.addEventListener("load", function () {
                    doConfirm(pin)
                         .then(function (serverResponse) {
                             switch (serverResponse.status) {
-                                case ServerResponse.OK: {
+                                case ServerResponse.prototype.OK: {
                                     break;
                                 }
                                 default :{

@@ -35,6 +35,6 @@ export default class EncryptionAlgorithm{
 
 }
 
-EncryptionAlgorithm.ENCRYPTED_TEXT = 'encrpytedText';
-EncryptionAlgorithm.DECRYPTED_TEXT = 'decryptedText';
-EncryptionAlgorithm.KEY = 'key';
+EncryptionAlgorithm.prototype.ENCRYPTED_TEXT = 'encrpytedText';
+EncryptionAlgorithm.prototype.DECRYPTED_TEXT = 'decryptedText';
+EncryptionAlgorithm.prototype.KEY = 'key';
