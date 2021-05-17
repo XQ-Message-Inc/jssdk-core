@@ -29,22 +29,22 @@ export default class FindContacts extends XQModule {
 
             let self = this;
 
-            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.prototype.DASHBOARD);
+            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.DASHBOARD);
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + dashboardAccessToken};
 
             return self.sdk.call(self.sdk.DASHBOARD_SERVER_URL,
                 self.serviceName,
-                CallMethod.prototype.GET,
+                CallMethod.GET,
                 additionalHeaderProperties,
                 maybePayLoad,
                 true,
-                Destination.prototype.DASHBOARD);
+                Destination.DASHBOARD);
 
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -56,9 +56,9 @@ export default class FindContacts extends XQModule {
 
 }
 
-FindContacts.prototype.ID = "id";
-FindContacts.prototype.CONTACTS = "contacts";
-FindContacts.prototype.FILTER = "filter";
-FindContacts.prototype.ROLE = "role";
-FindContacts.prototype.LIMIT = "limit";
-FindContacts.prototype.PAGE = "page";
+FindContacts.ID = "id";
+FindContacts.CONTACTS = "contacts";
+FindContacts.FILTER = "filter";
+FindContacts.ROLE = "role";
+FindContacts.LIMIT = "limit";
+FindContacts.PAGE = "page";

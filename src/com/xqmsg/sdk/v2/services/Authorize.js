@@ -14,13 +14,14 @@ import ServerResponse from "../ServerResponse.js";
  * The pin servers as the input parameter of {@link ValidateAccessRequest}.<br>
  *  @class [Authorize]
  */
+
 export default class Authorize extends XQModule {
 
     constructor(sdk) {
         super(sdk);
 
         this.serviceName = "authorize";
-        this.requiredFields = [this.USER];
+        this.requiredFields = [Authorize.USER];
 
     }
 
@@ -39,17 +40,17 @@ export default class Authorize extends XQModule {
         try {
             let self = this;
             self.sdk.validateInput(maybePayLoad, self.requiredFields);
-            let user = maybePayLoad[self.USER];
+            let user = maybePayLoad[Authorize.USER];
 
             return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
                                 self.serviceName,
-                                CallMethod.prototype.POST,
+                                CallMethod.POST,
                                 null,
                                 maybePayLoad,
                                 true)
                             .then(function (response) {
                                 switch (response.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
                                         const temporaryAccessToken = response.payload;
                                         self.cache.putXQPreAuthToken(user, temporaryAccessToken);
                                         self.cache.putActiveProfile(user);
@@ -63,7 +64,7 @@ export default class Authorize extends XQModule {
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -74,15 +75,17 @@ export default class Authorize extends XQModule {
 
 }
 
+
 /** The email of the user*/
-Authorize.prototype.USER = "user";
+Authorize.USER = "user";
 /** if 'pin' is sent the validation email will only have the code and no confirmation button */
-Authorize.prototype.CODE_TYPE = "codetype";
+Authorize.CODE_TYPE = "codetype";
 /** The first name of the user */
-Authorize.prototype.FIRST_NAME = "firstName";
+Authorize.FIRST_NAME = "firstName";
 /** The last name of the user*/
-Authorize.prototype.LAST_NAME = "lastName";
+Authorize.LAST_NAME = "lastName";
 /** The name of this service */
-Authorize.prototype.NEWS_LETTER = "newsLetter";
+Authorize.NEWS_LETTER = "newsLetter";
 /** The name of this service*/
-Authorize.prototype.NOTIFICATIONS = "notifications";
+Authorize.NOTIFICATIONS = "notifications";
+

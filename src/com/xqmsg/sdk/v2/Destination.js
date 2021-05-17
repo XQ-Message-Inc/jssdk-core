@@ -4,7 +4,9 @@
  *
  * @class [Destination]
  */
-export default class Destination {}
+export default class Destination {
 
-Destination.prototype.XQ = "XQ";
-Destination.prototype.DASHBOARD = "DASHBOARD";
+}
+
+Destination.XQ = "XQ";
+Destination.DASHBOARD = "DASHBOARD";
