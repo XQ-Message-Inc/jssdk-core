@@ -54,7 +54,7 @@ export default class Authorize extends XQModule {
               const temporaryAccessToken = response.payload;
               self.cache.putXQPreAuthToken(user, temporaryAccessToken);
               self.cache.putActiveProfile(user);
-              break;
+              return response;
             }
             default: {
               return response;
