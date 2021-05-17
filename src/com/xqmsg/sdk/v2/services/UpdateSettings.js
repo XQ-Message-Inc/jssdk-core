@@ -34,7 +34,7 @@ export default class UpdateSettings extends XQModule {
 
             return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
                 self.serviceName,
-                CallMethod.prototype.OPTIONS,
+                CallMethod.OPTIONS,
                 additionalHeaderProperties,
                 maybePayLoad,
                 true);
@@ -42,7 +42,7 @@ export default class UpdateSettings extends XQModule {
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -54,5 +54,5 @@ export default class UpdateSettings extends XQModule {
 }
 
 
-UpdateSettings.prototype.NOTIFICATIONS = "notifications";
-UpdateSettings.prototype.NEWSLETTER = "newsletter";
+UpdateSettings.NOTIFICATIONS = "notifications";
+UpdateSettings.NEWSLETTER = "newsletter";

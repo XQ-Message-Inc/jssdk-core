@@ -14,7 +14,7 @@ export default class CheckApiKey extends XQModule {
         super(sdk);
 
         this.serviceName = "apikey";
-        this.requiredFields = [this.API_KEY];
+        this.requiredFields = [CheckApiKey.API_KEY];
     }
 
 
@@ -36,7 +36,7 @@ export default class CheckApiKey extends XQModule {
 
             return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
                 this.serviceName,
-                CallMethod.prototype.GET,
+                CallMethod.GET,
                 additionalHeaderProperties,
                 maybePayLoad,
                 true);
@@ -44,7 +44,7 @@ export default class CheckApiKey extends XQModule {
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -56,5 +56,5 @@ export default class CheckApiKey extends XQModule {
 
 }
 
-CheckApiKey.prototype.API_KEY = "api-key";
-CheckApiKey.prototype.SCOPES = "scopes";
+CheckApiKey.API_KEY = "api-key";
+CheckApiKey.SCOPES = "scopes";

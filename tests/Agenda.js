@@ -62,7 +62,7 @@ export default class Agenda {
                             console.warn(`The user is authorized.\nThe authorization token is: ${accessToken}`);
                             return new Promise((resolved) => {
                                 resolved(new ServerResponse(
-                                    ServerResponse.prototype.OK,
+                                    ServerResponse.OK,
                                     200,
                                     {}));
                             });
@@ -92,7 +92,7 @@ export default class Agenda {
                             console.warn(`The user had already been authorized for dashboard usage.\nThe dashboard authorization token is: ${dashboardAccessToken}`);
                             return new Promise((resolved) => {
                                 resolved(new ServerResponse(
-                                    ServerResponse.prototype.OK,
+                                    ServerResponse.OK,
                                     200,
                                     {}));
                             });
@@ -103,7 +103,7 @@ export default class Agenda {
                                 .supplyAsync(null)
                                 .then(function (serverResponse) {
                                     switch (serverResponse.status) {
-                                        case ServerResponse.prototype.OK: {
+                                        case ServerResponse.OK: {
                                             let dashboardAccessToken = serverResponse.payload;
                                             console.info("Dashboard Access Token: " + dashboardAccessToken);
                                             return serverResponse;
@@ -138,10 +138,10 @@ export default class Agenda {
                             .supplyAsync(null)
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
                                         let data = serverResponse.payload;
 
-                                        let apps = data[GetApplications.prototype.APPS];
+                                        let apps = data[GetApplications.APPS];
 
                                         apps.forEach(function (app) {
                                             console.info(`Name: ${app["name"]}, Id: ${app["id"]}`);
@@ -176,18 +176,18 @@ export default class Agenda {
 
 
                         let payload = {
-                            [AddUserGroup.prototype.NAME]: "New Test Generated User Group",
-                            [AddUserGroup.prototype.MEMBERS]: self.makeUsers(2).ALL,
+                            [AddUserGroup.NAME]: "New Test Generated User Group",
+                            [AddUserGroup.MEMBERS]: self.makeUsers(2).ALL,
                         };
 
                         return new AddUserGroup(self.xqsdk)
                             .supplyAsync(payload)
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
                                         let data = serverResponse.payload;
 
-                                        let groupId = data[AddUserGroup.prototype.ID];
+                                        let groupId = data[AddUserGroup.ID];
 
                                         console.info(`Group Id: ${groupId}`);
 
@@ -219,30 +219,30 @@ export default class Agenda {
                         console.warn(label);
 
                         return new FindUserGroups(self.xqsdk)
-                            .supplyAsync( {[FindUserGroups.prototype.ID]: "[0-9]+"})
+                            .supplyAsync( {[FindUserGroups.ID]: "[0-9]+"})
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
 
                                         let data = serverResponse.payload;
 
-                                        let groups = data[FindUserGroups.prototype.GROUPS];
+                                        let groups = data[FindUserGroups.GROUPS];
 
                                         let found = groups.find(function (group) {
                                             return group["name"] == 'New Test Generated User Group';
                                         });
 
                                         let payload = {
-                                            [UpdateUserGroup.prototype.ID]: found[FindUserGroups.prototype.ID],
-                                            [UpdateUserGroup.prototype.NAME]: "Updated Test Generated User Group",
-                                            [UpdateUserGroup.prototype.MEMBERS]: self.makeUsers(3).ALL,
+                                            [UpdateUserGroup.ID]: found[FindUserGroups.ID],
+                                            [UpdateUserGroup.NAME]: "Updated Test Generated User Group",
+                                            [UpdateUserGroup.MEMBERS]: self.makeUsers(3).ALL,
                                         };
 
                                         return new UpdateUserGroup(self.xqsdk)
                                             .supplyAsync(payload)
                                             .then(function (serverResponse) {
                                                 switch (serverResponse.status) {
-                                                    case ServerResponse.prototype.OK: {
+                                                    case ServerResponse.OK: {
 
                                                         console.info(`Response Status Code: ${serverResponse.statusCode}`);
 
@@ -288,28 +288,28 @@ export default class Agenda {
                         console.warn(label);
 
                         return  new FindUserGroups(self.xqsdk)
-                            .supplyAsync( {[FindUserGroups.prototype.ID]: "[0-9]+"})
+                            .supplyAsync( {[FindUserGroups.ID]: "[0-9]+"})
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
 
                                         let data = serverResponse.payload;
 
-                                        let groups = data[FindUserGroups.prototype.GROUPS];
+                                        let groups = data[FindUserGroups.GROUPS];
 
                                         let found = groups.find(function (group) {
                                             return group["name"] === 'Updated Test Generated User Group';
                                         });
 
                                         let payload = {
-                                            [RemoveUserGroup.prototype.ID]: found[FindUserGroups.prototype.ID],
+                                            [RemoveUserGroup.ID]: found[FindUserGroups.ID],
                                         };
 
                                         return new RemoveUserGroup(self.xqsdk)
                                             .supplyAsync(payload)
                                             .then(function (serverResponse) {
                                                 switch (serverResponse.status) {
-                                                    case ServerResponse.prototype.OK: {
+                                                    case ServerResponse.OK: {
 
                                                         console.info(`Response Status Code: ${serverResponse.statusCode}`);
 
@@ -354,22 +354,22 @@ export default class Agenda {
                         console.warn(label);
 
                         let payload = {
-                            [AddContact.prototype.EMAIL]: self.makeUsers().FIRST,
-                            [AddContact.prototype.NOTIFICATIONS]: NotificationEnum.prototype.NONE,
-                            [AddContact.prototype.ROLE]: RolesEnum.prototype.ALIAS,
-                            [AddContact.prototype.TITLE]: "Mr.",
-                            [AddContact.prototype.FIRST_NAME]: "John",
-                            [AddContact.prototype.LAST_NAME]: "Doe",
+                            [AddContact.EMAIL]: self.makeUsers().FIRST,
+                            [AddContact.NOTIFICATIONS]: NotificationEnum.NONE,
+                            [AddContact.ROLE]: RolesEnum.ALIAS,
+                            [AddContact.TITLE]: "Mr.",
+                            [AddContact.FIRST_NAME]: "John",
+                            [AddContact.LAST_NAME]: "Doe",
                         };
 
                         return new AddContact(self.xqsdk)
                             .supplyAsync(payload)
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
                                         let data = serverResponse.payload;
 
-                                        let contactId = data[AddContact.prototype.ID];
+                                        let contactId = data[AddContact.ID];
 
                                         console.info(`New Contact Id: ${contactId}`);
 
@@ -401,28 +401,28 @@ export default class Agenda {
                         console.warn(label);
 
                         return new FindContacts(self.xqsdk)
-                            .supplyAsync( {[FindContacts.prototype.FILTER]: "%"})
+                            .supplyAsync( {[FindContacts.FILTER]: "%"})
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
 
                                         let data = serverResponse.payload;
 
-                                        let contacts = data[FindContacts.prototype.CONTACTS];
+                                        let contacts = data[FindContacts.CONTACTS];
 
                                         let found = contacts.find(function (contact) {
                                             return contact["fn"] === 'John' && contact["ln"] === 'Doe';
                                         });
 
                                         let payload = {
-                                            [DisableContact.prototype.ID]: found[FindContacts.prototype.ID],
+                                            [DisableContact.ID]: found[FindContacts.ID],
                                         };
 
                                         return new DisableContact(self.xqsdk)
                                             .supplyAsync(payload)
                                             .then(function (serverResponse) {
                                                 switch (serverResponse.status) {
-                                                    case ServerResponse.prototype.OK: {
+                                                    case ServerResponse.OK: {
 
                                                         console.info(`Disable User, Status Code: ${serverResponse.statusCode}`);
 
@@ -468,28 +468,28 @@ export default class Agenda {
                         console.warn(label);
 
                         return new FindContacts(self.xqsdk)
-                            .supplyAsync( {[FindContacts.prototype.FILTER]: "%"})
+                            .supplyAsync( {[FindContacts.FILTER]: "%"})
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
 
                                         let data = serverResponse.payload;
 
-                                        let contacts = data[FindContacts.prototype.CONTACTS];
+                                        let contacts = data[FindContacts.CONTACTS];
 
                                         let found = contacts.find(function (contact) {
                                             return contact["fn"] === 'John' && contact["ln"] === 'Doe';
                                         });
 
                                         let payload = {
-                                            [DisableContact.prototype.ID]: found[FindContacts.prototype.ID],
+                                            [DisableContact.ID]: found[FindContacts.ID],
                                         };
 
                                         return new RemoveContact(self.xqsdk)
                                             .supplyAsync(payload)
                                             .then(function (serverResponse) {
                                                 switch (serverResponse.status) {
-                                                    case ServerResponse.prototype.OK: {
+                                                    case ServerResponse.OK: {
 
                                                         console.info(`Remove User,  Status Code: ${serverResponse.statusCode}`);
 
@@ -538,14 +538,14 @@ export default class Agenda {
                             .supplyAsync(null)
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
                                         let data = serverResponse.payload;
 
-                                        let id = data[GetUserInfo.prototype.ID];
-                                        let usr = data[GetUserInfo.prototype.USER];
-                                        let firstName = data[GetUserInfo.prototype.FIRST_NAME];
-                                        let lastName = data[GetUserInfo.prototype.LAST_NAME];
-                                        let subscriptionStatus = data[GetUserInfo.prototype.SUBSCRIPTION_STATUS];
+                                        let id = data[GetUserInfo.ID];
+                                        let usr = data[GetUserInfo.USER];
+                                        let firstName = data[GetUserInfo.FIRST_NAME];
+                                        let lastName = data[GetUserInfo.LAST_NAME];
+                                        let subscriptionStatus = data[GetUserInfo.SUBSCRIPTION_STATUS];
 
                                         console.info("Id: " + id);
                                         console.info("User: " + usr);
@@ -583,14 +583,14 @@ export default class Agenda {
                             .supplyAsync(null)
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
                                         let data = serverResponse.payload;
 
-                                        let newsletter = data[GetSettings.prototype.NEWSLETTER];
-                                        let notifications = data[GetSettings.prototype.NOTIFICATIONS];
+                                        let newsletter = data[GetSettings.NEWSLETTER];
+                                        let notifications = data[GetSettings.NOTIFICATIONS];
 
                                         console.info("Receives Newsletters: " + newsletter);
-                                        console.info("Notifications: " + NotificationEnum.prototype.parseValue(notifications));
+                                        console.info("Notifications: " + NotificationEnum.parseValue(notifications));
                                         return serverResponse;
                                     }
                                     default: {
@@ -617,15 +617,15 @@ export default class Agenda {
                         console.warn(label);
 
                         let payload = {
-                            [UpdateSettings.prototype.NEWSLETTER]: false,
-                            [UpdateSettings.prototype.NOTIFICATIONS]: 2
+                            [UpdateSettings.NEWSLETTER]: false,
+                            [UpdateSettings.NOTIFICATIONS]: 2
                         };
 
                         return new UpdateSettings(self.xqsdk)
                             .supplyAsync(payload)
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
                                         let status = serverResponse.statusCode;
                                         let noContent = serverResponse.payload;
                                         console.info("Status: " + status);
@@ -659,7 +659,7 @@ export default class Agenda {
                             .supplyAsync(null)
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
                                         let delegateAccessToken = serverResponse.payload;
                                         console.info("Delegate Access Token: " + delegateAccessToken);
                                         return serverResponse;
@@ -699,10 +699,10 @@ export default class Agenda {
                             .encryptText(text, key)
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
                                         let data = serverResponse.payload;
-                                        console.info("Encrypted Text: " + data[EncryptionAlgorithm.prototype.ENCRYPTED_TEXT]);
-                                        console.info("Expanded Key: " + data[EncryptionAlgorithm.prototype.KEY]);
+                                        console.info("Encrypted Text: " + data[EncryptionAlgorithm.ENCRYPTED_TEXT]);
+                                        console.info("Expanded Key: " + data[EncryptionAlgorithm.KEY]);
                                         return serverResponse;
                                     }
                                     default: {
@@ -716,12 +716,12 @@ export default class Agenda {
                             .then(function (passedThrough) {
                                 let encryptResult = passedThrough.payload;
                                 return algorithm
-                                    .decryptText(encryptResult[EncryptionAlgorithm.prototype.ENCRYPTED_TEXT], encryptResult[EncryptionAlgorithm.prototype.KEY])
+                                    .decryptText(encryptResult[EncryptionAlgorithm.ENCRYPTED_TEXT], encryptResult[EncryptionAlgorithm.KEY])
                                     .then(function (serverResponse) {
                                         switch (serverResponse.status) {
-                                            case ServerResponse.prototype.OK: {
+                                            case ServerResponse.OK: {
                                                 let data = serverResponse.payload;
-                                                console.info("Decrypted Text: " + data[EncryptionAlgorithm.prototype.DECRYPTED_TEXT]);
+                                                console.info("Decrypted Text: " + data[EncryptionAlgorithm.DECRYPTED_TEXT]);
                                                 return serverResponse;
                                             }
                                             default: {
@@ -760,10 +760,10 @@ export default class Agenda {
                             .encryptText(text, key)
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
                                         let data = serverResponse.payload;
-                                        console.info("AES Encrypted Text: " + data[EncryptionAlgorithm.prototype.ENCRYPTED_TEXT]);
-                                        console.info("Key: " + data[EncryptionAlgorithm.prototype.KEY]);
+                                        console.info("AES Encrypted Text: " + data[EncryptionAlgorithm.ENCRYPTED_TEXT]);
+                                        console.info("Key: " + data[EncryptionAlgorithm.KEY]);
                                         return serverResponse;
                                     }
                                     default: {
@@ -777,12 +777,12 @@ export default class Agenda {
                             .then(function (passedThrough) {
                                 let encryptResult = passedThrough.payload;
                                 return algorithm
-                                    .decryptText(encryptResult[EncryptionAlgorithm.prototype.ENCRYPTED_TEXT], encryptResult[EncryptionAlgorithm.prototype.KEY])
+                                    .decryptText(encryptResult[EncryptionAlgorithm.ENCRYPTED_TEXT], encryptResult[EncryptionAlgorithm.KEY])
                                     .then(function (serverResponse) {
                                         switch (serverResponse.status) {
-                                            case ServerResponse.prototype.OK: {
+                                            case ServerResponse.OK: {
                                                 let decryptResult = serverResponse.payload;
-                                                console.info("AES Decrypted Text: " + decryptResult[EncryptionAlgorithm.prototype.DECRYPTED_TEXT]);
+                                                console.info("AES Decrypted Text: " + decryptResult[EncryptionAlgorithm.DECRYPTED_TEXT]);
                                                 return serverResponse;
                                             }
                                             default: {
@@ -819,18 +819,18 @@ export default class Agenda {
 
                         return new Encrypt(self.xqsdk, algorithm)
                             .supplyAsync({
-                                [Encrypt.prototype.TEXT]: text,
-                                [Encrypt.prototype.RECIPIENTS]: [user],
-                                [Encrypt.prototype.EXPIRES_HOURS]: 1,
-                                [Encrypt.prototype.DELETE_ON_RECEIPT]: true
+                                [Encrypt.TEXT]: text,
+                                [Encrypt.RECIPIENTS]: [user],
+                                [Encrypt.EXPIRES_HOURS]: 1,
+                                [Encrypt.DELETE_ON_RECEIPT]: true
                             })
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
                                         let data = serverResponse.payload;
 
-                                        locatorKey = data[Encrypt.prototype.LOCATOR_KEY];
-                                        encryptedText = data[Encrypt.prototype.ENCRYPTED_TEXT];
+                                        locatorKey = data[Encrypt.LOCATOR_KEY];
+                                        encryptedText = data[Encrypt.ENCRYPTED_TEXT];
                                         return serverResponse;
                                     }
                                     default: {
@@ -843,7 +843,7 @@ export default class Agenda {
 
                             })
                             .then(function (intermediaryResult) {
-                                if(intermediaryResult.status === ServerResponse.prototype.ERROR){
+                                if(intermediaryResult.status === ServerResponse.ERROR){
                                     return intermediaryResult;
                                 }
 
@@ -853,15 +853,15 @@ export default class Agenda {
 
                                 return new Decrypt(self.xqsdk, algorithm)
                                     .supplyAsync({
-                                        [Decrypt.prototype.LOCATOR_KEY]: locatorKey,
-                                        [Decrypt.prototype.ENCRYPTED_TEXT]: encryptedText
+                                        [Decrypt.LOCATOR_KEY]: locatorKey,
+                                        [Decrypt.ENCRYPTED_TEXT]: encryptedText
                                     })
                                     .then(function (serverResponse) {
                                         switch (serverResponse.status) {
-                                            case ServerResponse.prototype.OK: {
+                                            case ServerResponse.OK: {
                                                 let data = serverResponse.payload;
 
-                                                let decryptText = data[EncryptionAlgorithm.prototype.DECRYPTED_TEXT];
+                                                let decryptText = data[EncryptionAlgorithm.DECRYPTED_TEXT];
                                                 console.info("Decrypted Text: " + decryptText);
                                                 return serverResponse;
                                             }
@@ -900,18 +900,18 @@ export default class Agenda {
 
                         return new Encrypt(self.xqsdk, algorithm)
                             .supplyAsync({
-                                [Encrypt.prototype.TEXT]: text,
-                                [Encrypt.prototype.RECIPIENTS]: recipients,
-                                [Encrypt.prototype.EXPIRES_HOURS]: 1,
-                                [Encrypt.prototype.DELETE_ON_RECEIPT]: true
+                                [Encrypt.TEXT]: text,
+                                [Encrypt.RECIPIENTS]: recipients,
+                                [Encrypt.EXPIRES_HOURS]: 1,
+                                [Encrypt.DELETE_ON_RECEIPT]: true
                             })
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
                                         let data = serverResponse.payload;
 
-                                        locatorKey = data[Encrypt.prototype.LOCATOR_KEY];
-                                        encryptedText = data[Encrypt.prototype.ENCRYPTED_TEXT];
+                                        locatorKey = data[Encrypt.LOCATOR_KEY];
+                                        encryptedText = data[Encrypt.ENCRYPTED_TEXT];
 
                                         return serverResponse;
                                     }
@@ -926,7 +926,7 @@ export default class Agenda {
                             })
                             .then(function (intermediaryResult) {
 
-                                if(intermediaryResult.status === ServerResponse.prototype.ERROR){
+                                if(intermediaryResult.status === ServerResponse.ERROR){
                                     return intermediaryResult;
                                 }
 
@@ -937,15 +937,15 @@ export default class Agenda {
 
                                 return new Decrypt(self.xqsdk, algorithm)
                                     .supplyAsync({
-                                        [Decrypt.prototype.LOCATOR_KEY]: locatorKey,
-                                        [Decrypt.prototype.ENCRYPTED_TEXT]: encryptedText
+                                        [Decrypt.LOCATOR_KEY]: locatorKey,
+                                        [Decrypt.ENCRYPTED_TEXT]: encryptedText
                                     })
                                     .then(function (serverResponse) {
                                         switch (serverResponse.status) {
-                                            case ServerResponse.prototype.OK: {
+                                            case ServerResponse.OK: {
                                                 let data = serverResponse.payload;
 
-                                                let decryptText = data[EncryptionAlgorithm.prototype.DECRYPTED_TEXT];
+                                                let decryptText = data[EncryptionAlgorithm.DECRYPTED_TEXT];
                                                 console.info("Decrypted Text: " + decryptText);
                                                 return serverResponse;
                                             }
@@ -989,31 +989,31 @@ export default class Agenda {
                         return new FileEncrypt(self.xqsdk, algorithm)
                             .supplyAsync(
                                 {
-                                    [FileEncrypt.prototype.RECIPIENTS]: recipients,
-                                    [FileEncrypt.prototype.EXPIRES_HOURS]: expiration,
-                                    [FileEncrypt.prototype.SOURCE_FILE]: sourceFile
+                                    [FileEncrypt.RECIPIENTS]: recipients,
+                                    [FileEncrypt.EXPIRES_HOURS]: expiration,
+                                    [FileEncrypt.SOURCE_FILE]: sourceFile
                                 })
                             .then(async function (serverResponse) {
 
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
                                         var encryptedFile = serverResponse.payload;
                                         console.warn(`Encrypted File: ${encryptedFile.name}, ${encryptedFile.size} bytes`);
                                         const encryptedFileContent = await encryptedFile.arrayBuffer();
                                         console.warn(`Encrypted File Content: ${new TextDecoder().decode(encryptedFileContent).substr(0, 250)}...\n`);
 
                                         return new FileDecrypt(self.xqsdk, algorithm)
-                                            .supplyAsync({[FileDecrypt.prototype.SOURCE_FILE]: encryptedFile})
+                                            .supplyAsync({[FileDecrypt.SOURCE_FILE]: encryptedFile})
                                             .then(async function (serverResponse) {
                                                 switch (serverResponse.status) {
-                                                    case ServerResponse.prototype.OK: {
+                                                    case ServerResponse.OK: {
                                                         var decryptedFile = serverResponse.payload;
                                                         console.warn(`Decrypted File: ${decryptedFile.name}, ${decryptedFile.size} bytes`);
                                                         const decryptedContent = await decryptedFile.arrayBuffer();
                                                         console.info(`Decrypted File Content: ${new TextDecoder().decode(decryptedContent)}\n`);
                                                         return serverResponse;
                                                     }
-                                                    case ServerResponse.prototype.ERROR: {
+                                                    case ServerResponse.ERROR: {
                                                         console.error(serverResponse);
                                                         return serverResponse;
                                                     }
@@ -1044,9 +1044,9 @@ export default class Agenda {
                     const testUser = self.makeUsers().FIRST;
 
                     let payload = {
-                        [AuthorizeAlias.prototype.USER]: testUser,
-                        [AuthorizeAlias.prototype.FIRST_NAME]: "User",
-                        [AuthorizeAlias.prototype.LAST_NAME]: "XQMessage"
+                        [AuthorizeAlias.USER]: testUser,
+                        [AuthorizeAlias.FIRST_NAME]: "User",
+                        [AuthorizeAlias.LAST_NAME]: "XQMessage"
                     };
 
                     return new AuthorizeAlias(self.xqsdk)
@@ -1058,14 +1058,14 @@ export default class Agenda {
                             self.xqsdk.getCache().putXQAccess(testUser, testUserToken);
 
                             return new CombineAuthorizations(self.xqsdk)
-                                .supplyAsync({[CombineAuthorizations.prototype.TOKENS]: [testUserToken]})
+                                .supplyAsync({[CombineAuthorizations.TOKENS]: [testUserToken]})
                                 .then(function (serverResponse) {
                                     switch (serverResponse.status) {
-                                        case ServerResponse.prototype.OK: {
+                                        case ServerResponse.OK: {
                                             let data = serverResponse.payload;
-                                            let mergedToken = data[CombineAuthorizations.prototype.MERGED_TOKEN];
+                                            let mergedToken = data[CombineAuthorizations.MERGED_TOKEN];
                                             console.info("Merged Token: " + mergedToken);
-                                            let mergeCount = data[CombineAuthorizations.prototype.MERGE_COUNT];
+                                            let mergeCount = data[CombineAuthorizations.MERGE_COUNT];
                                             console.info("Number of tokens combined: " + mergeCount);
                                             self.xqsdk.getCache().removeProfile(testUser);
                                             return serverResponse;
@@ -1092,9 +1092,9 @@ export default class Agenda {
                         const testUser = self.makeUsers().FIRST;
 
                         let payload = {
-                            [AuthorizeAlias.prototype.USER]: testUser,
-                            [AuthorizeAlias.prototype.FIRST_NAME]: "User",
-                            [AuthorizeAlias.prototype.LAST_NAME]: "XQMessage"
+                            [AuthorizeAlias.USER]: testUser,
+                            [AuthorizeAlias.FIRST_NAME]: "User",
+                            [AuthorizeAlias.LAST_NAME]: "XQMessage"
                         };
                         return new AuthorizeAlias(self.xqsdk)
                             .supplyAsync(payload)
@@ -1110,9 +1110,9 @@ export default class Agenda {
                                     .supplyAsync(null)
                                     .then(function (serverResponse) {
                                         switch (serverResponse.status) {
-                                            case ServerResponse.prototype.OK: {
+                                            case ServerResponse.OK: {
                                                 let noContent = serverResponse.payload;
-                                                console.info("Status: " + ServerResponse.prototype.OK);
+                                                console.info("Status: " + ServerResponse.OK);
                                                 console.info("Data: " + noContent);
 
                                                 self.xqsdk.getCache().removeProfile(testUser);
@@ -1153,9 +1153,9 @@ export default class Agenda {
                         const testUser = self.makeUsers().FIRST;
 
                         let payload = {
-                            [AuthorizeAlias.prototype.USER]: testUser,
-                            [AuthorizeAlias.prototype.FIRST_NAME]: "User",
-                            [AuthorizeAlias.prototype.LAST_NAME]: "XQMessage"
+                            [AuthorizeAlias.USER]: testUser,
+                            [AuthorizeAlias.FIRST_NAME]: "User",
+                            [AuthorizeAlias.LAST_NAME]: "XQMessage"
                         };
                         return new AuthorizeAlias(self.xqsdk)
                             .supplyAsync(payload)
@@ -1171,9 +1171,9 @@ export default class Agenda {
                                     .supplyAsync(null)
                                     .then(function (serverResponse) {
                                         switch (serverResponse.status) {
-                                            case ServerResponse.prototype.OK: {
+                                            case ServerResponse.OK: {
                                                 let noContent = serverResponse.payload;
-                                                console.info("Status: " + ServerResponse.prototype.OK);
+                                                console.info("Status: " + ServerResponse.OK);
                                                 console.info("Data: " + noContent);
 
                                                 self.xqsdk.getCache().removeProfile(testUser);
@@ -1209,17 +1209,17 @@ export default class Agenda {
                         let user = self.xqsdk.getCache().getActiveProfile(true);
 
                         let payload = {
-                            [AuthorizeAlias.prototype.USER]: user,
-                            [AuthorizeAlias.prototype.FIRST_NAME]: "User",
-                            [AuthorizeAlias.prototype.LAST_NAME]: "XQMessage"
+                            [AuthorizeAlias.USER]: user,
+                            [AuthorizeAlias.FIRST_NAME]: "User",
+                            [AuthorizeAlias.LAST_NAME]: "XQMessage"
                         };
                         return new AuthorizeAlias(self.xqsdk)
                             .supplyAsync(payload)
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
                                         let token = serverResponse.payload;
-                                        console.info("Status: " + ServerResponse.prototype.OK);
+                                        console.info("Status: " + ServerResponse.OK);
                                         console.info("Token via Alias Authorization: " + token);
                                         return serverResponse
                                     }
@@ -1246,12 +1246,12 @@ export default class Agenda {
                         console.warn(label);
 
                         return new CheckApiKey(self.xqsdk)
-                            .supplyAsync({[CheckApiKey.prototype.API_KEY]: self.xqsdk.XQ_API_KEY})
+                            .supplyAsync({[CheckApiKey.API_KEY]: self.xqsdk.XQ_API_KEY})
                             .then(function (serverResponse) {
                                 switch (serverResponse.status) {
-                                    case ServerResponse.prototype.OK: {
-                                        var scopes = serverResponse.payload[CheckApiKey.prototype.SCOPES];
-                                        console.info("Status: " + ServerResponse.prototype.OK);
+                                    case ServerResponse.OK: {
+                                        var scopes = serverResponse.payload[CheckApiKey.SCOPES];
+                                        console.info("Status: " + ServerResponse.OK);
                                         console.info(`API Key Scopes: "${scopes}"`);
 
                                         return serverResponse;
@@ -1284,26 +1284,26 @@ export default class Agenda {
 
                         return new GeneratePacket(self.xqsdk)
                             .supplyAsync({
-                                [GeneratePacket.prototype.KEY]: '1A2B3C4D5E6F7G8H9I10J',
-                                [GeneratePacket.prototype.RECIPIENTS]: [user],
-                                [GeneratePacket.prototype.EXPIRES_HOURS]: 5,
-                                [GeneratePacket.prototype.DELETE_ON_RECEIPT]: false
+                                [GeneratePacket.KEY]: '1A2B3C4D5E6F7G8H9I10J',
+                                [GeneratePacket.RECIPIENTS]: [user],
+                                [GeneratePacket.EXPIRES_HOURS]: 5,
+                                [GeneratePacket.DELETE_ON_RECEIPT]: false
                             })
                             .then(function (uploadResponse) {
                                 switch (uploadResponse.status) {
-                                    case ServerResponse.prototype.OK: {
+                                    case ServerResponse.OK: {
                                         let packet = uploadResponse.payload;
                                         return new ValidatePacket(self.xqsdk)
-                                            .supplyAsync({[ValidatePacket.prototype.PACKET]: packet})
+                                            .supplyAsync({[ValidatePacket.PACKET]: packet})
                                             .then(function (packetValidationResponse) {
                                                 switch (packetValidationResponse.status) {
-                                                    case ServerResponse.prototype.OK: {
+                                                    case ServerResponse.OK: {
                                                         const locatorKey = packetValidationResponse.payload;
                                                         return new FetchKey(self.xqsdk)
-                                                            .supplyAsync({[Decrypt.prototype.LOCATOR_KEY]: locatorKey})
+                                                            .supplyAsync({[Decrypt.LOCATOR_KEY]: locatorKey})
                                                             .then((serverResponse) => {
                                                                 switch (serverResponse.status) {
-                                                                    case ServerResponse.prototype.OK: {
+                                                                    case ServerResponse.OK: {
                                                                         let key = serverResponse.payload;
                                                                         console.info("Retrieved Key: " + key);
                                                                         return serverResponse;
@@ -1317,17 +1317,17 @@ export default class Agenda {
                                                                 }
                                                             })
                                                             .then((na) => {
-                                                                if(na.status === ServerResponse.prototype.ERROR){
+                                                                if(na.status === ServerResponse.ERROR){
                                                                     return na;
                                                                 }
                                                                 console.warn('Test Key Expiration');
                                                                 return new CheckKeyExpiration(self.xqsdk)
-                                                                    .supplyAsync({[Decrypt.prototype.LOCATOR_KEY]: locatorKey})
+                                                                    .supplyAsync({[Decrypt.LOCATOR_KEY]: locatorKey})
                                                                     .then(function (serverResponse) {
                                                                             switch (serverResponse.status) {
-                                                                                case ServerResponse.prototype.OK: {
+                                                                                case ServerResponse.OK: {
                                                                                     let data = serverResponse.payload;
-                                                                                    let expiresInSeconds = data[CheckKeyExpiration.prototype.EXPIRES_IN];
+                                                                                    let expiresInSeconds = data[CheckKeyExpiration.EXPIRES_IN];
                                                                                     let expiresOn = new Date(new Date().getTime() + expiresInSeconds * 1000);
                                                                                     console.info("Key Expires On " + expiresOn);
                                                                                     return serverResponse;
@@ -1343,16 +1343,16 @@ export default class Agenda {
                                                                     );
                                                             })
                                                             .then((na) => {
-                                                                if(na.status === ServerResponse.prototype.ERROR){
+                                                                if(na.status === ServerResponse.ERROR){
                                                                     return na;
                                                                 }
                                                                 console.warn('Test Revoke Key Access');
 
                                                                 return new RevokeKeyAccess(self.xqsdk)
-                                                                    .supplyAsync({[RevokeKeyAccess.prototype.LOCATOR_KEY]: locatorKey})
+                                                                    .supplyAsync({[RevokeKeyAccess.LOCATOR_KEY]: locatorKey})
                                                                     .then(function (serverResponse) {
                                                                             switch (serverResponse.status) {
-                                                                                case ServerResponse.prototype.OK: {
+                                                                                case ServerResponse.OK: {
                                                                                     let noContent = serverResponse.payload;
                                                                                     console.info("Data: " + noContent);
                                                                                     return serverResponse;
@@ -1368,7 +1368,7 @@ export default class Agenda {
                                                                     )
                                                             })
                                                             .then((na) => {
-                                                                if(na.status === ServerResponse.prototype.ERROR){
+                                                                if(na.status === ServerResponse.ERROR){
                                                                     return na;
                                                                 }
                                                                 console.warn('Test Revoke User Access');
@@ -1378,15 +1378,15 @@ export default class Agenda {
                                                                 return new RevokeUserAccess(self.xqsdk)
                                                                     .supplyAsync(
                                                                         {
-                                                                            [RevokeUserAccess.prototype.USER]: user,
-                                                                            [RevokeUserAccess.prototype.RECIPIENTS]: [user],
-                                                                            [RevokeUserAccess.prototype.LOCATOR_KEY]: locatorKey
+                                                                            [RevokeUserAccess.USER]: user,
+                                                                            [RevokeUserAccess.RECIPIENTS]: [user],
+                                                                            [RevokeUserAccess.LOCATOR_KEY]: locatorKey
                                                                         })
                                                                     .then(function (serverResponse) {
                                                                         switch (serverResponse.status) {
-                                                                            case ServerResponse.prototype.OK: {
+                                                                            case ServerResponse.OK: {
                                                                                 let noContent = serverResponse.payload;
-                                                                                console.info("Status: " + ServerResponse.prototype.OK);
+                                                                                console.info("Status: " + ServerResponse.OK);
                                                                                 console.info("Data: " + noContent);
                                                                                 return serverResponse;
                                                                             }
@@ -1400,7 +1400,7 @@ export default class Agenda {
                                                                     });
                                                             })
                                                             .then((na) => {
-                                                                if(na.status === ServerResponse.prototype.ERROR){
+                                                                if(na.status === ServerResponse.ERROR){
                                                                     return na;
                                                                 }
                                                                 console.warn('Test Grant User Access');
@@ -1410,14 +1410,14 @@ export default class Agenda {
                                                                 return new GrantUserAccess(self.xqsdk)
                                                                     .supplyAsync(
                                                                         {
-                                                                            [GrantUserAccess.prototype.RECIPIENTS]: [user],
-                                                                            [GrantUserAccess.prototype.LOCATOR_TOKEN]: locatorKey
+                                                                            [GrantUserAccess.RECIPIENTS]: [user],
+                                                                            [GrantUserAccess.LOCATOR_TOKEN]: locatorKey
                                                                         })
                                                                     .then(function (serverResponse) {
                                                                             switch (serverResponse.status) {
-                                                                                case ServerResponse.prototype.OK: {
+                                                                                case ServerResponse.OK: {
                                                                                     let noContent = serverResponse.payload;
-                                                                                    console.info("Status: " + ServerResponse.prototype.OK);
+                                                                                    console.info("Status: " + ServerResponse.OK);
                                                                                     console.info("Data: " + noContent);
                                                                                     return serverResponse;
                                                                                 }

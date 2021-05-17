@@ -18,7 +18,7 @@ export default class CombineAuthorizations extends XQModule{
         super(sdk);
 
         this.serviceName =  "combined";
-        this.requiredFields = [this.TOKENS];
+        this.requiredFields = [CombineAuthorizations.TOKENS];
     }
 
 
@@ -38,7 +38,7 @@ export default class CombineAuthorizations extends XQModule{
             let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
             return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
                                  self.serviceName,
-                                 CallMethod.prototype.POST,
+                                 CallMethod.POST,
                                  additionalHeaderProperties,
                                  maybePayLoad,
                                  true);
@@ -47,7 +47,7 @@ export default class CombineAuthorizations extends XQModule{
         catch (exception){
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -60,8 +60,8 @@ export default class CombineAuthorizations extends XQModule{
 }
 
 
-CombineAuthorizations.prototype.TOKENS = "tokens";
+CombineAuthorizations.TOKENS = "tokens";
 /**The merged token.*/
-CombineAuthorizations.prototype.MERGED_TOKEN = "token";
+CombineAuthorizations.MERGED_TOKEN = "token";
 /**The number of tokens that were successfully merged into the token.*/
-CombineAuthorizations.prototype.MERGE_COUNT = "merged";
+CombineAuthorizations.MERGE_COUNT = "merged";

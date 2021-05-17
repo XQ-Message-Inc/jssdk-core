@@ -14,7 +14,7 @@ export default class AddUserGroup extends XQModule {
     constructor(sdk) {
         super(sdk);
         this.serviceName = "usergroup";
-        this.requiredFields = [this.NAME];
+        this.requiredFields = [AddUserGroup.NAME];
     }
 
     /**
@@ -29,22 +29,22 @@ export default class AddUserGroup extends XQModule {
 
             self.sdk.validateInput(maybePayLoad, self.requiredFields);
 
-            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.prototype.DASHBOARD);
+            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.DASHBOARD);
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + dashboardAccessToken};
 
             return self.sdk.call(self.sdk.DASHBOARD_SERVER_URL,
                 self.serviceName,
-                CallMethod.prototype.POST,
+                CallMethod.POST,
                 additionalHeaderProperties,
                 maybePayLoad,
                 true,
-                Destination.prototype.DASHBOARD);
+                Destination.DASHBOARD);
 
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -56,6 +56,6 @@ export default class AddUserGroup extends XQModule {
 
 }
 
-AddUserGroup.prototype.ID = "id";
-AddUserGroup.prototype.NAME = "name";
-AddUserGroup.prototype.MEMBERS = "members";
+AddUserGroup.ID = "id";
+AddUserGroup.NAME = "name";
+AddUserGroup.MEMBERS = "members";

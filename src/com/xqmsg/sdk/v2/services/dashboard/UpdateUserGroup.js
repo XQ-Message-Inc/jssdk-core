@@ -15,7 +15,7 @@ export default class UpdateUserGroup extends XQModule {
     constructor(sdk) {
         super(sdk);
         this.serviceName = "usergroup";
-        this.requiredFields = [this.ID];
+        this.requiredFields = [UpdateUserGroup.ID];
     }
 
 
@@ -31,27 +31,27 @@ export default class UpdateUserGroup extends XQModule {
 
             self.sdk.validateInput(maybePayLoad, self.requiredFields);
 
-            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.prototype.DASHBOARD);
+            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.DASHBOARD);
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + dashboardAccessToken};
 
             let payload = {
-                [UpdateUserGroup.prototype.NAME]: maybePayLoad[this.NAME],
-                [UpdateUserGroup.prototype.MEMBERS]: maybePayLoad[this.MEMBERS],
+                [UpdateUserGroup.NAME]: maybePayLoad[UpdateUserGroup.NAME],
+                [UpdateUserGroup.MEMBERS]: maybePayLoad[UpdateUserGroup.MEMBERS],
             };
 
             return self.sdk.call(self.sdk.DASHBOARD_SERVER_URL,
-                self.serviceName + '/' + maybePayLoad[this.ID],
-                CallMethod.prototype.PATCH,
+                self.serviceName + '/' + maybePayLoad[UpdateUserGroup.ID],
+                CallMethod.PATCH,
                 additionalHeaderProperties,
                 payload,
                 true,
-                Destination.prototype.DASHBOARD);
+                Destination.DASHBOARD);
 
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -63,6 +63,6 @@ export default class UpdateUserGroup extends XQModule {
 
 }
 
-UpdateUserGroup.prototype.ID = "id";
-UpdateUserGroup.prototype.NAME = "name";
-UpdateUserGroup.prototype.MEMBERS = "members";
+UpdateUserGroup.ID = "id";
+UpdateUserGroup.NAME = "name";
+UpdateUserGroup.MEMBERS = "members";

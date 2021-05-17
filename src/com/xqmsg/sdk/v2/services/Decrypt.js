@@ -11,7 +11,7 @@ export default class Decrypt extends XQModule {
         super(sdk);
 
         this.algorithm = algorithm;
-        this.requiredFields = [this.LOCATOR_KEY, this.ENCRYPTED_TEXT];
+        this.requiredFields = [Decrypt.LOCATOR_KEY, Decrypt.ENCRYPTED_TEXT];
 
     }
 
@@ -30,30 +30,30 @@ export default class Decrypt extends XQModule {
             const sdk = self.sdk;
             const accessToken = self.accessToken;
             const algorithm = self.algorithm;
-            let locatorKey = maybePayLoad[self.LOCATOR_KEY];
-            let encryptedText = maybePayLoad[self.ENCRYPTED_TEXT];
+            let locatorKey = maybePayLoad[Decrypt.LOCATOR_KEY];
+            let encryptedText = maybePayLoad[Decrypt.ENCRYPTED_TEXT];
 
             return new FetchKey (sdk, accessToken)
-                .supplyAsync({[FetchKey.prototype.LOCATOR_KEY]: locatorKey})
+                .supplyAsync({[FetchKey.LOCATOR_KEY]: locatorKey})
                 .then(function (keyRetrievalResponse) {
                     switch (keyRetrievalResponse.status) {
-                        case ServerResponse.prototype.OK: {
+                        case ServerResponse.OK: {
                             let encryptionKey = keyRetrievalResponse.payload;
                             return algorithm
                                 .decryptText(encryptedText, encryptionKey)
                                 .then(function (decryptResponse) {
                                     switch (decryptResponse.status) {
-                                        case ServerResponse.prototype.OK: {
+                                        case ServerResponse.OK: {
                                             return decryptResponse;
                                         }
-                                        case ServerResponse.prototype.ERROR: {
+                                        case ServerResponse.ERROR: {
                                             console.error(`${algorithm.constructor.name}.decryptText(...) failed, code: ${decryptResponse.statusCode}, reason: ${decryptResponse.payload}`);
                                             return decryptResponse;
                                         }
                                     }
                                 });
                         }
-                        case ServerResponse.prototype.ERROR: {
+                        case ServerResponse.ERROR: {
                             console.info(keyRetrievalResponse);
                             return keyRetrievalResponse;
                         }
@@ -63,7 +63,7 @@ export default class Decrypt extends XQModule {
         } catch (validationException) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     validationException.code,
                     validationException.reason
                 ));
@@ -76,5 +76,5 @@ export default class Decrypt extends XQModule {
 }
 
 //**key to fetch the encryption key from the server*/
-Decrypt.prototype.LOCATOR_KEY = "locatorKey";
-Decrypt.prototype.ENCRYPTED_TEXT = "encryptedText";
+Decrypt.LOCATOR_KEY = "locatorKey";
+Decrypt.ENCRYPTED_TEXT = "encryptedText";

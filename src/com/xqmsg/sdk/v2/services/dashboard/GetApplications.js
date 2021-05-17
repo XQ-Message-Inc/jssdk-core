@@ -28,22 +28,22 @@ export default class GetApplications extends XQModule {
         try {
 
             let self = this;
-            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.prototype.DASHBOARD);
+            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.DASHBOARD);
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + dashboardAccessToken};
 
             return self.sdk.call(self.sdk.DASHBOARD_SERVER_URL,
                 self.serviceName,
-                CallMethod.prototype.GET,
+                CallMethod.GET,
                 additionalHeaderProperties,
                 maybePayLoad,
                 true,
-                Destination.prototype.DASHBOARD);
+                Destination.DASHBOARD);
 
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.prototype.ERROR,
+                    ServerResponse.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -55,4 +55,4 @@ export default class GetApplications extends XQModule {
 
 }
 
-GetApplications.prototype.APPS = "apps";
+GetApplications.APPS = "apps";

@@ -14,7 +14,7 @@ export default class CheckKeyExpiration extends XQModule{
         super(sdk);
 
         this.serviceName =  "expiration";
-        this.requiredFields = [this.LOCATOR_KEY];
+        this.requiredFields = [CheckKeyExpiration.LOCATOR_KEY];
     }
 
 
@@ -32,12 +32,12 @@ export default class CheckKeyExpiration extends XQModule{
             self.sdk.validateInput(maybePayLoad, self.requiredFields);
             let accessToken = self.sdk.validateAccessToken();
 
-            let locatorKey = maybePayLoad[this.LOCATOR_KEY];
+            let locatorKey = maybePayLoad[CheckKeyExpiration.LOCATOR_KEY];
             let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
 
             return self.sdk.call(self.sdk.VALIDATION_SERVER_URL,
                                  self.serviceName + '/' + encodeURIComponent(locatorKey),
-                                 CallMethod.prototype.GET,
+                                 CallMethod.GET,
                                  additionalHeaderProperties,
                                  null,
                                  true);
@@ -47,7 +47,7 @@ export default class CheckKeyExpiration extends XQModule{
             return new Promise(function (resolve, reject) {
                 resolve(
                     new ServerResponse(
-                        ServerResponse.prototype.ERROR,
+                        ServerResponse.ERROR,
                         exception.code,
                         exception.reason
                     ));
@@ -59,7 +59,7 @@ export default class CheckKeyExpiration extends XQModule{
 }
 
 /**key to fetch the encryption key from the server*/
-CheckKeyExpiration.prototype.LOCATOR_KEY = "locatorKey";
+CheckKeyExpiration.LOCATOR_KEY = "locatorKey";
 /**The number of seconds before this token expires.<br>If the token is already expired, this will be 0*/
-CheckKeyExpiration.prototype.EXPIRES_IN = "expiresOn";
+CheckKeyExpiration.EXPIRES_IN = "expiresOn";
 

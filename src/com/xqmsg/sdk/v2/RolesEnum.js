@@ -10,7 +10,7 @@ export default class  RolesEnum {}
  * @param {Number} opt - Selected Option
  * @return {String} - String Representation of the Option
  */
-RolesEnum.prototype.parseValue = function(opt) {
+RolesEnum.parseValue = function(opt) {
     switch (opt) {
         case this.UNKNOWN:
             return "UNKNOWN";
@@ -43,11 +43,11 @@ RolesEnum.prototype.parseValue = function(opt) {
  * @property {Number} ALIAS  - An Alias role is similar is an anonymous alias that is trackable by an SMB.
  */
 
-RolesEnum.prototype.UNKNOWN = 0;
-RolesEnum.prototype.ADMIN = 1;
-RolesEnum.prototype.USER = 2;
-RolesEnum.prototype.CUSTOMER = 3;
-RolesEnum.prototype.VENDOR = 4;
-RolesEnum.prototype.SUPER_USER = 5;
-RolesEnum.prototype.DEVICE = 6;
-RolesEnum.prototype.ALIAS = 7;
+RolesEnum.UNKNOWN = 0;
+RolesEnum.ADMIN = 1;
+RolesEnum.USER = 2;
+RolesEnum.CUSTOMER = 3;
+RolesEnum.VENDOR = 4;
+RolesEnum.SUPER_USER = 5;
+RolesEnum.DEVICE = 6;
+RolesEnum.ALIAS = 7;
