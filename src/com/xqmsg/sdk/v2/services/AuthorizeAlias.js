@@ -14,7 +14,7 @@ export default class AuthorizeAlias extends XQModule{
     super(sdk);
 
     this.serviceName = "authorizealias";
-    this.requiredFields = [AuthorizeAlias.USER];
+    this.requiredFields = [this.USER];
   }
 
 
@@ -30,11 +30,12 @@ export default class AuthorizeAlias extends XQModule{
 
     try {
 
-      this.sdk.validateInput(maybePayLoad, this.requiredFields);
+      const self = this;
+      self.sdk.validateInput(maybePayLoad, self.requiredFields);
 
-      return this.sdk.call(this.sdk.SUBSCRIPTION_SERVER_URL,
-                           this.serviceName,
-                           CallMethod.POST,
+      return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
+                           self.serviceName,
+                           CallMethod.prototype.POST,
                            null,
                            maybePayLoad,
                            true)
@@ -42,7 +43,7 @@ export default class AuthorizeAlias extends XQModule{
     catch (validationException){
       return new Promise(function (resolve) {
         resolve(new ServerResponse(
-            ServerResponse.ERROR,
+            ServerResponse.prototype.ERROR,
             validationException.code,
             validationException.reason
         ));
@@ -53,6 +54,6 @@ export default class AuthorizeAlias extends XQModule{
   }
 }
 
-AuthorizeAlias.USER = "user";
-AuthorizeAlias.FIRST_NAME = "firstName";
-AuthorizeAlias.LAST_NAME = "lastName";
+AuthorizeAlias.prototype.USER = "user";
+AuthorizeAlias.prototype.FIRST_NAME = "firstName";
+AuthorizeAlias.prototype.LAST_NAME = "lastName";
