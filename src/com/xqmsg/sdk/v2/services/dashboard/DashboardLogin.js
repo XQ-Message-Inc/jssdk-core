@@ -40,14 +40,14 @@ export default class DashboardLogin extends XQModule{
                 .sdk
                 .call(this.sdk.DASHBOARD_SERVER_URL,
                     this.serviceName,
-                    CallMethod.GET,
+                    CallMethod.prototype.GET,
                     additionalHeaderProperties,
                     {request:"sub"},
                     true,
-                    Destination.DASHBOARD)
+                    Destination.prototype.DASHBOARD)
                 .then(function (exchangeResponse){
                     switch (exchangeResponse.status) {
-                        case ServerResponse.OK: {
+                        case ServerResponse.prototype.OK: {
                             let dashboardAccessToken = exchangeResponse.payload;
                             try {
                                 let activeProfile = self.cache.getActiveProfile(true);
@@ -67,7 +67,7 @@ export default class DashboardLogin extends XQModule{
         } catch (exc) {
             return new Promise(function (resolve) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     exc.code,
                     exc.reason
                 ));
@@ -78,4 +78,4 @@ export default class DashboardLogin extends XQModule{
 
 }
 
-DashboardLogin.REQUEST = "request";
+DashboardLogin.prototype.REQUEST = "request";

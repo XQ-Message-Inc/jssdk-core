@@ -3,9 +3,9 @@
  */
 export default class CallMethod {}
 
-CallMethod.POST = "POST";
-CallMethod.GET = "GET";
-CallMethod.PATCH = "PATCH";
-CallMethod.OPTIONS = "OPTIONS";
-CallMethod.DELETE = "DELETE";
+CallMethod.prototype.POST = "POST";
+CallMethod.prototype.GET = "GET";
+CallMethod.prototype.PATCH = "PATCH";
+CallMethod.prototype.OPTIONS = "OPTIONS";
+CallMethod.prototype.DELETE = "DELETE";
 

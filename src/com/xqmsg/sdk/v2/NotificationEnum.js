@@ -10,7 +10,7 @@ export default class  NotificationEnum {}
  * @param {Number} opt - Selected Option
  * @return {String} - String Representation of the Option
  */
-NotificationEnum.parseValue = function(opt) {
+NotificationEnum.prototype.parseValue = function(opt) {
     switch (opt) {
         case this.NONE:
             return "NONE";
@@ -31,7 +31,7 @@ NotificationEnum.parseValue = function(opt) {
  * @property {Number} TUTORIALS  - Receive Tutorials
  * @property {Number} BOTH  - Receive Both
  */
-NotificationEnum.NONE=0;
-NotificationEnum.USAGE_REPORTS=1;
-NotificationEnum.TUTORIALS=2;
-NotificationEnum.BOTH=3;
+NotificationEnum.prototype.NONE=0;
+NotificationEnum.prototype.USAGE_REPORTS=1;
+NotificationEnum.prototype.TUTORIALS=2;
+NotificationEnum.prototype.BOTH=3;

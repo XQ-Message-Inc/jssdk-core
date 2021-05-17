@@ -14,7 +14,7 @@ export default class ValidatePacket extends XQModule{
         super(sdk);
 
         this.serviceName =  "packet";
-        this.requiredFields = [ValidatePacket.PACKET];
+        this.requiredFields = [this.PACKET];
 
     }
 
@@ -33,12 +33,12 @@ export default class ValidatePacket extends XQModule{
 
             let additionalHeaderProperties = {
                 "Authorization": "Bearer " + accessToken,
-                [XQSDK.CONTENT_TYPE]: XQSDK.TEXT_PLAIN_UTF_8
+                [XQSDK.prototype.CONTENT_TYPE]: XQSDK.prototype.TEXT_PLAIN_UTF_8
             };
 
             return self.sdk.call(self.sdk.VALIDATION_SERVER_URL,
                 self.serviceName,
-                CallMethod.POST,
+                CallMethod.prototype.POST,
                 additionalHeaderProperties,
                 maybePayLoad,
                 true);
@@ -47,7 +47,7 @@ export default class ValidatePacket extends XQModule{
         catch (validationException){
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     validationException.code,
                     validationException.reason
                 ));
@@ -59,4 +59,4 @@ export default class ValidatePacket extends XQModule{
 
 }
 
-ValidatePacket.PACKET = "data";
+ValidatePacket.prototype.PACKET = "data";

@@ -20,7 +20,7 @@ export default class FetchKey extends XQModule{
 
         this.sdk = sdk;
         this.serviceName = "key";
-        this.requiredFields = [FetchKey.LOCATOR_KEY];
+        this.requiredFields = [this.LOCATOR_KEY];
 
     }
 
@@ -38,30 +38,30 @@ export default class FetchKey extends XQModule{
             self.sdk.validateInput(maybePayLoad, self.requiredFields);
             let accessToken = self.sdk.validateAccessToken();
 
-            let locatorKey = maybePayLoad[FetchKey.LOCATOR_KEY];
+            let locatorKey = maybePayLoad[FetchKey.prototype.LOCATOR_KEY];
             let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
 
             return self.sdk.call(self.sdk.VALIDATION_SERVER_URL,
                 self.serviceName + '/' + encodeURIComponent(locatorKey),
-                CallMethod.GET,
+                CallMethod.prototype.GET,
                 additionalHeaderProperties,
                 null,
                 true)
                 .then(function (serverResponse){
                     return  new Promise(function(resolve, reject)  {
                         switch (serverResponse.status) {
-                            case ServerResponse.OK: {
+                            case ServerResponse.prototype.OK: {
                                 let key = serverResponse.payload;
                                 key = key.substr(2);
 
                                 resolve(new ServerResponse(
-                                    ServerResponse.OK,
-                                    ServerResponse.OK,
+                                    ServerResponse.prototype.OK,
+                                    ServerResponse.prototype.OK,
                                     key
                                 ));
                                 break;
                             }
-                            case ServerResponse.ERROR: {
+                            case ServerResponse.prototype.ERROR: {
                                 console.error(`RetrieveKey failed, code: ${serverResponse.statusCode}, reason: ${serverResponse.payload}`);
                                 resolve(serverResponse);
                                 break;
@@ -73,7 +73,7 @@ export default class FetchKey extends XQModule{
         catch (validationException){
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     validationException.code,
                     validationException.reason
                 ));
@@ -85,4 +85,4 @@ export default class FetchKey extends XQModule{
 
 }
 
-FetchKey.LOCATOR_KEY = "locatorKey";
+FetchKey.prototype.LOCATOR_KEY = "locatorKey";

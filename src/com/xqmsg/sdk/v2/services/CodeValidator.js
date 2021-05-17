@@ -15,7 +15,7 @@ export default class CodeValidator extends XQModule {
         super(sdk);
 
         this.serviceName = "codevalidation";
-        this.requiredFields = [CodeValidator.PIN];
+        this.requiredFields = [this.PIN];
 
     }
 
@@ -37,16 +37,16 @@ export default class CodeValidator extends XQModule {
             return self.sdk
                 .call(self.sdk.SUBSCRIPTION_SERVER_URL,
                     this.serviceName,
-                    CallMethod.GET,
+                    CallMethod.prototype.GET,
                     additionalHeaderProperties,
                     maybePayLoad,
                     true)
                 .then(function (validationResponse) {
                     switch (validationResponse.status) {
-                        case ServerResponse.OK: {
+                        case ServerResponse.prototype.OK: {
                             return new ExchangeForAccessToken(self.sdk).supplyAsync(null)
                         }
-                        case ServerResponse.ERROR: {
+                        case ServerResponse.prototype.ERROR: {
                             console.info(validationResponse);
                             return validationResponse;
                         }
@@ -56,7 +56,7 @@ export default class CodeValidator extends XQModule {
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -70,5 +70,5 @@ export default class CodeValidator extends XQModule {
 }
 
 /**Pin to validate the access request*/
-CodeValidator.PIN = "pin";
+CodeValidator.prototype.PIN = "pin";
 

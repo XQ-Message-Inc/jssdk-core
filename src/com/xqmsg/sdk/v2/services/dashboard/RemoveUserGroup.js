@@ -15,7 +15,7 @@ export default class RemoveUserGroup extends XQModule {
     constructor(sdk) {
         super(sdk);
         this.serviceName = "usergroup";
-        this.requiredFields = [RemoveUserGroup.ID];
+        this.requiredFields = [this.ID];
     }
 
 
@@ -31,22 +31,22 @@ export default class RemoveUserGroup extends XQModule {
 
             self.sdk.validateInput(maybePayLoad, self.requiredFields);
 
-            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.DASHBOARD);
+            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.prototype.DASHBOARD);
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + dashboardAccessToken};
 
             return self.sdk.call(self.sdk.DASHBOARD_SERVER_URL,
-                            self.serviceName + '/' + maybePayLoad[RemoveUserGroup.ID],
-                            CallMethod.DELETE,
+                            self.serviceName + '/' + maybePayLoad[this.ID],
+                            CallMethod.prototype.DELETE,
                             additionalHeaderProperties,
                             null,
                             true,
-                            Destination.DASHBOARD);
+                            Destination.prototype.DASHBOARD);
 
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -58,4 +58,4 @@ export default class RemoveUserGroup extends XQModule {
 
 }
 
-RemoveUserGroup.ID = "id";
+RemoveUserGroup.prototype.ID = "id";

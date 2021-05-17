@@ -27,12 +27,12 @@ export default class FetchQuantumEntropy extends XQModule {
 
         try {
 
-            let additionalHeaderProperties = {[XQSDK.CONTENT_TYPE]: XQSDK.TEXT_PLAIN_UTF_8};
+            let additionalHeaderProperties = {[XQSDK.prototype.CONTENT_TYPE]: XQSDK.prototype.TEXT_PLAIN_UTF_8};
 
             return this.sdk
                 .call(this.sdk.KEY_SERVER_URL,
                     null,
-                    CallMethod.GET,
+                    CallMethod.prototype.GET,
                     additionalHeaderProperties,
                     maybePayLoad,
                     false);
@@ -41,7 +41,7 @@ export default class FetchQuantumEntropy extends XQModule {
             (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -53,5 +53,5 @@ export default class FetchQuantumEntropy extends XQModule {
     }
 }
 
-FetchQuantumEntropy.KS = 'ks';
-FetchQuantumEntropy._256 = '256';
+FetchQuantumEntropy.prototype.KS = 'ks';
+FetchQuantumEntropy.prototype._256 = '256';

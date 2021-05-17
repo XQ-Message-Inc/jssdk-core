@@ -27,7 +27,7 @@ export default class AESEncryption extends EncryptionAlgorithm {
                     if (key === '' | key == undefined) {
                         console.error("AES Source Key cannot be empty.");
                         resolve(new ServerResponse(
-                            ServerResponse.ERROR,
+                            ServerResponse.prototype.ERROR,
                             500,
                             "AES Source Key cannot be empty."
                         ));
@@ -36,11 +36,11 @@ export default class AESEncryption extends EncryptionAlgorithm {
                     var encryptedText = CryptoJS.AES.encrypt(text, key).toString();
 
                     resolve(new ServerResponse(
-                        ServerResponse.OK,
+                        ServerResponse.prototype.OK,
                         200,
                         {
-                            [EncryptionAlgorithm.ENCRYPTED_TEXT]: encryptedText,
-                            [EncryptionAlgorithm.KEY]: key
+                            [EncryptionAlgorithm.prototype.ENCRYPTED_TEXT]: encryptedText,
+                            [EncryptionAlgorithm.prototype.KEY]: key
                         }
                     ));
 
@@ -48,7 +48,7 @@ export default class AESEncryption extends EncryptionAlgorithm {
                     console.error(error.message);
 
                     resolve(new ServerResponse(
-                        ServerResponse.ERROR,
+                        ServerResponse.prototype.ERROR,
                         500,
                         error.message
                     ));
@@ -57,7 +57,7 @@ export default class AESEncryption extends EncryptionAlgorithm {
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -83,7 +83,7 @@ export default class AESEncryption extends EncryptionAlgorithm {
                     if (key === '' | key == undefined) {
                         console.error("AES Source Key cannot be empty.");
                         resolve(new ServerResponse(
-                            ServerResponse.ERROR,
+                            ServerResponse.prototype.ERROR,
                             500,
                             "AES Source Key cannot be empty."
                         ));
@@ -92,16 +92,16 @@ export default class AESEncryption extends EncryptionAlgorithm {
                     var decryptedText = bytes.toString(CryptoJS.enc.Utf8);
 
                     resolve(new ServerResponse(
-                        ServerResponse.OK,
+                        ServerResponse.prototype.OK,
                         200,
                         {
-                            [EncryptionAlgorithm.DECRYPTED_TEXT]: decryptedText
+                            [EncryptionAlgorithm.prototype.DECRYPTED_TEXT]: decryptedText
                         }
                     ));
                 } catch (error) {
                     console.error(error.message);
                     resolve(new ServerResponse(
-                        ServerResponse.ERROR,
+                        ServerResponse.prototype.ERROR,
                         500,
                         error.message
                     ));
@@ -110,7 +110,7 @@ export default class AESEncryption extends EncryptionAlgorithm {
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     exception.code,
                     exception.reason
                 ));

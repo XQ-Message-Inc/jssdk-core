@@ -32,7 +32,7 @@ export default class DeleteSubscriber extends XQModule{
             let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
             return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
                                  self.serviceName,
-                                 CallMethod.DELETE,
+                                 CallMethod.prototype.DELETE,
                                  additionalHeaderProperties,
                                  maybePayLoad,
                                  true);
@@ -41,7 +41,7 @@ export default class DeleteSubscriber extends XQModule{
         catch (exception){
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     exception.code,
                     exception.reason
                 ));

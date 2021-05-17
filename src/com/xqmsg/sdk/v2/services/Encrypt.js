@@ -18,7 +18,7 @@ export default class Encrypt extends XQModule{
         super(sdk);
 
         this.algorithm = algorithm;
-        this.requiredFields = [Encrypt.RECIPIENTS, Encrypt.TEXT, Encrypt.EXPIRES_HOURS];
+        this.requiredFields = [this.RECIPIENTS, this.TEXT, this.EXPIRES_HOURS];
 
     }
 
@@ -39,16 +39,16 @@ export default class Encrypt extends XQModule{
 
             const sdk = self.sdk;
             const algorithm = self.algorithm;
-            const message = maybePayLoad[Encrypt.TEXT];
-            const recipients = maybePayLoad[Encrypt.RECIPIENTS];
-            const expiresHours = maybePayLoad[Encrypt.EXPIRES_HOURS];
-            const deleteOnReceipt = maybePayLoad[Encrypt.DELETE_ON_RECEIPT];
+            const message = maybePayLoad[self.TEXT];
+            const recipients = maybePayLoad[self.RECIPIENTS];
+            const expiresHours = maybePayLoad[self.EXPIRES_HOURS];
+            const deleteOnReceipt = maybePayLoad[self.DELETE_ON_RECEIPT];
 
             return new  FetchQuantumEntropy(sdk)
-                .supplyAsync({[FetchQuantumEntropy.KS]: FetchQuantumEntropy._256})
+                .supplyAsync({[FetchQuantumEntropy.prototype.KS]: FetchQuantumEntropy.prototype._256})
                 .then(function (keyResponse) {
                     switch (keyResponse.status) {
-                        case ServerResponse.OK: {
+                        case ServerResponse.prototype.OK: {
                             let initialKey = keyResponse.payload;
                             let expandedKey = algorithm.expandKey(initialKey, message.length > 4096 ? 4096 : Math.max(2048, message.length));
 
@@ -56,52 +56,52 @@ export default class Encrypt extends XQModule{
                                 .encryptText(message, expandedKey)
                                 .then(function (encryptResponse) {
                                     switch (encryptResponse.status) {
-                                        case ServerResponse.OK: {
+                                        case ServerResponse.prototype.OK: {
                                             let encryptResult = encryptResponse.payload;
-                                            let encryptedText = encryptResult[EncryptionAlgorithm.ENCRYPTED_TEXT];
-                                            let expandedKey = encryptResult[EncryptionAlgorithm.KEY];
+                                            let encryptedText = encryptResult[EncryptionAlgorithm.prototype.ENCRYPTED_TEXT];
+                                            let expandedKey = encryptResult[EncryptionAlgorithm.prototype.KEY];
 
                                             return new GeneratePacket(sdk)
                                                 .supplyAsync({
-                                                    [GeneratePacket.KEY]: algorithm.prefix + expandedKey,
-                                                    [GeneratePacket.RECIPIENTS]: recipients,
-                                                    [GeneratePacket.EXPIRES_HOURS]: expiresHours,
-                                                    [GeneratePacket.DELETE_ON_RECEIPT]: deleteOnReceipt?deleteOnReceipt:false
+                                                    [GeneratePacket.prototype.KEY]: algorithm.prefix + expandedKey,
+                                                    [GeneratePacket.prototype.RECIPIENTS]: recipients,
+                                                    [GeneratePacket.prototype.EXPIRES_HOURS]: expiresHours,
+                                                    [GeneratePacket.prototype.DELETE_ON_RECEIPT]: deleteOnReceipt?deleteOnReceipt:false
                                                 })
                                                 .then(function (uploadResponse) {
                                                     switch (uploadResponse.status) {
-                                                        case ServerResponse.OK: {
+                                                        case ServerResponse.prototype.OK: {
                                                             let packet = uploadResponse.payload;
                                                             return new ValidatePacket(sdk)
-                                                                .supplyAsync({[ValidatePacket.PACKET]: packet})
+                                                                .supplyAsync({[ValidatePacket.prototype.PACKET]: packet})
                                                                 .then(function (packetValidationResponse) {
                                                                     switch (packetValidationResponse.status) {
-                                                                        case ServerResponse.OK: {
+                                                                        case ServerResponse.prototype.OK: {
                                                                             let locator = packetValidationResponse.payload;
                                                                             return new ServerResponse(
-                                                                                ServerResponse.OK,
+                                                                                ServerResponse.prototype.OK,
                                                                                 200,
                                                                                 {
-                                                                                    [Encrypt.LOCATOR_KEY]: locator,
-                                                                                    [Encrypt.ENCRYPTED_TEXT]: encryptedText
+                                                                                    [self.LOCATOR_KEY]: locator,
+                                                                                    [self.ENCRYPTED_TEXT]: encryptedText
                                                                                 }
                                                                             );
                                                                         }
-                                                                        case ServerResponse.ERROR: {
+                                                                        case ServerResponse.prototype.ERROR: {
                                                                             console.error(`PacketValidation failed, code: ${packetValidationResponse.statusCode}, reason: ${packetValidationResponse.payload}`);
                                                                             return packetValidationResponse;
                                                                         }
                                                                     }
                                                                 });
                                                         }
-                                                        case ServerResponse.ERROR: {
+                                                        case ServerResponse.prototype.ERROR: {
                                                             console.error(`GeneratePacket failed, code: ${uploadResponse.statusCode}, reason: ${uploadResponse.payload}`);
                                                             return uploadResponse;
                                                         }
                                                     }
                                                 });
                                         }
-                                        case ServerResponse.ERROR: {
+                                        case ServerResponse.prototype.ERROR: {
                                             console.error(`${algorithm.constructor.name}.encryptText(...) failed,  code: ${encryptResponse.statusCode}, reason: ${encryptResponse.payload}`);
                                             return encryptResponse;
                                         }
@@ -109,7 +109,7 @@ export default class Encrypt extends XQModule{
 
                                 });
                         }
-                        case ServerResponse.ERROR: {
+                        case ServerResponse.prototype.ERROR: {
                             console.error(`FetchQuantumEntropy failed, code: ${keyResponse.statusCode}, reason: ${keyResponse.payload}`);
                             return keyResponse;
                         }
@@ -119,7 +119,7 @@ export default class Encrypt extends XQModule{
         } catch (exception) {
         return new Promise(function (resolve) {
             resolve(new ServerResponse(
-                ServerResponse.ERROR,
+                ServerResponse.prototype.ERROR,
                 exception.code,
                 exception.reason
             ));
@@ -132,15 +132,15 @@ export default class Encrypt extends XQModule{
 
 
 /** List of emails of users intended to have read access to the encrypted content*/
-Encrypt.RECIPIENTS = "recipients";
+Encrypt.prototype.RECIPIENTS = "recipients";
 /** Should the content be deleted after opening*/
-Encrypt.DELETE_ON_RECEIPT = "dor";
+Encrypt.prototype.DELETE_ON_RECEIPT = "dor";
 /** Life span of the encrypted content*/
-Encrypt.EXPIRES_HOURS = "expires";
+Encrypt.prototype.EXPIRES_HOURS = "expires";
 /** Text to be encrypted.*/
-Encrypt.TEXT = "text";
+Encrypt.prototype.TEXT = "text";
 
 /** Token by which to fetch the encryption key from the serve*/
-Encrypt.LOCATOR_KEY = "locatorKey";
+Encrypt.prototype.LOCATOR_KEY = "locatorKey";
 /** Encrypted Text*/
-Encrypt.ENCRYPTED_TEXT = "encryptedText";
+Encrypt.prototype.ENCRYPTED_TEXT = "encryptedText";

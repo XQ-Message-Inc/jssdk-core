@@ -14,7 +14,7 @@ export default class AddContact extends XQModule {
     constructor(sdk) {
         super(sdk);
         this.serviceName = "contact";
-        this.requiredFields = [AddContact.EMAIL, AddContact.ROLE, AddContact.NOTIFICATIONS];
+        this.requiredFields = [this.EMAIL, this.ROLE, this.NOTIFICATIONS];
     }
 
     /**
@@ -29,22 +29,22 @@ export default class AddContact extends XQModule {
 
             self.sdk.validateInput(maybePayLoad, self.requiredFields);
 
-            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.DASHBOARD);
+            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.prototype.DASHBOARD);
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + dashboardAccessToken};
 
             return self.sdk.call(self.sdk.DASHBOARD_SERVER_URL,
                 self.serviceName,
-                CallMethod.POST,
+                CallMethod.prototype.POST,
                 additionalHeaderProperties,
                 maybePayLoad,
                 true,
-                Destination.DASHBOARD);
+                Destination.prototype.DASHBOARD);
 
         } catch (exception) {
             return new Promise(function (resolve, reject) {
                 resolve(new ServerResponse(
-                    ServerResponse.ERROR,
+                    ServerResponse.prototype.ERROR,
                     exception.code,
                     exception.reason
                 ));
@@ -56,10 +56,10 @@ export default class AddContact extends XQModule {
 
 }
 
-AddContact.ID = "id";
-AddContact.EMAIL = "email";
-AddContact.ROLE = "role";
-AddContact.NOTIFICATIONS = "notifications";
-AddContact.LAST_NAME = "lastName";
-AddContact.FIRST_NAME = "firstName";
-AddContact.TITLE = "title";
+AddContact.prototype.ID = "id";
+AddContact.prototype.EMAIL = "email";
+AddContact.prototype.ROLE = "role";
+AddContact.prototype.NOTIFICATIONS = "notifications";
+AddContact.prototype.LAST_NAME = "lastName";
+AddContact.prototype.FIRST_NAME = "firstName";
+AddContact.prototype.TITLE = "title";
