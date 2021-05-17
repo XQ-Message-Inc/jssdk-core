@@ -9,15 +9,15 @@ import ServerResponse from "../ServerResponse.js";
  * @class [GrantUserAccess]
  */
 export default class GrantUserAccess extends XQModule {
-
   constructor(sdk) {
     super(sdk);
 
     this.serviceName = "grant";
-    this.requiredFields = [GrantUserAccess.LOCATOR_TOKEN, GrantUserAccess.RECIPIENTS];
-
+    this.requiredFields = [
+      GrantUserAccess.LOCATOR_TOKEN,
+      GrantUserAccess.RECIPIENTS,
+    ];
   }
-
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
@@ -30,41 +30,40 @@ export default class GrantUserAccess extends XQModule {
    */
 
   supplyAsync = function (maybePayLoad) {
-
     try {
-
       this.sdk.validateInput(maybePayLoad, this.requiredFields);
       let accessToken = this.sdk.validateAccessToken();
 
       let recipientList = maybePayLoad[GrantUserAccess.RECIPIENTS];
-      maybePayLoad[GrantUserAccess.RECIPIENTS]= recipientList.join(",");
+      maybePayLoad[GrantUserAccess.RECIPIENTS] = recipientList.join(",");
 
-      let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
+      let additionalHeaderProperties = {
+        Authorization: "Bearer " + accessToken,
+      };
 
-      return this.sdk
-                 .call(this.sdk.VALIDATION_SERVER_URL,
-                       this.serviceName + '/' + encodeURIComponent(maybePayLoad[GrantUserAccess.LOCATOR_TOKEN]),
-                       CallMethod.OPTIONS,
-                       additionalHeaderProperties,
-                       maybePayLoad,
-                       true);
-    }
-    catch (exception){
+      return this.sdk.call(
+        this.sdk.VALIDATION_SERVER_URL,
+        this.serviceName +
+          "/" +
+          encodeURIComponent(maybePayLoad[GrantUserAccess.LOCATOR_TOKEN]),
+        CallMethod.OPTIONS,
+        additionalHeaderProperties,
+        maybePayLoad,
+        true
+      );
+    } catch (exception) {
       return new Promise(function (resolve, reject) {
-        resolve(new ServerResponse(
+        resolve(
+          new ServerResponse(
             ServerResponse.ERROR,
             exception.code,
             exception.reason
-        ));
+          )
+        );
       });
     }
-
-  }
-
-
-
+  };
 }
-
 
 GrantUserAccess.RECIPIENTS = "recipients";
 GrantUserAccess.LOCATOR_TOKEN = "locatorToken";

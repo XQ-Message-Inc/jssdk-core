@@ -1,28 +1,18 @@
-export default  class StatusException  {
+export default class StatusException {
+  constructor(code, reason) {
+    this.code = code;
+    this.reason = reason;
+  }
 
-    constructor( code,  reason) {
+  notImplemented = function () {
+    return new StatusException(501, "501 Not Implemented");
+  };
 
-        this.code=code;
-        this.reason= reason;
+  code = function () {
+    return this.code;
+  };
 
-    }
-
-    notImplemented = function() {
-        return new StatusException(501, "501 Not Implemented");
-    }
-
-    code = function(){
-        return this.code;
-    }
-
-    reason= function(){
-        return this.reason;
-    }
-
-
+  reason = function () {
+    return this.reason;
+  };
 }
-
-
-
-
-
