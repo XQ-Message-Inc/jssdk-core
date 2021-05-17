@@ -1,5 +1,7 @@
 import EncryptionAlgorithm from "../algorithms/EncryptionAlgorithm.js";
 import ServerResponse from "../ServerResponse.js";
+import AES from "crypto-js/aes";
+import encodeUTF8 from "crypto-js/enc-utf8";
 
 export default class AESEncryption extends EncryptionAlgorithm {
   constructor(sdk) {
@@ -32,7 +34,7 @@ export default class AESEncryption extends EncryptionAlgorithm {
             );
           }
 
-          var encryptedText = CryptoJS.AES.encrypt(text, key).toString();
+          var encryptedText = AES.encrypt(text, key).toString();
 
           resolve(
             new ServerResponse(ServerResponse.OK, 200, {
@@ -82,8 +84,8 @@ export default class AESEncryption extends EncryptionAlgorithm {
               )
             );
           }
-          var bytes = CryptoJS.AES.decrypt(text, key);
-          var decryptedText = bytes.toString(CryptoJS.enc.Utf8);
+          var bytes = AES.decrypt(text, key);
+          var decryptedText = bytes.toString(encodeUTF8);
 
           resolve(
             new ServerResponse(ServerResponse.OK, 200, {
