@@ -24,16 +24,14 @@ export default class Decrypt extends XQModule {
     supplyAsync = function (maybePayLoad) {
 
         try {
-            let self = this;
-            self.sdk.validateInput(maybePayLoad, self.requiredFields);
+            this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
-            const sdk = self.sdk;
-            const accessToken = self.accessToken;
-            const algorithm = self.algorithm;
+            const accessToken = this.accessToken;
+            const algorithm = this.algorithm;
             let locatorKey = maybePayLoad[Decrypt.LOCATOR_KEY];
             let encryptedText = maybePayLoad[Decrypt.ENCRYPTED_TEXT];
 
-            return new FetchKey (sdk, accessToken)
+            return new FetchKey (this.sdk, accessToken)
                 .supplyAsync({[FetchKey.LOCATOR_KEY]: locatorKey})
                 .then(function (keyRetrievalResponse) {
                     switch (keyRetrievalResponse.status) {

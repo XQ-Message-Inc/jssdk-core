@@ -28,13 +28,12 @@ export default class CheckApiKey extends XQModule {
 
         try {
 
-            let self = this;
-            self.sdk.validateInput(maybePayLoad, self.requiredFields);
-            let accessToken = self.sdk.validateAccessToken();
+            this.sdk.validateInput(maybePayLoad, this.requiredFields);
+            let accessToken = this.sdk.validateAccessToken();
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
 
-            return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
+            return this.sdk.call(this.sdk.SUBSCRIPTION_SERVER_URL,
                 this.serviceName,
                 CallMethod.GET,
                 additionalHeaderProperties,
