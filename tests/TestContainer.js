@@ -32,6 +32,8 @@ import CheckKeyExpiration from "../src/com/xqmsg/sdk/v2/services/CheckKeyExpirat
 import RevokeKeyAccess from "../src/com/xqmsg/sdk/v2/services/RevokeKeyAccess.js";
 import RevokeUserAccess from "../src/com/xqmsg/sdk/v2/services/RevokeUserAccess.js";
 import GrantUserAccess from "../src/com/xqmsg/sdk/v2/services/GrantUserAccess.js";
+import Authorize from "../src/com/xqmsg/sdk/v2/services/Authorize.js";
+import CodeValidator from "../src/com/xqmsg/sdk/v2/services/CodeValidator.js";
 
 /**
  * This class contains the tests.
