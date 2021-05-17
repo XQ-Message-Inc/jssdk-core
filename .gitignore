@@ -123,5 +123,6 @@ xq-javascript-sdk.iml
 
 /tests/resources/utf-8-sampler.txt.xqf
 
-
 dist
+
+.vscode
