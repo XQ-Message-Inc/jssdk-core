@@ -2,7 +2,7 @@ import ServerResponse from "./../src/com/xqmsg/sdk/v2/ServerResponse.js";
 import Authorize from "../src/com/xqmsg/sdk/v2/services/Authorize.js"
 import CodeValidator from "../src/com/xqmsg/sdk/v2/services/CodeValidator.js"
 import XQSDK from "./../src/com/xqmsg/sdk/v2/XQSDK.js"
-import TestContainer from "./TestContainer.js";
+import Agenda from "./Agenda.js";
 
 
 const oReq = new XMLHttpRequest();
@@ -11,8 +11,8 @@ oReq.open("GET",  "/tests/resources/utf-8-sampler.txt");
 oReq.addEventListener("load", function () {
 
     const xqsdk = new XQSDK();
-    const container = new TestContainer(xqsdk, this.responseText);
-    const tests = container.loadTests();
+
+    let tests = new Agenda(xqsdk, this.responseText).loadTests();
 
     try {
         xqsdk.getCache().getActiveProfile(true);

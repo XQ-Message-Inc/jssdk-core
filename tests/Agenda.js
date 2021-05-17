@@ -37,9 +37,9 @@ import CodeValidator from "../src/com/xqmsg/sdk/v2/services/CodeValidator.js";
 
 /**
  * This class contains the tests.
- * @class [TestContainer]
+ * @class [Agenda]
  */
-export default class TestContainer {
+export default class Agenda {
 
     constructor(aSdk, aSamplerFileContent) {
         this.xqsdk = aSdk;
