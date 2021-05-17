@@ -29,29 +29,29 @@ export default class CodeValidator extends XQModule {
 
         try {
             let self = this;
-            this.sdk.validateInput(maybePayLoad, this.requiredFields);
-            let preAuthToken = this.sdk.validatePreAuthToken();
+            self.sdk.validateInput(maybePayLoad, self.requiredFields);
+            let preAuthToken = self.sdk.validatePreAuthToken();
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + preAuthToken};
 
-            return this.sdk
-                       .call(this.sdk.SUBSCRIPTION_SERVER_URL,
-                             this.serviceName,
-                             CallMethod.GET,
-                             additionalHeaderProperties,
-                             maybePayLoad,
-                             true)
-                       .then(function (validationResponse) {
-                           switch (validationResponse.status) {
-                               case ServerResponse.OK: {
-                                   return new ExchangeForAccessToken(self.sdk).supplyAsync(null)
-                               }
-                               case ServerResponse.ERROR: {
-                                   console.info(validationResponse);
-                                   return validationResponse;
-                               }
-                           }
-                       });
+            return self.sdk
+                .call(self.sdk.SUBSCRIPTION_SERVER_URL,
+                    this.serviceName,
+                    CallMethod.GET,
+                    additionalHeaderProperties,
+                    maybePayLoad,
+                    true)
+                .then(function (validationResponse) {
+                    switch (validationResponse.status) {
+                        case ServerResponse.OK: {
+                            return new ExchangeForAccessToken(self.sdk).supplyAsync(null)
+                        }
+                        case ServerResponse.ERROR: {
+                            console.info(validationResponse);
+                            return validationResponse;
+                        }
+                    }
+                });
 
         } catch (exception) {
             return new Promise(function (resolve, reject) {

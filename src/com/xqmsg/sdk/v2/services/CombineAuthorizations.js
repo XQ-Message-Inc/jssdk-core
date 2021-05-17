@@ -31,12 +31,13 @@ export default class CombineAuthorizations extends XQModule{
 
         try {
 
-            this.sdk.validateInput(maybePayLoad, this.requiredFields);
-            let accessToken = this.sdk.validateAccessToken();
+            const self = this;
+            self.sdk.validateInput(maybePayLoad, self.requiredFields);
+            let accessToken = self.sdk.validateAccessToken();
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
-            return this.sdk.call(this.sdk.SUBSCRIPTION_SERVER_URL,
-                                 this.serviceName,
+            return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
+                                 self.serviceName,
                                  CallMethod.POST,
                                  additionalHeaderProperties,
                                  maybePayLoad,

@@ -25,14 +25,16 @@ export default class AddUserGroup extends XQModule {
 
         try {
 
-            this.sdk.validateInput(maybePayLoad, this.requiredFields);
+            let self = this;
 
-            let dashboardAccessToken = this.sdk.validateAccessToken(Destination.DASHBOARD);
+            self.sdk.validateInput(maybePayLoad, self.requiredFields);
+
+            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.DASHBOARD);
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + dashboardAccessToken};
 
-            return this.sdk.call(this.sdk.DASHBOARD_SERVER_URL,
-                this.serviceName,
+            return self.sdk.call(self.sdk.DASHBOARD_SERVER_URL,
+                self.serviceName,
                 CallMethod.POST,
                 additionalHeaderProperties,
                 maybePayLoad,
