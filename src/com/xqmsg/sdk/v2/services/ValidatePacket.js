@@ -27,21 +27,21 @@ export default class ValidatePacket extends XQModule{
 
         try {
 
-            this.sdk.validateInput(maybePayLoad, this.requiredFields);
-            let accessToken = this.sdk.validateAccessToken();
+            let self = this;
+            self.sdk.validateInput(maybePayLoad, self.requiredFields);
+            let accessToken = self.sdk.validateAccessToken();
 
             let additionalHeaderProperties = {
                 "Authorization": "Bearer " + accessToken,
                 [XQSDK.CONTENT_TYPE]: XQSDK.TEXT_PLAIN_UTF_8
             };
 
-            return this.sdk
-                       .call(this.sdk.VALIDATION_SERVER_URL,
-                             this.serviceName,
-                             CallMethod.POST,
-                             additionalHeaderProperties,
-                             maybePayLoad,
-                             true);
+            return self.sdk.call(self.sdk.VALIDATION_SERVER_URL,
+                self.serviceName,
+                CallMethod.POST,
+                additionalHeaderProperties,
+                maybePayLoad,
+                true);
 
         }
         catch (validationException){

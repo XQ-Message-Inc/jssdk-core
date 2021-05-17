@@ -25,7 +25,8 @@ export default class DeleteAuthorization extends XQModule {
 
         try {
 
-            let accessToken = this.sdk.validateAccessToken();
+            const self = this;
+            let accessToken = self.sdk.validateAccessToken();
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
 

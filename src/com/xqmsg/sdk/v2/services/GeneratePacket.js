@@ -26,15 +26,16 @@ export default class GeneratePacket extends XQModule{
      */
     supplyAsync = function (maybePayLoad) {
         try {
-            this.sdk.validateInput(maybePayLoad, this.requiredFields);
-            let accessToken = this.sdk.validateAccessToken();
+            let self = this;
+            self.sdk.validateInput(maybePayLoad, self.requiredFields);
+            let accessToken = self.sdk.validateAccessToken();
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
 
             maybePayLoad[GeneratePacket.RECIPIENTS]= maybePayLoad[GeneratePacket.RECIPIENTS].join(",");
 
-            return this.sdk.call(this.sdk.SUBSCRIPTION_SERVER_URL,
-                                 this.serviceName,
+            return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
+                                 self.serviceName,
                                  CallMethod.POST,
                                  additionalHeaderProperties,
                                  maybePayLoad,

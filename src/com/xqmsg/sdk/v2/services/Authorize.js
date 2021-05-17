@@ -39,15 +39,15 @@ export default class Authorize extends XQModule {
 
         try {
             let self = this;
-            this.sdk.validateInput(maybePayLoad, this.requiredFields);
+            self.sdk.validateInput(maybePayLoad, self.requiredFields);
             let user = maybePayLoad[Authorize.USER];
 
-            return this.sdk.call(this.sdk.SUBSCRIPTION_SERVER_URL,
-                                 this.serviceName,
-                                 CallMethod.POST,
-                                 null,
-                                 maybePayLoad,
-                                 true)
+            return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
+                                self.serviceName,
+                                CallMethod.POST,
+                                null,
+                                maybePayLoad,
+                                true)
                             .then(function (response) {
                                 switch (response.status) {
                                     case ServerResponse.OK: {

@@ -34,41 +34,41 @@ export default class FetchKey extends XQModule{
     supplyAsync = function (maybePayLoad) {
 
         try {
-            this.sdk.validateInput(maybePayLoad, this.requiredFields);
-            let accessToken = this.sdk.validateAccessToken();
+            const self = this;
+            self.sdk.validateInput(maybePayLoad, self.requiredFields);
+            let accessToken = self.sdk.validateAccessToken();
 
             let locatorKey = maybePayLoad[FetchKey.LOCATOR_KEY];
             let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
 
-            return this.sdk
-                       .call(this.sdk.VALIDATION_SERVER_URL,
-                             this.serviceName + '/' + encodeURIComponent(locatorKey),
-                             CallMethod.GET,
-                             additionalHeaderProperties,
-                             null,
-                             true)
-                             .then(function (serverResponse){
-                                 return  new Promise(function(resolve, reject)  {
-                                     switch (serverResponse.status) {
-                                         case ServerResponse.OK: {
-                                             let key = serverResponse.payload;
-                                             key = key.substr(2);
+            return self.sdk.call(self.sdk.VALIDATION_SERVER_URL,
+                self.serviceName + '/' + encodeURIComponent(locatorKey),
+                CallMethod.GET,
+                additionalHeaderProperties,
+                null,
+                true)
+                .then(function (serverResponse){
+                    return  new Promise(function(resolve, reject)  {
+                        switch (serverResponse.status) {
+                            case ServerResponse.OK: {
+                                let key = serverResponse.payload;
+                                key = key.substr(2);
 
-                                             resolve(new ServerResponse(
-                                                 ServerResponse.OK,
-                                                 ServerResponse.OK,
-                                                 key
-                                             ));
-                                             break;
-                                         }
-                                         case ServerResponse.ERROR: {
-                                             console.error(`RetrieveKey failed, code: ${serverResponse.statusCode}, reason: ${serverResponse.payload}`);
-                                             resolve(serverResponse);
-                                             break;
-                                         }
-                                     }
-                                 });
-                             });
+                                resolve(new ServerResponse(
+                                    ServerResponse.OK,
+                                    ServerResponse.OK,
+                                    key
+                                ));
+                                break;
+                            }
+                            case ServerResponse.ERROR: {
+                                console.error(`RetrieveKey failed, code: ${serverResponse.statusCode}, reason: ${serverResponse.payload}`);
+                                resolve(serverResponse);
+                                break;
+                            }
+                        }
+                    });
+                });
         }
         catch (validationException){
             return new Promise(function (resolve, reject) {

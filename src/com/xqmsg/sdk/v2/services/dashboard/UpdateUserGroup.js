@@ -26,10 +26,12 @@ export default class UpdateUserGroup extends XQModule {
     supplyAsync = function (maybePayLoad) {
 
         try {
-            
-            this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
-            let dashboardAccessToken = this.sdk.validateAccessToken(Destination.DASHBOARD);
+            let self = this;
+
+            self.sdk.validateInput(maybePayLoad, self.requiredFields);
+
+            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.DASHBOARD);
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + dashboardAccessToken};
 
@@ -38,14 +40,13 @@ export default class UpdateUserGroup extends XQModule {
                 [UpdateUserGroup.MEMBERS]: maybePayLoad[UpdateUserGroup.MEMBERS],
             };
 
-            return this.sdk
-                       .call(this.sdk.DASHBOARD_SERVER_URL,
-                             this.serviceName + '/' + maybePayLoad[UpdateUserGroup.ID],
-                             CallMethod.PATCH,
-                             additionalHeaderProperties,
-                             payload,
-                             true,
-                             Destination.DASHBOARD);
+            return self.sdk.call(self.sdk.DASHBOARD_SERVER_URL,
+                self.serviceName + '/' + maybePayLoad[UpdateUserGroup.ID],
+                CallMethod.PATCH,
+                additionalHeaderProperties,
+                payload,
+                true,
+                Destination.DASHBOARD);
 
         } catch (exception) {
             return new Promise(function (resolve, reject) {

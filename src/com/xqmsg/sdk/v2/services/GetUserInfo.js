@@ -27,12 +27,13 @@ export default class GetUserInfo extends XQModule {
 
         try {
 
-            let accessToken = this.sdk.validateAccessToken();
+            let self = this;
+            let accessToken = self.sdk.validateAccessToken();
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
 
-            return this.sdk.call(this.sdk.SUBSCRIPTION_SERVER_URL,
-                this.serviceName,
+            return self.sdk.call(self.sdk.SUBSCRIPTION_SERVER_URL,
+                self.serviceName,
                 CallMethod.GET,
                 additionalHeaderProperties,
                 maybePayLoad,

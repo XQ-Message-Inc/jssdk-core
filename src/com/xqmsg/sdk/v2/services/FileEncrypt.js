@@ -32,11 +32,11 @@ export default class FileEncrypt extends XQModule {
     supplyAsync = function (maybePayLoad) {
 
         try {
+            let self = this;
+            self.sdk.validateInput(maybePayLoad, self.requiredFields);
 
-            this.sdk.validateInput(maybePayLoad, this.requiredFields);
-
-            const algorithm = this.algorithm;
-            const sdk = this.sdk;
+            const algorithm = self.algorithm;
+            const sdk = self.sdk;
             const sourceFile = maybePayLoad[FileEncrypt.SOURCE_FILE];
             const recipients = maybePayLoad[FileEncrypt.RECIPIENTS];
             const expiration = maybePayLoad[FileEncrypt.EXPIRES_HOURS];

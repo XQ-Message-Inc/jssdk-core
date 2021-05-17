@@ -24,21 +24,22 @@ export default class RemoveContact extends XQModule {
     supplyAsync = function (maybePayLoad) {
 
         try {
-            
-            this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
-            let dashboardAccessToken = this.sdk.validateAccessToken(Destination.DASHBOARD);
+            let self = this;
+
+            self.sdk.validateInput(maybePayLoad, self.requiredFields);
+
+            let dashboardAccessToken = self.sdk.validateAccessToken(Destination.DASHBOARD);
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + dashboardAccessToken};
 
-            return this.sdk
-                       .call(this.sdk.DASHBOARD_SERVER_URL,
-                             `${this.serviceName}/${maybePayLoad[RemoveContact.ID]}?delete=true`,
-                             CallMethod.DELETE,
-                             additionalHeaderProperties,
-                             null,
-                             true,
-                             Destination.DASHBOARD);
+            return self.sdk.call(self.sdk.DASHBOARD_SERVER_URL,
+                `${self.serviceName}/${maybePayLoad[RemoveContact.ID]}?delete=true`,
+                CallMethod.DELETE,
+                additionalHeaderProperties,
+                null,
+                true,
+                Destination.DASHBOARD);
 
         } catch (exception) {
             return new Promise(function (resolve, reject) {

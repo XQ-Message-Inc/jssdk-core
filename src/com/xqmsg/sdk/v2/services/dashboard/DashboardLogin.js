@@ -32,7 +32,7 @@ export default class DashboardLogin extends XQModule{
 
             let self = this;
 
-            let xqAccessToken = this.sdk.validateAccessToken();
+            let xqAccessToken = self.sdk.validateAccessToken();
 
             let additionalHeaderProperties = {"Authorization": "Bearer " + xqAccessToken};
 
