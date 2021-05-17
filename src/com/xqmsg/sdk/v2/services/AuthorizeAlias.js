@@ -30,36 +30,14 @@ export default class AuthorizeAlias extends XQModule{
 
     try {
 
-      let self = this;
-
       this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
-      const aliasUser = maybePayLoad[AuthorizeAlias.USER];
-
-      return this.sdk
-                 .call(this.sdk.SUBSCRIPTION_SERVER_URL,
-                       this.serviceName,
-                       CallMethod.POST,
-                       null,
-                       maybePayLoad,
-                       true)
-                .then(function (authorizeAliasResponse){
-                  switch (authorizeAliasResponse.status) {
-                    case ServerResponse.OK: {
-                      let accessToken = authorizeAliasResponse.payload;
-                      try {
-                        self.cache.putXQAccess(aliasUser, accessToken);
-                        return authorizeAliasResponse;
-                      } catch (e) {
-                        console.log(e.message);
-                        return null;
-                      }
-                    }
-                    default: {
-                      return exchangeResponse;
-                    }
-                  }
-                      });
+      return this.sdk.call(this.sdk.SUBSCRIPTION_SERVER_URL,
+                           this.serviceName,
+                           CallMethod.POST,
+                           null,
+                           maybePayLoad,
+                           true)
     }
     catch (validationException){
       return new Promise(function (resolve) {

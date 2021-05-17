@@ -1055,6 +1055,8 @@ export default class TestContainer {
 
                             let testUserToken = serverResponse.payload;
 
+                            self.xqsdk.getCache().putXQAccess(testUser, testUserToken);
+
                             return new CombineAuthorizations(self.xqsdk)
                                 .supplyAsync({[CombineAuthorizations.TOKENS]: [testUserToken]})
                                 .then(function (serverResponse) {
