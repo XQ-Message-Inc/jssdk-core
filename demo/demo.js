@@ -6,31 +6,19 @@ import CodeValidator from "../src/com/xqmsg/sdk/v2/services/CodeValidator.js";
 import EncryptionAlgorithm from "./../src/com/xqmsg/sdk/v2/algorithms/EncryptionAlgorithm.js";
 import XQSDK from "./../src/com/xqmsg/sdk/v2/XQSDK.js";
 
-import {
-  removeAllProperties,
-  setProperty,
-  getProperty,
-  replaceProperty,
-} from "../src/com/xqmsg/sdk/v2/Commons";
-
-var xqsdk = new XQSDK(
-  "5e9b3574-c3ec-419d-b2b6-ba3d0a900562-b817b4dc-6961-48ac-95a4-8a32463d9fbc",
-  "99d40976-50b6-4e29-a2a7-3c63068a7191-d1429fa8-93a7-4b69-831f-559e72334a1b"
-);
+var xqsdk = new XQSDK();
 
 $(
   "#sender-access-request-button, #validate-access-request-button, #recipient-list-button, #recipient-access-request-button, #encrypt-button, #decrypt-button, #refresh-button"
-).on("click", async function (clickEvent) {
+).on("click", function (clickEvent) {
   switch (clickEvent.currentTarget.id) {
     case "sender-access-request-button":
       //initally clear out old stores
       removeAllProperties();
 
-      console.log(xqsdk.XQ_API_KEY);
-
       let user = $("#user-input").val();
       setProperty("user", user);
-      await new Authorize(xqsdk)
+      new Authorize(xqsdk)
         .supplyAsync({ [Authorize.USER]: user, [Authorize.CODE_TYPE]: "pin" })
         .then(function (response) {
           switch (response.status) {

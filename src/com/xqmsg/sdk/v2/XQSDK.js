@@ -8,36 +8,24 @@ import ValidationException from "./exceptions/ValidationException.js";
 import StatusException from "./exceptions/StatusException.js";
 import Config from "./Config.js";
 
-const DASHBOARD_SERVER_URL = "https://dashboard.xqmsg.net/v2";
-const KEY_SERVER_URL = "https://quantum.xqmsg.net/v2/";
-const SUBSCRIPTION_SERVER_URL = "https://stg-subscription.xqmsg.net/v2";
-const VALIDATION_SERVER_URL = "https://stg-validation.xqmsg.net/v2";
-
 /**
  * @class [XQSDK]
  */
 export default class XQSDK {
-  constructor(generalToken, dashboardToken) {
-    const config = {
-      XQ_API_KEY: generalToken,
-      DASHBOARD_API_KEY: dashboardToken,
-      DASHBOARD_SERVER_URL,
-      KEY_SERVER_URL,
-      SUBSCRIPTION_SERVER_URL,
-      VALIDATION_SERVER_URL,
-    };
+  constructor() {
+    let config = new Config();
+
+    this.XQ_API_KEY = config.application.XQ_API_KEY;
+    this.DASHBOARD_API_KEY = config.application.DASHBOARD_API_KEY;
 
     this.cache = new SimpleXQCache(localStorage);
     this.OTPv2_ALGORITHM = "OTPV2";
     this.AES_ALGORITHM = "AES";
 
-    this.XQ_API_KEY = config.XQ_API_KEY;
-    this.DASHBOARD_API_KEY = config.DASHBOARD_API_KEY;
-
-    this.DASHBOARD_SERVER_URL = config.DASHBOARD_SERVER_URL;
-    this.KEY_SERVER_URL = config.KEY_SERVER_URL;
-    this.SUBSCRIPTION_SERVER_URL = config.SUBSCRIPTION_SERVER_URL;
-    this.VALIDATION_SERVER_URL = config.VALIDATION_SERVER_URL;
+    this.SUBSCRIPTION_SERVER_URL = config.application.SUBSCRIPTION_SERVER_URL;
+    this.DASHBOARD_SERVER_URL = config.application.DASHBOARD_SERVER_URL;
+    this.VALIDATION_SERVER_URL = config.application.VALIDATION_SERVER_URL;
+    this.KEY_SERVER_URL = config.application.KEY_SERVER_URL;
 
     this.ALGORITHMS = {};
     this.ALGORITHMS[this.OTPv2_ALGORITHM] = new OTPv2Encryption(this);
@@ -130,7 +118,6 @@ export default class XQSDK {
       if (requiresAPIKey) {
         switch (destination) {
           case Destination.XQ: {
-            console.log(XQSDK.API_KEY, self.XQ_API_KEY);
             xhttp.setRequestHeader(XQSDK.API_KEY, self.XQ_API_KEY);
             xhttp.setRequestHeader(
               XQSDK.ACCESS_CONTROL_ALLOW_ORIGIN,
