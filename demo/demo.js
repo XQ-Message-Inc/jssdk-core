@@ -13,7 +13,10 @@ import {
   replaceProperty,
 } from "../src/com/xqmsg/sdk/v2/Commons";
 
-var xqsdk = new XQSDK();
+var xqsdk = new XQSDK(
+  "5e9b3574-c3ec-419d-b2b6-ba3d0a900562-b817b4dc-6961-48ac-95a4-8a32463d9fbc",
+  "99d40976-50b6-4e29-a2a7-3c63068a7191-d1429fa8-93a7-4b69-831f-559e72334a1b"
+);
 
 $(
   "#sender-access-request-button, #validate-access-request-button, #recipient-list-button, #recipient-access-request-button, #encrypt-button, #decrypt-button, #refresh-button"
@@ -22,6 +25,8 @@ $(
     case "sender-access-request-button":
       //initally clear out old stores
       removeAllProperties();
+
+      console.log(xqsdk.XQ_API_KEY);
 
       let user = $("#user-input").val();
       setProperty("user", user);
