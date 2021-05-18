@@ -56,7 +56,7 @@ export default class AuthorizeAlias extends XQModule{
                       }
                     }
                     default: {
-                      return exchangeResponse;
+                      return authorizeAliasResponse;
                     }
                   }
                       });
