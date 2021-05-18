@@ -61,12 +61,12 @@ export default class AuthorizeAlias extends XQModule{
                   }
                       });
     }
-    catch (validationException){
+    catch (exception){
       return new Promise(function (resolve) {
         resolve(new ServerResponse(
             ServerResponse.ERROR,
-            validationException.code,
-            validationException.reason
+            exception.code,
+            exception.reason
         ));
       });
     }
