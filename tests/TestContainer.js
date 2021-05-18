@@ -1202,7 +1202,7 @@ export default class TestContainer {
 
                     if (this.enabled) {
                         console.warn(label);
-                        let user = self.xqsdk.getCache().getActiveProfile(true);
+                        let user =  self.makeUsers().FIRST;
 
                         let payload = {
                             [AuthorizeAlias.USER]: user,
