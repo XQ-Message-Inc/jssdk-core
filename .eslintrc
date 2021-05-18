@@ -7,9 +7,10 @@
     },
     "env": {
       "browser": true,
-      "jest": true,
       "es6": true,
-      "node": true
+      "jest": true,
+      "jquery": true,
+      "node": true,
     },
     "rules": {
       "prettier/prettier": "warn",

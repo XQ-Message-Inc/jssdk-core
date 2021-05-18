@@ -1,25 +1,31 @@
-import ServerResponse from "./../src/com/xqmsg/sdk/v2/ServerResponse.js";
-import Decrypt from "./../src/com/xqmsg/sdk/v2/services/Decrypt.js";
-import Encrypt from "./../src/com/xqmsg/sdk/v2/services/Encrypt.js";
-import Authorize from "../src/com/xqmsg/sdk/v2/services/Authorize.js";
-import CodeValidator from "../src/com/xqmsg/sdk/v2/services/CodeValidator.js";
-import EncryptionAlgorithm from "./../src/com/xqmsg/sdk/v2/algorithms/EncryptionAlgorithm.js";
-import XQSDK from "./../src/com/xqmsg/sdk/v2/XQSDK.js";
+import {
+  Authorize,
+  CodeValidator,
+  Decrypt,
+  Encrypt,
+  EncryptionAlgorithm,
+  ServerResponse,
+  XQSDK,
+} from "../src/index.js";
 
 import {
-  removeAllProperties,
-  setProperty,
   getProperty,
+  removeAllProperties,
+  removeProperty,
   replaceProperty,
+  setProperty,
 } from "../src/com/xqmsg/sdk/v2/Commons";
 
-var xqsdk = new XQSDK();
+var xqsdk = new XQSDK({
+  XQ_API_KEY: "YOUR_XQ_API_KEY",
+  DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
+});
 
 $(
   "#sender-access-request-button, #validate-access-request-button, #recipient-list-button, #recipient-access-request-button, #encrypt-button, #decrypt-button, #refresh-button"
 ).on("click", function (clickEvent) {
   switch (clickEvent.currentTarget.id) {
-    case "sender-access-request-button":
+    case "sender-access-request-button": {
       //initally clear out old stores
       removeAllProperties();
 
@@ -41,7 +47,8 @@ $(
           }
         });
       break;
-    case "validate-access-request-button":
+    }
+    case "validate-access-request-button": {
       new CodeValidator(xqsdk)
         .supplyAsync({ [CodeValidator.PIN]: $("#pin-input").val() })
         .then(function (validationResponse) {
@@ -62,7 +69,8 @@ $(
           }
         });
       break;
-    case "encrypt-button":
+    }
+    case "encrypt-button": {
       const recipientsInput = $("#recipient-list-input")
         .val()
         .split(/,|\s+/g)
@@ -110,7 +118,8 @@ $(
           }
         });
       break;
-    case "recipient-access-request-button":
+    }
+    case "recipient-access-request-button": {
       let recipient = $("#recipient-input").val();
       setProperty("user", recipient);
       new Authorize(xqsdk)
@@ -129,7 +138,8 @@ $(
           }
         });
       break;
-    case "decrypt-button":
+    }
+    case "decrypt-button": {
       const locatorKey = getProperty(Encrypt.LOCATOR_KEY);
       const encryptedText = getProperty(Encrypt.ENCRYPTED_TEXT);
       new Decrypt(xqsdk, xqsdk.getAlgorithm(getProperty("algorithm")))
@@ -153,10 +163,12 @@ $(
           }
         });
       break;
-    case "refresh-button":
+    }
+    case "refresh-button": {
       removeAllProperties();
       location.reload();
       break;
+    }
   }
 });
 

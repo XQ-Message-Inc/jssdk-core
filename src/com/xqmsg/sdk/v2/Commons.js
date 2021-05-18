@@ -323,8 +323,9 @@ function removeAllProperties() {
 }
 
 module.exports = {
-  removeAllProperties,
-  setProperty,
   getProperty,
+  removeAllProperties,
+  removeProperty,
   replaceProperty,
+  setProperty,
 };

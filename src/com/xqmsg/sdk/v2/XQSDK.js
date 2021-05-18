@@ -6,14 +6,29 @@ import CallMethod from "./CallMethod.js";
 import Destination from "./Destination.js";
 import ValidationException from "./exceptions/ValidationException.js";
 import StatusException from "./exceptions/StatusException.js";
-import Config from "./Config.js";
+
+const SUBSCRIPTION_SERVER_URL = "https://subscription.xqmsg.net/v2";
+const VALIDATION_SERVER_URL = "https://validation.xqmsg.net/v2";
+const KEY_SERVER_URL = "https://quantum.xqmsg.net/v2/";
+const DASHBOARD_SERVER_URL = "https://dashboard.xqmsg.net/v2";
 
 /**
  * @class [XQSDK]
  */
 export default class XQSDK {
-  constructor() {
-    let config = new Config();
+  constructor(credentials) {
+    const { XQ_API_KEY, DASHBOARD_API_KEY } = credentials;
+
+    let config = {
+      application: {
+        XQ_API_KEY,
+        DASHBOARD_API_KEY,
+        SUBSCRIPTION_SERVER_URL,
+        VALIDATION_SERVER_URL,
+        KEY_SERVER_URL,
+        DASHBOARD_SERVER_URL,
+      },
+    };
 
     this.XQ_API_KEY = config.application.XQ_API_KEY;
     this.DASHBOARD_API_KEY = config.application.DASHBOARD_API_KEY;
