@@ -15,39 +15,39 @@ import ServerResponse from "../ServerResponse.js";
 export default class FetchQuantumEntropy extends XQModule {
   constructor(sdk) {
     super(sdk);
-  }
 
-  /**
-   *
-   * @param {{}} maybePayLoad:
-   * @returns {Promise<ServerResponse<{payload:string}>>}
-   */
-  supplyAsync = function (maybePayLoad) {
-    try {
-      let additionalHeaderProperties = {
-        [XQSDK.CONTENT_TYPE]: XQSDK.TEXT_PLAIN_UTF_8,
-      };
+    /**
+     *
+     * @param {{}} maybePayLoad:
+     * @returns {Promise<ServerResponse<{payload:string}>>}
+     */
+    this.supplyAsync = (maybePayLoad) => {
+      try {
+        let additionalHeaderProperties = {
+          [XQSDK.CONTENT_TYPE]: XQSDK.TEXT_PLAIN_UTF_8,
+        };
 
-      return this.sdk.call(
-        this.sdk.KEY_SERVER_URL,
-        null,
-        CallMethod.GET,
-        additionalHeaderProperties,
-        maybePayLoad,
-        false
-      );
-    } catch (exception) {
-      return new Promise(function (resolve, reject) {
-        resolve(
-          new ServerResponse(
-            ServerResponse.ERROR,
-            exception.code,
-            exception.reason
-          )
+        return this.sdk.call(
+          this.sdk.KEY_SERVER_URL,
+          null,
+          CallMethod.GET,
+          additionalHeaderProperties,
+          maybePayLoad,
+          false
         );
-      });
-    }
-  };
+      } catch (exception) {
+        return new Promise((resolve, reject) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
+          );
+        });
+      }
+    };
+  }
 }
 
 FetchQuantumEntropy.KS = "ks";

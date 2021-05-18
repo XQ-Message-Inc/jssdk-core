@@ -17,60 +17,62 @@ export default class DashboardLogin extends XQModule {
     super(sdk);
     this.serviceName = "login/verify";
     this.requiredFields = [];
-  }
 
-  /**
-   * @param {Map} [maybePayLoad=null] - Container for the request parameters supplied to this method.
-   *
-   * @returns {Promise<ServerResponse<{payload:String}>>}
-   */
-  supplyAsync = function (maybePayLoad) {
-    try {
-      let self = this;
+    /**
+     * @param {Map} [maybePayLoad=null] - Container for the request parameters supplied to this method.
+     *
+     * @returns {Promise<ServerResponse<{payload:String}>>}
+     */
+    this.supplyAsync = (maybePayLoad) => {
+      try {
+        let self = this;
 
-      let xqAccessToken = this.sdk.validateAccessToken();
+        let xqAccessToken = this.sdk.validateAccessToken();
 
-      let additionalHeaderProperties = {
-        Authorization: "Bearer " + xqAccessToken,
-      };
+        let additionalHeaderProperties = {
+          Authorization: "Bearer " + xqAccessToken,
+        };
 
-      return this.sdk
-        .call(
-          this.sdk.DASHBOARD_SERVER_URL,
-          this.serviceName,
-          CallMethod.GET,
-          additionalHeaderProperties,
-          { request: "sub" },
-          true,
-          Destination.DASHBOARD
-        )
-        .then(function (exchangeResponse) {
-          switch (exchangeResponse.status) {
-            case ServerResponse.OK: {
-              let dashboardAccessToken = exchangeResponse.payload;
-              try {
-                let activeProfile = self.cache.getActiveProfile(true);
-                self.cache.putDashboardAccess(
-                  activeProfile,
-                  dashboardAccessToken
-                );
+        return this.sdk
+          .call(
+            this.sdk.DASHBOARD_SERVER_URL,
+            this.serviceName,
+            CallMethod.GET,
+            additionalHeaderProperties,
+            { request: "sub" },
+            true,
+            Destination.DASHBOARD
+          )
+          .then(function (exchangeResponse) {
+            switch (exchangeResponse.status) {
+              case ServerResponse.OK: {
+                let dashboardAccessToken = exchangeResponse.payload;
+                try {
+                  let activeProfile = self.cache.getActiveProfile(true);
+                  self.cache.putDashboardAccess(
+                    activeProfile,
+                    dashboardAccessToken
+                  );
+                  return exchangeResponse;
+                } catch (e) {
+                  console.log(e.message);
+                  return null;
+                }
+              }
+              default: {
                 return exchangeResponse;
-              } catch (e) {
-                console.log(e.message);
-                return null;
               }
             }
-            default: {
-              return exchangeResponse;
-            }
-          }
+          });
+      } catch (exc) {
+        return new Promise((resolve) => {
+          resolve(
+            new ServerResponse(ServerResponse.ERROR, exc.code, exc.reason)
+          );
         });
-    } catch (exc) {
-      return new Promise(function (resolve) {
-        resolve(new ServerResponse(ServerResponse.ERROR, exc.code, exc.reason));
-      });
-    }
-  };
+      }
+    };
+  }
 }
 
 DashboardLogin.REQUEST = "request";

@@ -18,45 +18,45 @@ export default class AddContact extends XQModule {
       AddContact.ROLE,
       AddContact.NOTIFICATIONS,
     ];
-  }
 
-  /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @returns {Promise<ServerResponse<{payload:{id:int, status:string}}>>}
-   */
-  supplyAsync = function (maybePayLoad) {
-    try {
-      this.sdk.validateInput(maybePayLoad, this.requiredFields);
+    /**
+     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+     * @returns {Promise<ServerResponse<{payload:{id:int, status:string}}>>}
+     */
+    this.supplyAsync = (maybePayLoad) => {
+      try {
+        this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
-      let dashboardAccessToken = this.sdk.validateAccessToken(
-        Destination.DASHBOARD
-      );
-
-      let additionalHeaderProperties = {
-        Authorization: "Bearer " + dashboardAccessToken,
-      };
-
-      return this.sdk.call(
-        this.sdk.DASHBOARD_SERVER_URL,
-        this.serviceName,
-        CallMethod.POST,
-        additionalHeaderProperties,
-        maybePayLoad,
-        true,
-        Destination.DASHBOARD
-      );
-    } catch (exception) {
-      return new Promise(function (resolve, reject) {
-        resolve(
-          new ServerResponse(
-            ServerResponse.ERROR,
-            exception.code,
-            exception.reason
-          )
+        let dashboardAccessToken = this.sdk.validateAccessToken(
+          Destination.DASHBOARD
         );
-      });
-    }
-  };
+
+        let additionalHeaderProperties = {
+          Authorization: "Bearer " + dashboardAccessToken,
+        };
+
+        return this.sdk.call(
+          this.sdk.DASHBOARD_SERVER_URL,
+          this.serviceName,
+          CallMethod.POST,
+          additionalHeaderProperties,
+          maybePayLoad,
+          true,
+          Destination.DASHBOARD
+        );
+      } catch (exception) {
+        return new Promise((resolve, reject) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
+          );
+        });
+      }
+    };
+  }
 }
 
 AddContact.ID = "id";

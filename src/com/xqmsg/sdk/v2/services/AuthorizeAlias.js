@@ -14,62 +14,62 @@ export default class AuthorizeAlias extends XQModule {
 
     this.serviceName = "authorizealias";
     this.requiredFields = [AuthorizeAlias.USER];
-  }
 
-  /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {String} maybePayLoad.user - Email of the user to be validated.
-   * @param {String} [maybePayLoad.firstName] - First name of the user.
-   * @param {String} [maybePayLoad.lastName] - Last name of the user.
-   *
-   * @returns {Promise<ServerResponse<{payload:string}>>}
-   */
-  supplyAsync = function (maybePayLoad) {
-    try {
-      let self = this;
+    /**
+     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+     * @param {String} maybePayLoad.user - Email of the user to be validated.
+     * @param {String} [maybePayLoad.firstName] - First name of the user.
+     * @param {String} [maybePayLoad.lastName] - Last name of the user.
+     *
+     * @returns {Promise<ServerResponse<{payload:string}>>}
+     */
+    this.supplyAsync = (maybePayLoad) => {
+      try {
+        let self = this;
 
-      this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
-      const aliasUser = maybePayLoad[AuthorizeAlias.USER];
+        const aliasUser = maybePayLoad[AuthorizeAlias.USER];
 
-      return this.sdk
-        .call(
-          this.sdk.SUBSCRIPTION_SERVER_URL,
-          this.serviceName,
-          CallMethod.POST,
-          null,
-          maybePayLoad,
-          true
-        )
-        .then(function (authorizeAliasResponse) {
-          switch (authorizeAliasResponse.status) {
-            case ServerResponse.OK: {
-              let accessToken = authorizeAliasResponse.payload;
-              try {
-                self.cache.putXQAccess(aliasUser, accessToken);
-                return authorizeAliasResponse;
-              } catch (e) {
-                console.log(e.message);
-                return null;
+        return this.sdk
+          .call(
+            this.sdk.SUBSCRIPTION_SERVER_URL,
+            this.serviceName,
+            CallMethod.POST,
+            null,
+            maybePayLoad,
+            true
+          )
+          .then((authorizeAliasResponse) => {
+            switch (authorizeAliasResponse.status) {
+              case ServerResponse.OK: {
+                let accessToken = authorizeAliasResponse.payload;
+                try {
+                  self.cache.putXQAccess(aliasUser, accessToken);
+                  return authorizeAliasResponse;
+                } catch (e) {
+                  console.log(e.message);
+                  return null;
+                }
+              }
+              default: {
+                return console.error("Error retrieving alias authorization");
               }
             }
-            default: {
-              return console.error("Error retrieving alias authorization");
-            }
-          }
+          });
+      } catch (validationException) {
+        return new Promise((resolve) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              validationException.code,
+              validationException.reason
+            )
+          );
         });
-    } catch (validationException) {
-      return new Promise(function (resolve) {
-        resolve(
-          new ServerResponse(
-            ServerResponse.ERROR,
-            validationException.code,
-            validationException.reason
-          )
-        );
-      });
-    }
-  };
+      }
+    };
+  }
 }
 
 AuthorizeAlias.USER = "user";

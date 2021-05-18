@@ -16,49 +16,48 @@ export default class GeneratePacket extends XQModule {
       GeneratePacket.RECIPIENTS,
       GeneratePacket.EXPIRES_HOURS,
     ];
-  }
+    /**
+     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+     * @param {String} maybePayLoad.key - The secret key that the user wants to protect.
+     * @param {Long} maybePayLoad.expires - The number of hours that this key will remain valid for. After this time, it will no longer be accessible.
+     * @param {[String]} maybePayLoad.recipients  -  list of emails of those recipients who are allowed to access the key.
+     * @param {Boolean} [maybePayLoad.dor=false] - Should the content be deleted after opening.
+     *
+     * @returns {Promise<ServerResponse<{payload:string}>>}
+     */
+    this.supplyAsync = (maybePayLoad) => {
+      try {
+        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        let accessToken = this.sdk.validateAccessToken();
 
-  /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {String} maybePayLoad.key - The secret key that the user wants to protect.
-   * @param {Long} maybePayLoad.expires - The number of hours that this key will remain valid for. After this time, it will no longer be accessible.
-   * @param {[String]} maybePayLoad.recipients  -  list of emails of those recipients who are allowed to access the key.
-   * @param {Boolean} [maybePayLoad.dor=false] - Should the content be deleted after opening.
-   *
-   * @returns {Promise<ServerResponse<{payload:string}>>}
-   */
-  supplyAsync = function (maybePayLoad) {
-    try {
-      this.sdk.validateInput(maybePayLoad, this.requiredFields);
-      let accessToken = this.sdk.validateAccessToken();
+        let additionalHeaderProperties = {
+          Authorization: "Bearer " + accessToken,
+        };
 
-      let additionalHeaderProperties = {
-        Authorization: "Bearer " + accessToken,
-      };
+        maybePayLoad[GeneratePacket.RECIPIENTS] =
+          maybePayLoad[GeneratePacket.RECIPIENTS].join(",");
 
-      maybePayLoad[GeneratePacket.RECIPIENTS] =
-        maybePayLoad[GeneratePacket.RECIPIENTS].join(",");
-
-      return this.sdk.call(
-        this.sdk.SUBSCRIPTION_SERVER_URL,
-        this.serviceName,
-        CallMethod.POST,
-        additionalHeaderProperties,
-        maybePayLoad,
-        true
-      );
-    } catch (validationException) {
-      return new Promise(function (resolve, reject) {
-        resolve(
-          new ServerResponse(
-            ServerResponse.ERROR,
-            validationException.code,
-            validationException.reason
-          )
+        return this.sdk.call(
+          this.sdk.SUBSCRIPTION_SERVER_URL,
+          this.serviceName,
+          CallMethod.POST,
+          additionalHeaderProperties,
+          maybePayLoad,
+          true
         );
-      });
-    }
-  };
+      } catch (validationException) {
+        return new Promise((resolve, reject) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              validationException.code,
+              validationException.reason
+            )
+          );
+        });
+      }
+    };
+  }
 }
 
 GeneratePacket.KEY = "key";
