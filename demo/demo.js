@@ -6,6 +6,13 @@ import CodeValidator from "../src/com/xqmsg/sdk/v2/services/CodeValidator.js";
 import EncryptionAlgorithm from "./../src/com/xqmsg/sdk/v2/algorithms/EncryptionAlgorithm.js";
 import XQSDK from "./../src/com/xqmsg/sdk/v2/XQSDK.js";
 
+import {
+  removeAllProperties,
+  setProperty,
+  getProperty,
+  replaceProperty,
+} from "../src/com/xqmsg/sdk/v2/Commons";
+
 var xqsdk = new XQSDK();
 
 $(
