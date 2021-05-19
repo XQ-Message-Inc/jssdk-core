@@ -8,15 +8,13 @@ import ServerResponse from "../ServerResponse.js";
  * However, its use is limited to basic encryption and decryption.
  * @class [AuthorizeAlias]
  */
-export default class AuthorizeAlias extends XQModule{
-
+export default class AuthorizeAlias extends XQModule {
   constructor(sdk) {
     super(sdk);
 
     this.serviceName = "authorizealias";
     this.requiredFields = [AuthorizeAlias.USER];
   }
-
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
@@ -27,9 +25,7 @@ export default class AuthorizeAlias extends XQModule{
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
   supplyAsync = function (maybePayLoad) {
-
     try {
-
       let self = this;
 
       this.sdk.validateInput(maybePayLoad, this.requiredFields);
@@ -37,42 +33,43 @@ export default class AuthorizeAlias extends XQModule{
       const aliasUser = maybePayLoad[AuthorizeAlias.USER];
 
       return this.sdk
-                 .call(this.sdk.SUBSCRIPTION_SERVER_URL,
-                       this.serviceName,
-                       CallMethod.POST,
-                       null,
-                       maybePayLoad,
-                       true)
-                .then(function (authorizeAliasResponse){
-                  switch (authorizeAliasResponse.status) {
-                    case ServerResponse.OK: {
-                      let accessToken = authorizeAliasResponse.payload;
-                      try {
-                        self.cache.putXQAccess(aliasUser, accessToken);
-                        return authorizeAliasResponse;
-                      } catch (e) {
-                        console.log(e.message);
-                        return null;
-                      }
-                    }
-                    default: {
-                      return authorizeAliasResponse;
-                    }
-                  }
-                      });
-    }
-    catch (exception){
+        .call(
+          this.sdk.SUBSCRIPTION_SERVER_URL,
+          this.serviceName,
+          CallMethod.POST,
+          null,
+          maybePayLoad,
+          true
+        )
+        .then(function (authorizeAliasResponse) {
+          switch (authorizeAliasResponse.status) {
+            case ServerResponse.OK: {
+              let accessToken = authorizeAliasResponse.payload;
+              try {
+                self.cache.putXQAccess(aliasUser, accessToken);
+                return authorizeAliasResponse;
+              } catch (e) {
+                console.log(e.message);
+                return null;
+              }
+            }
+            default: {
+              return console.error("Error retrieving alias authorization");
+            }
+          }
+        });
+    } catch (validationException) {
       return new Promise(function (resolve) {
-        resolve(new ServerResponse(
+        resolve(
+          new ServerResponse(
             ServerResponse.ERROR,
-            exception.code,
-            exception.reason
-        ));
+            validationException.code,
+            validationException.reason
+          )
+        );
       });
     }
-
-
-  }
+  };
 }
 
 AuthorizeAlias.USER = "user";

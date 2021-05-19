@@ -12,77 +12,74 @@ import ServerResponse from "./../ServerResponse.js";
  *
  * @class [FetchKey]
  */
-export default class FetchKey extends XQModule{
+export default class FetchKey extends XQModule {
+  constructor(sdk) {
+    super(sdk);
 
+    this.sdk = sdk;
+    this.serviceName = "key";
+    this.requiredFields = [FetchKey.LOCATOR_KEY];
+  }
 
-    constructor(sdk) {
-        super(sdk);
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {String} maybePayLoad.locatorToken - The  locator token,  used as a URL to discover the key on  the server
+   *                The URL encoding part is handled internally in the service itself
+   * @returns {Promise<ServerResponse<{payload:string}>>}
+   */
+  supplyAsync = function (maybePayLoad) {
+    try {
+      this.sdk.validateInput(maybePayLoad, this.requiredFields);
+      let accessToken = this.sdk.validateAccessToken();
 
-        this.sdk = sdk;
-        this.serviceName = "key";
-        this.requiredFields = [FetchKey.LOCATOR_KEY];
+      let locatorKey = maybePayLoad[FetchKey.LOCATOR_KEY];
+      let additionalHeaderProperties = {
+        Authorization: "Bearer " + accessToken,
+      };
 
+      return this.sdk
+        .call(
+          this.sdk.VALIDATION_SERVER_URL,
+          this.serviceName + "/" + encodeURIComponent(locatorKey),
+          CallMethod.GET,
+          additionalHeaderProperties,
+          null,
+          true
+        )
+        .then(function (serverResponse) {
+          return new Promise(function (resolve, reject) {
+            switch (serverResponse.status) {
+              case ServerResponse.OK: {
+                let key = serverResponse.payload;
+                key = key.substr(2);
+
+                resolve(
+                  new ServerResponse(ServerResponse.OK, ServerResponse.OK, key)
+                );
+                break;
+              }
+              case ServerResponse.ERROR: {
+                console.error(
+                  `RetrieveKey failed, code: ${serverResponse.statusCode}, reason: ${serverResponse.payload}`
+                );
+                resolve(serverResponse);
+                break;
+              }
+            }
+          });
+        });
+    } catch (validationException) {
+      return new Promise(function (resolve, reject) {
+        resolve(
+          new ServerResponse(
+            ServerResponse.ERROR,
+            validationException.code,
+            validationException.reason
+          )
+        );
+      });
     }
-
-
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {String} maybePayLoad.locatorToken - The  locator token,  used as a URL to discover the key on  the server
-     *                The URL encoding part is handled internally in the service itself
-     * @returns {Promise<ServerResponse<{payload:string}>>}
-     */
-    supplyAsync = function (maybePayLoad) {
-
-        try {
-            this.sdk.validateInput(maybePayLoad, this.requiredFields);
-            let accessToken = this.sdk.validateAccessToken();
-
-            let locatorKey = maybePayLoad[FetchKey.LOCATOR_KEY];
-            let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
-
-            return this.sdk
-                       .call(this.sdk.VALIDATION_SERVER_URL,
-                             this.serviceName + '/' + encodeURIComponent(locatorKey),
-                             CallMethod.GET,
-                             additionalHeaderProperties,
-                             null,
-                             true)
-                             .then(function (serverResponse){
-                                 return  new Promise(function(resolve, reject)  {
-                                     switch (serverResponse.status) {
-                                         case ServerResponse.OK: {
-                                             let key = serverResponse.payload;
-                                             key = key.substr(2);
-
-                                             resolve(new ServerResponse(
-                                                 ServerResponse.OK,
-                                                 ServerResponse.OK,
-                                                 key
-                                             ));
-                                             break;
-                                         }
-                                         case ServerResponse.ERROR: {
-                                             console.error(`RetrieveKey failed, code: ${serverResponse.statusCode}, reason: ${serverResponse.payload}`);
-                                             resolve(serverResponse);
-                                             break;
-                                         }
-                                     }
-                                 });
-                             });
-        }
-        catch (validationException){
-            return new Promise(function (resolve, reject) {
-                resolve(new ServerResponse(
-                    ServerResponse.ERROR,
-                    validationException.code,
-                    validationException.reason
-                ));
-            });
-        }
-
-
-    }
-
+  };
 }
 
 FetchKey.LOCATOR_KEY = "locatorKey";
