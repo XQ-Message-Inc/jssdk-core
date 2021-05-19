@@ -3,33 +3,33 @@
  *
  * @class [RolesEnum]
  **/
-export default class  RolesEnum {}
+export default class RolesEnum {}
 
 /**
  * Maps numeric value to its respective textual representation
  * @param {Number} opt - Selected Option
  * @return {String} - String Representation of the Option
  */
-RolesEnum.parseValue = function(opt) {
-    switch (opt) {
-        case this.UNKNOWN:
-            return "UNKNOWN";
-        case this.ADMIN:
-            return "ADMIN";
-        case this.USER:
-            return "USER";
-        case this.CUSTOMER:
-            return "CUSTOMER";
-       case this.VENDOR:
-            return "VENDOR";
-        case this.SUPER_USER:
-            return "SUPER_USER";
-        case this.DEVICE:
-            return "DEVICE";
-        case this.ALIAS:
-            return "ALIAS";
-    }
-}
+RolesEnum.parseValue = function (opt) {
+  switch (opt) {
+    case this.UNKNOWN:
+      return "UNKNOWN";
+    case this.ADMIN:
+      return "ADMIN";
+    case this.USER:
+      return "USER";
+    case this.CUSTOMER:
+      return "CUSTOMER";
+    case this.VENDOR:
+      return "VENDOR";
+    case this.SUPER_USER:
+      return "SUPER_USER";
+    case this.DEVICE:
+      return "DEVICE";
+    case this.ALIAS:
+      return "ALIAS";
+  }
+};
 
 /**
  * @type {UNKNOWN, ADMIN, USER, CUSTOMER, VENDOR, SUPER_USER, DEVICE, ALIAS}

@@ -8,47 +8,43 @@ import ServerResponse from "../ServerResponse.js";
  *
  * @class [DeleteSubscriber]
  */
-export default class DeleteSubscriber extends XQModule{
+export default class DeleteSubscriber extends XQModule {
+  constructor(sdk) {
+    super(sdk);
 
-    constructor(sdk) {
-        super(sdk);
+    this.serviceName = "subscriber";
+  }
 
-        this.serviceName = "subscriber";
+  /**
+   *
+   * @param {{}} [maybePayLoad=null]
+   * @returns {Promise<ServerResponse<{}>>}
+   */
+  supplyAsync = function (maybePayLoad) {
+    try {
+      let accessToken = this.sdk.validateAccessToken();
+
+      let additionalHeaderProperties = {
+        Authorization: "Bearer " + accessToken,
+      };
+      return this.sdk.call(
+        this.sdk.SUBSCRIPTION_SERVER_URL,
+        this.serviceName,
+        CallMethod.DELETE,
+        additionalHeaderProperties,
+        maybePayLoad,
+        true
+      );
+    } catch (exception) {
+      return new Promise(function (resolve, reject) {
+        resolve(
+          new ServerResponse(
+            ServerResponse.ERROR,
+            exception.code,
+            exception.reason
+          )
+        );
+      });
     }
-
-
-    /**
-     *
-     * @param {{}} [maybePayLoad=null]
-     * @returns {Promise<ServerResponse<{}>>}
-     */
-    supplyAsync = function (maybePayLoad) {
-
-        try {
-
-            let accessToken = this.sdk.validateAccessToken();
-
-            let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
-            return this.sdk.call(this.sdk.SUBSCRIPTION_SERVER_URL,
-                                 this.serviceName,
-                                 CallMethod.DELETE,
-                                 additionalHeaderProperties,
-                                 maybePayLoad,
-                                 true);
-
-        }
-        catch (exception){
-            return new Promise(function (resolve, reject) {
-                resolve(new ServerResponse(
-                    ServerResponse.ERROR,
-                    exception.code,
-                    exception.reason
-                ));
-            });
-        }
-
-
-    }
-
-
+  };
 }

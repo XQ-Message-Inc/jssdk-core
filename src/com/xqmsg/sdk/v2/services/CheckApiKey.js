@@ -8,15 +8,12 @@ import ServerResponse from "../ServerResponse.js";
  * @class [CheckApiKey]
  */
 export default class CheckApiKey extends XQModule {
+  constructor(sdk) {
+    super(sdk);
 
-
-    constructor(sdk) {
-        super(sdk);
-
-        this.serviceName = "apikey";
-        this.requiredFields = [CheckApiKey.API_KEY];
-    }
-
+    this.serviceName = "apikey";
+    this.requiredFields = [CheckApiKey.API_KEY];
+  }
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
@@ -24,35 +21,35 @@ export default class CheckApiKey extends XQModule {
    *
    * @returns {Promise<ServerResponse<{payload:{scopes:[string]}}>>}
    */
-    supplyAsync = function (maybePayLoad) {
+  supplyAsync = function (maybePayLoad) {
+    try {
+      this.sdk.validateInput(maybePayLoad, this.requiredFields);
+      let accessToken = this.sdk.validateAccessToken();
 
-        try {
+      let additionalHeaderProperties = {
+        Authorization: "Bearer " + accessToken,
+      };
 
-            this.sdk.validateInput(maybePayLoad, this.requiredFields);
-            let accessToken = this.sdk.validateAccessToken();
-
-            let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
-
-            return this.sdk.call(this.sdk.SUBSCRIPTION_SERVER_URL,
-                this.serviceName,
-                CallMethod.GET,
-                additionalHeaderProperties,
-                maybePayLoad,
-                true);
-
-        } catch (exception) {
-            return new Promise(function (resolve, reject) {
-                resolve(new ServerResponse(
-                    ServerResponse.ERROR,
-                    exception.code,
-                    exception.reason
-                ));
-            });
-        }
-
-
+      return this.sdk.call(
+        this.sdk.SUBSCRIPTION_SERVER_URL,
+        this.serviceName,
+        CallMethod.GET,
+        additionalHeaderProperties,
+        maybePayLoad,
+        true
+      );
+    } catch (exception) {
+      return new Promise(function (resolve, reject) {
+        resolve(
+          new ServerResponse(
+            ServerResponse.ERROR,
+            exception.code,
+            exception.reason
+          )
+        );
+      });
     }
-
+  };
 }
 
 CheckApiKey.API_KEY = "api-key";
