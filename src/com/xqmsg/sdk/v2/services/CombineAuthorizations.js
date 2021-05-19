@@ -12,52 +12,48 @@ import ServerResponse from "../ServerResponse.js";
  *
  * @class [CombineAuthorizations]
  */
-export default class CombineAuthorizations extends XQModule{
+export default class CombineAuthorizations extends XQModule {
+  constructor(sdk) {
+    super(sdk);
 
-    constructor(sdk) {
-        super(sdk);
+    this.serviceName = "combined";
+    this.requiredFields = [CombineAuthorizations.TOKENS];
+  }
 
-        this.serviceName =  "combined";
-        this.requiredFields = [CombineAuthorizations.TOKENS];
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {[String]} maybePayLoad.tokens - The list of tokens to merge
+   * @returns {Promise<ServerResponse<{payload:{token:string, merged:long}}>>}
+   */
+  supplyAsync = function (maybePayLoad) {
+    try {
+      this.sdk.validateInput(maybePayLoad, this.requiredFields);
+      let accessToken = this.sdk.validateAccessToken();
+
+      let additionalHeaderProperties = {
+        Authorization: "Bearer " + accessToken,
+      };
+      return this.sdk.call(
+        this.sdk.SUBSCRIPTION_SERVER_URL,
+        this.serviceName,
+        CallMethod.POST,
+        additionalHeaderProperties,
+        maybePayLoad,
+        true
+      );
+    } catch (exception) {
+      return new Promise(function (resolve, reject) {
+        resolve(
+          new ServerResponse(
+            ServerResponse.ERROR,
+            exception.code,
+            exception.reason
+          )
+        );
+      });
     }
-
-
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {[String]} maybePayLoad.tokens - The list of tokens to merge
-     * @returns {Promise<ServerResponse<{payload:{token:string, merged:long}}>>}
-     */
-    supplyAsync = function (maybePayLoad) {
-
-        try {
-
-            this.sdk.validateInput(maybePayLoad, this.requiredFields);
-            let accessToken = this.sdk.validateAccessToken();
-
-            let additionalHeaderProperties = {"Authorization": "Bearer " + accessToken};
-            return this.sdk.call(this.sdk.SUBSCRIPTION_SERVER_URL,
-                                 this.serviceName,
-                                 CallMethod.POST,
-                                 additionalHeaderProperties,
-                                 maybePayLoad,
-                                 true);
-
-        }
-        catch (exception){
-            return new Promise(function (resolve, reject) {
-                resolve(new ServerResponse(
-                    ServerResponse.ERROR,
-                    exception.code,
-                    exception.reason
-                ));
-            });
-        }
-
-
-    }
-
+  };
 }
-
 
 CombineAuthorizations.TOKENS = "tokens";
 /**The merged token.*/

@@ -8,4 +8,3 @@ CallMethod.GET = "GET";
 CallMethod.PATCH = "PATCH";
 CallMethod.OPTIONS = "OPTIONS";
 CallMethod.DELETE = "DELETE";
-

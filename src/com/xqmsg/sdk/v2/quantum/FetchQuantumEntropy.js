@@ -1,6 +1,6 @@
 import XQModule from "../services/XQModule.js";
 import CallMethod from "../CallMethod.js";
-import XQSDK from '../XQSDK.js';
+import XQSDK from "../XQSDK.js";
 import ServerResponse from "../ServerResponse.js";
 
 /**
@@ -13,45 +13,42 @@ import ServerResponse from "../ServerResponse.js";
  * 4-bit binary representation.
  */
 export default class FetchQuantumEntropy extends XQModule {
+  constructor(sdk) {
+    super(sdk);
+  }
 
-    constructor(sdk) {
-        super(sdk);
+  /**
+   *
+   * @param {{}} maybePayLoad:
+   * @returns {Promise<ServerResponse<{payload:string}>>}
+   */
+  supplyAsync = function (maybePayLoad) {
+    try {
+      let additionalHeaderProperties = {
+        [XQSDK.CONTENT_TYPE]: XQSDK.TEXT_PLAIN_UTF_8,
+      };
+
+      return this.sdk.call(
+        this.sdk.KEY_SERVER_URL,
+        null,
+        CallMethod.GET,
+        additionalHeaderProperties,
+        maybePayLoad,
+        false
+      );
+    } catch (exception) {
+      return new Promise(function (resolve, reject) {
+        resolve(
+          new ServerResponse(
+            ServerResponse.ERROR,
+            exception.code,
+            exception.reason
+          )
+        );
+      });
     }
-
-    /**
-     *
-     * @param {{}} maybePayLoad:
-     * @returns {Promise<ServerResponse<{payload:string}>>}
-     */
-    supplyAsync = function (maybePayLoad) {
-
-        try {
-
-            let additionalHeaderProperties = {[XQSDK.CONTENT_TYPE]: XQSDK.TEXT_PLAIN_UTF_8};
-
-            return this.sdk
-                .call(this.sdk.KEY_SERVER_URL,
-                    null,
-                    CallMethod.GET,
-                    additionalHeaderProperties,
-                    maybePayLoad,
-                    false);
-
-        } catch
-            (exception) {
-            return new Promise(function (resolve, reject) {
-                resolve(new ServerResponse(
-                    ServerResponse.ERROR,
-                    exception.code,
-                    exception.reason
-                ));
-            });
-
-        }
-
-
-    }
+  };
 }
 
-FetchQuantumEntropy.KS = 'ks';
-FetchQuantumEntropy._256 = '256';
+FetchQuantumEntropy.KS = "ks";
+FetchQuantumEntropy._256 = "256";
