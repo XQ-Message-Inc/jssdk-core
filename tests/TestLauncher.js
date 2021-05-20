@@ -8,7 +8,11 @@ const oReq = new XMLHttpRequest();
 oReq.open("GET", "/tests/resources/utf-8-sampler.txt");
 
 oReq.addEventListener("load", function () {
-  const xqsdk = new XQSDK();
+  const xqsdk = new XQSDK({
+    XQ_API_KEY: "YOUR_XQ_API_KEY",
+    DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
+  });
+
   const container = new TestContainer(xqsdk, this.responseText);
   const tests = container.loadTests();
 
@@ -45,7 +49,9 @@ oReq.addEventListener("load", function () {
               let errorMessage = serverResponse.payload;
               try {
                 errorMessage = JSON.parse(serverResponse.payload).status;
-              } catch (e) {}
+              } catch (e) {
+                return;
+              }
               $(`#cb-${mkId(test.name)}`).prop({
                 checked: true,
                 disabled: true,
@@ -155,7 +161,9 @@ oReq.addEventListener("load", function () {
             let error = serverResponse.payload;
             try {
               error = JSON.parse(error).status;
-            } catch (e) {}
+            } catch (e) {
+              return;
+            }
             console.error("failed , reason: ", error);
             return serverResponse;
           }
@@ -186,7 +194,9 @@ oReq.addEventListener("load", function () {
             let error = serverResponse.payload;
             try {
               error = JSON.parse(error).status;
-            } catch (e) {}
+            } catch (e) {
+              return;
+            }
             console.error("failed , reason: ", error);
             return serverResponse;
           }
@@ -243,7 +253,9 @@ oReq.addEventListener("load", function () {
                 } else {
                   errorMessage = jsonObj.status;
                 }
-              } catch (e) {}
+              } catch (e) {
+                return;
+              }
               $("label[for='label-content']")
                 .css({
                   "font-style": "italic",
