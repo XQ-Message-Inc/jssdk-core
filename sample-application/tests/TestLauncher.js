@@ -1,7 +1,9 @@
-import ServerResponse from "./../src/com/xqmsg/sdk/v2/ServerResponse.js";
-import Authorize from "../src/com/xqmsg/sdk/v2/services/Authorize.js";
-import CodeValidator from "../src/com/xqmsg/sdk/v2/services/CodeValidator.js";
-import XQSDK from "./../src/com/xqmsg/sdk/v2/XQSDK.js";
+import {
+  Authorize,
+  CodeValidator,
+  ServerResponse,
+  XQSDK,
+} from "../../src/index.js";
 import TestContainer from "./TestContainer.js";
 
 const oReq = new XMLHttpRequest();
