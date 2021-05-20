@@ -9,8 +9,8 @@
   "files": ["/dist/*.js", "/dist/**/&.js"],
   "scripts": {
     "build": "parcel build ./src/index.js",
-    "dev": "parcel ./demo/html/demo.html",
-    "dev-test": "parcel ./tests/html/tests.html",
+    "dev": "parcel ./sample-application/demo/html/demo.html",
+    "dev-test": "parcel ./sample-application/tests/html/tests.html",
     "test": "jest",
     "lint": "eslint src/**/*.js"
   },
