@@ -5,16 +5,9 @@ const oReq = new XMLHttpRequest();
 oReq.open("GET", "/tests/resources/utf-8-sampler.txt");
 
 oReq.addEventListener("load", function () {
-  // const xqsdk = new XQSDK({
-  //   XQ_API_KEY: "YOUR_XQ_API_KEY",
-  //   DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
-  // });
-
   const xqsdk = new XQSDK({
-    XQ_API_KEY:
-      "5e9b3574-c3ec-419d-b2b6-ba3d0a900562-b817b4dc-6961-48ac-95a4-8a32463d9fbc",
-    DASHBOARD_API_KEY:
-      "52d77935-513e-420f-a013-cb4cbc80ada3-648f8353-4a1e-49db-85f1-3ab6233e57c6",
+    XQ_API_KEY: "YOUR_XQ_API_KEY",
+    DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
   });
 
   const container = new TestContainer(xqsdk, this.responseText);
