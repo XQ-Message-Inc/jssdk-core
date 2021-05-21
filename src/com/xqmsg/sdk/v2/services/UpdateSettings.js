@@ -11,9 +11,8 @@ export default class UpdateSettings extends XQModule {
 
     this.serviceName = "settings";
     this.requiredFields = [];
-  }
 
-  /**
+    /**
      *
      * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
      * @param {boolean} maybePayLoad.newsLetter - Should this user receive newsletters or not? <br>This is only valid for new users, and is ignored if the user already exists.
@@ -21,34 +20,35 @@ export default class UpdateSettings extends XQModule {
 
      * @returns {Promise<ServerResponse<{}>>}
      */
-  supplyAsync = function (maybePayLoad) {
-    try {
-      let accessToken = this.sdk.validateAccessToken();
+    this.supplyAsync = (maybePayLoad) => {
+      try {
+        let accessToken = this.sdk.validateAccessToken();
 
-      let additionalHeaderProperties = {
-        Authorization: "Bearer " + accessToken,
-      };
+        let additionalHeaderProperties = {
+          Authorization: "Bearer " + accessToken,
+        };
 
-      return this.sdk.call(
-        this.sdk.SUBSCRIPTION_SERVER_URL,
-        this.serviceName,
-        CallMethod.OPTIONS,
-        additionalHeaderProperties,
-        maybePayLoad,
-        true
-      );
-    } catch (exception) {
-      return new Promise(function (resolve, reject) {
-        resolve(
-          new ServerResponse(
-            ServerResponse.ERROR,
-            exception.code,
-            exception.reason
-          )
+        return this.sdk.call(
+          this.sdk.SUBSCRIPTION_SERVER_URL,
+          this.serviceName,
+          CallMethod.OPTIONS,
+          additionalHeaderProperties,
+          maybePayLoad,
+          true
         );
-      });
-    }
-  };
+      } catch (exception) {
+        return new Promise((resolve, reject) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
+          );
+        });
+      }
+    };
+  }
 }
 
 UpdateSettings.NOTIFICATIONS = "notifications";

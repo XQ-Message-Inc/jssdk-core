@@ -14,50 +14,51 @@ export default class FileDecrypt extends XQModule {
 
     this.algorithm = algorithm;
     this.requiredFields = [FileDecrypt.SOURCE_FILE];
-  }
-  /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {File} maybePayLoad.sourceFile - The file to be decrypted.
-   *
-   *  @returns {Promise<ServerResponse<{payload:File}>>}
-   */
-  supplyAsync = function (maybePayLoad) {
-    try {
-      this.sdk.validateInput(maybePayLoad, this.requiredFields);
-    } catch (validationException) {
-      return new Promise(function (resolve, reject) {
-        resolve(
-          new ServerResponse(
-            ServerResponse.ERROR,
-            validationException.code,
-            validationException.reason
-          )
-        );
-      });
-    }
-    const algorithm = this.algorithm;
-    const sdk = this.sdk;
-    const accessToken = this.accessToken;
-    const sourceFile = maybePayLoad[FileDecrypt.SOURCE_FILE];
 
-    return algorithm.decryptFile(sourceFile, function (aLocatorToken) {
-      return new FetchKey(sdk, accessToken)
-        .supplyAsync({ [FetchKey.LOCATOR_KEY]: aLocatorToken })
-        .then(function (retrieveKeyRespose) {
-          switch (retrieveKeyRespose.status) {
-            case ServerResponse.OK: {
-              return retrieveKeyRespose.payload;
-            }
-            case ServerResponse.ERROR: {
-              console.error(
-                `${algorithm.constructor.name}.decryptFile() failed, code: ${retrieveKeyRespose.statusCode}, reason: ${retrieveKeyRespose.payload}`
-              );
-              return retrieveKeyRespose;
-            }
-          }
+    /**
+     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+     * @param {File} maybePayLoad.sourceFile - The file to be decrypted.
+     *
+     *  @returns {Promise<ServerResponse<{payload:File}>>}
+     */
+    this.supplyAsync = (maybePayLoad) => {
+      try {
+        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+      } catch (validationException) {
+        return new Promise((resolve, reject) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              validationException.code,
+              validationException.reason
+            )
+          );
         });
-    });
-  };
+      }
+      const algorithm = this.algorithm;
+      const sdk = this.sdk;
+      const accessToken = this.accessToken;
+      const sourceFile = maybePayLoad[FileDecrypt.SOURCE_FILE];
+
+      return algorithm.decryptFile(sourceFile, (aLocatorToken) => {
+        return new FetchKey(sdk, accessToken)
+          .supplyAsync({ [FetchKey.LOCATOR_KEY]: aLocatorToken })
+          .then((retrieveKeyRespose) => {
+            switch (retrieveKeyRespose.status) {
+              case ServerResponse.OK: {
+                return retrieveKeyRespose.payload;
+              }
+              case ServerResponse.ERROR: {
+                console.error(
+                  `${algorithm.constructor.name}.decryptFile() failed, code: ${retrieveKeyRespose.statusCode}, reason: ${retrieveKeyRespose.payload}`
+                );
+                return retrieveKeyRespose;
+              }
+            }
+          });
+      });
+    };
+  }
 }
 
 FileDecrypt.SOURCE_FILE = "sourceFile";

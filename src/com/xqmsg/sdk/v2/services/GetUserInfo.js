@@ -14,40 +14,40 @@ export default class GetUserInfo extends XQModule {
 
     this.serviceName = "subscriber";
     this.requiredFields = [];
-  }
 
-  /**
-   * @param {Map} [maybePayLoad=null]
-   * @returns {Promise<ServerResponse<{payload:{id:long, usr:string, firstName:string, sub:string, starts:long, ends:Long}}>>}
-   */
-  supplyAsync = function (maybePayLoad) {
-    try {
-      let accessToken = this.sdk.validateAccessToken();
+    /**
+     * @param {Map} [maybePayLoad=null]
+     * @returns {Promise<ServerResponse<{payload:{id:long, usr:string, firstName:string, sub:string, starts:long, ends:Long}}>>}
+     */
+    this.supplyAsync = (maybePayLoad) => {
+      try {
+        let accessToken = this.sdk.validateAccessToken();
 
-      let additionalHeaderProperties = {
-        Authorization: "Bearer " + accessToken,
-      };
+        let additionalHeaderProperties = {
+          Authorization: "Bearer " + accessToken,
+        };
 
-      return this.sdk.call(
-        this.sdk.SUBSCRIPTION_SERVER_URL,
-        this.serviceName,
-        CallMethod.GET,
-        additionalHeaderProperties,
-        maybePayLoad,
-        true
-      );
-    } catch (exception) {
-      return new Promise(function (resolve, reject) {
-        resolve(
-          new ServerResponse(
-            ServerResponse.ERROR,
-            exception.code,
-            exception.reason
-          )
+        return this.sdk.call(
+          this.sdk.SUBSCRIPTION_SERVER_URL,
+          this.serviceName,
+          CallMethod.GET,
+          additionalHeaderProperties,
+          maybePayLoad,
+          true
         );
-      });
-    }
-  };
+      } catch (exception) {
+        return new Promise((resolve, reject) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
+          );
+        });
+      }
+    };
+  }
 }
 
 GetUserInfo.ID = "id";

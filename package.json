@@ -1,14 +1,16 @@
 {
   "name": "@xqmsg/jssdk-core",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "A Javascript Implementation of XQ Message SDK, V.2",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "directories": {
     "test": "tests"
   },
+  "files": ["/dist/*.js", "/dist/**/&.js"],
   "scripts": {
-    "build": "parcel build ./demo/html/demo.html",
-    "dev": "parcel ./demo/html/demo.html",
+    "build": "parcel build ./src/index.js",
+    "dev": "parcel ./sample-application/demo/html/demo.html",
+    "dev-test": "parcel ./sample-application/tests/html/tests.html",
     "test": "jest",
     "lint": "eslint src/**/*.js"
   },
@@ -35,6 +37,6 @@
     "prettier": "^2.3.0"
   },
   "dependencies": {
-    "crypto-js": "^4.0.0"
+    "crypto-js": "3.1.9-1"
   }
 }
