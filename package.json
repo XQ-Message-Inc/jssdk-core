@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "check-types": "tsc --noEmit",
-    "build": "yarn types && parcel build ./src/index.ts",
+    "build": "parcel build ./src/index.ts",
     "dev": "parcel ./sample-application/demo/html/demo.html",
     "dev-test": "parcel ./sample-application/tests/html/tests.html",
     "test": "jest",
