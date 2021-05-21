@@ -6,7 +6,7 @@ import {
   EncryptionAlgorithm,
   ServerResponse,
   XQSDK,
-} from "../src/index.js";
+} from "../../src/index.js";
 
 import {
   getProperty,
@@ -14,9 +14,9 @@ import {
   removeProperty,
   replaceProperty,
   setProperty,
-} from "../src/com/xqmsg/sdk/v2/Commons";
+} from "../../src/com/xqmsg/sdk/v2/Commons";
 
-var xqsdk = new XQSDK({
+const xqsdk = new XQSDK({
   XQ_API_KEY: "YOUR_XQ_API_KEY",
   DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
 });
