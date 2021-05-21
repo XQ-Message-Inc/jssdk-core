@@ -6,7 +6,7 @@ type NotificationEnumTypes = "NONE" | "USAGE_REPORTS" | "TUTORIALS" | "BOTH";
  * @class [NotificationEnum]
  **/
 export default class NotificationEnum {
-  static parseValue: (opt: any) => NotificationEnumTypes;
+  static parseValue: (opt: number) => NotificationEnumTypes;
   static NONE: number;
   static USAGE_REPORTS: number;
   static TUTORIALS: number;
@@ -18,7 +18,7 @@ export default class NotificationEnum {
  * @param {Number} opt - Selected Option
  * @return {String} - String Representation of the Option
  */
-NotificationEnum.parseValue = function (opt: NotificationEnumTypes) {
+NotificationEnum.parseValue = function (opt) {
   switch (opt) {
     case this.NONE:
       return "NONE";
@@ -28,6 +28,9 @@ NotificationEnum.parseValue = function (opt: NotificationEnumTypes) {
       return "TUTORIALS";
     case this.BOTH:
       return "BOTH";
+    default: {
+      return "NONE";
+    }
   }
 };
 

@@ -9,6 +9,7 @@ type EncryptionAlgorithm = {
     locate: (aLocatorToken: string) => Promise<Record<string, any>>
   ) => void;
 };
+
 /**
  *
  * Decrypts data stored in a file using the {@link EncryptionAlgorithm} provided.

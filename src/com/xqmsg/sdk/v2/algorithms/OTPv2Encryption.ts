@@ -20,7 +20,8 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
   doEncrypt: (arg0: Uint8Array) => Uint8Array;
   encryptFile: EncryptFile;
   encryptText: EncryptText;
-  exclusiveDisjunction: (text: string, expandedKey: string | void) => string;
+
+  exclusiveDisjunction: (text: string, expandedKey: string) => string;
   parseFileForDecrypt: (file: any) => Promise<{
     locator: string;
     nameEncrypted: string;
@@ -59,7 +60,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
           const expandedKey = self.expandKey(key, 2048);
           if (expandedKey == null) {
             console.error("Key could not be UTF8 encoded.");
-            resolve(
+            return resolve(
               new ServerResponse(
                 ServerResponse.ERROR,
                 500,
@@ -147,7 +148,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
             },
             function (e) {
               console.error(e);
-              return null;
+              throw e;
             }
           );
       } catch (exception) {

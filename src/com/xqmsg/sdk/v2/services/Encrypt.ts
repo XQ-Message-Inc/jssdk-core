@@ -1,9 +1,9 @@
 import EncryptionAlgorithm from "../algorithms/EncryptionAlgorithm";
 import FetchQuantumEntropy from "../quantum/FetchQuantumEntropy";
 import GeneratePacket from "./GeneratePacket";
-import ServerResponse, { ServerResponseProps } from "../ServerResponse";
+import ServerResponse from "../ServerResponse";
 import ValidatePacket from "./ValidatePacket";
-import XQModule, { SupplyAsync } from "./XQModule";
+import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 /**
  *
@@ -20,7 +20,7 @@ export default class Encrypt extends XQModule {
   static LOCATOR_KEY: string;
   static RECIPIENTS: string;
   static TEXT: string;
-  supplyAsync: SupplyAsync;
+  supplyAsync: (maybePayLoad: Record<string, any>) => Promise<any>;
 
   constructor(sdk: XQSDK, algorithm: EncryptionAlgorithm) {
     super(sdk);
@@ -54,7 +54,7 @@ export default class Encrypt extends XQModule {
 
         return new FetchQuantumEntropy(sdk)
           .supplyAsync({ [FetchQuantumEntropy.KS]: FetchQuantumEntropy._256 })
-          .then((keyResponse: ServerResponseProps) => {
+          .then((keyResponse: ServerResponse) => {
             switch (keyResponse.status) {
               case ServerResponse.OK: {
                 let initialKey = keyResponse.payload as string;
@@ -147,15 +147,15 @@ export default class Encrypt extends XQModule {
             }
           });
       } catch (exception) {
-        return new Promise((resolve) => {
+        return new Promise((resolve) =>
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
               exception.code,
               exception.reason
             )
-          );
-        });
+          )
+        );
       }
     };
   }

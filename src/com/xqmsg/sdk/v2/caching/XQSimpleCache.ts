@@ -7,7 +7,7 @@ export default class XQSimpleCache {
   PROFILE_LIST_KEY: string;
   XQ_PREFIX: string;
   clearAllProfiles: () => void;
-  getActiveProfile: (required: boolean) => string;
+  getActiveProfile: (required: boolean) => string | null;
   getDashboardAccess: (user: string, required?: boolean) => any;
   getXQAccess: (user: string, required?: boolean) => any;
   getXQPreAuthToken: (user: string) => any;
@@ -174,9 +174,12 @@ export default class XQSimpleCache {
       for (var i = 0; i < availableProfiles.length; i++) {
         let user = this.getActiveProfile(false);
 
-        this.removeXQPreAuthToken(user);
-        this.removeXQAccess(user);
-        this.removeDashboardAccess(user);
+        if (user) {
+          this.removeXQPreAuthToken(user);
+          this.removeXQAccess(user);
+          this.removeDashboardAccess(user);
+        }
+
         break;
       }
       this.storage.removeItem(this.ACTIVE_PROFILE_KEY);
@@ -207,19 +210,4 @@ export default class XQSimpleCache {
       return `${this.DASHBOARD_PREFIX}-${validatedUser}`;
     };
   }
-  // makeExchangeKey(user: string): any {
-  //   throw new Error("Method not implemented.");
-  // }
-  // makeXQAccessKey(user: string): any {
-  //   throw new Error("Method not implemented.");
-  // }
-  // makeDashboardAccessKey(user: string): any {
-  //   throw new Error("Method not implemented.");
-  // }
-  // listProfiles() {
-  //   throw new Error("Method not implemented.");
-  // }
-  // getActiveProfile(arg0: boolean) {
-  //   throw new Error("Method not implemented.");
-  // }
 }
