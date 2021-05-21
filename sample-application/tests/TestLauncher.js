@@ -1,10 +1,5 @@
-import {
-  Authorize,
-  CodeValidator,
-  ServerResponse,
-  XQSDK,
-} from "../../src/index.js";
-import TestContainer from "./TestContainer.js";
+import { Authorize, CodeValidator, ServerResponse, XQSDK } from "../../src/";
+import TestContainer from "./TestContainer";
 
 const oReq = new XMLHttpRequest();
 oReq.open("GET", "/tests/resources/utf-8-sampler.txt");

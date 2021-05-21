@@ -6,7 +6,7 @@ import {
   EncryptionAlgorithm,
   ServerResponse,
   XQSDK,
-} from "../../src/index.js";
+} from "../../src";
 
 import {
   getProperty,

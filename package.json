@@ -6,9 +6,13 @@
   "directories": {
     "test": "tests"
   },
-  "files": ["/dist/*.js", "/dist/**/&.js"],
+  "files": [
+    "/dist/*.js",
+    "/dist/**/&.js"
+  ],
   "scripts": {
-    "build": "parcel build ./src/index.js",
+    "check-types": "tsc --noEmit",
+    "build": "yarn types && parcel build ./src/index.ts",
     "dev": "parcel ./sample-application/demo/html/demo.html",
     "dev-test": "parcel ./sample-application/tests/html/tests.html",
     "test": "jest",
@@ -29,12 +33,15 @@
     "@babel/core": "^7.14.2",
     "@babel/eslint-parser": "^7.14.2",
     "@babel/preset-env": "^7.14.2",
+    "@parcel/transformer-typescript-tsc": "^2.0.0-nightly.3",
+    "@types/crypto-js": "^4.0.1",
     "eslint": "^7.26.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "jest": "^26.6.3",
     "parcel": "^2.0.0-beta.2",
-    "prettier": "^2.3.0"
+    "prettier": "^2.3.0",
+    "typescript": "^4.2.4"
   },
   "dependencies": {
     "crypto-js": "3.1.9-1"

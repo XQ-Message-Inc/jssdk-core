@@ -1,0 +1,10 @@
+{
+    "source": {
+      "include": ["."],
+      "includePattern": ".+\\.js(doc|x)?$",
+      "excludePattern": "(node_modules|./src/com/xqmsg/sdk/v2/Commons.ts)"
+    },
+    "opts": {
+        "template": "./node_modules/tsd-jsdoc/dist"
+    }
+}
