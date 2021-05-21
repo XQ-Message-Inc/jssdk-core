@@ -1,14 +1,23 @@
 {
   "name": "@xqmsg/jssdk-core",
-  "version": "0.0.1",
+  "version": "1.0.6",
   "description": "A Javascript Implementation of XQ Message SDK, V.2",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "directories": {
     "test": "tests"
   },
+  "files": [
+    "/dist/*.js",
+    "/dist/**/&.js",
+    "/dist/*.ts",
+    "/dist/**/&.ts"
+  ],
+  "types": "./dist/main.d.ts",
   "scripts": {
-    "build": "parcel build ./demo/html/demo.html",
-    "dev": "parcel ./demo/html/demo.html",
+    "check-types": "tsc --noEmit",
+    "build": "parcel build ./src/index.ts",
+    "dev": "parcel ./sample-application/demo/html/demo.html",
+    "dev-test": "parcel ./sample-application/tests/html/tests.html",
     "test": "jest",
     "lint": "eslint src/**/*.js"
   },
@@ -27,14 +36,20 @@
     "@babel/core": "^7.14.2",
     "@babel/eslint-parser": "^7.14.2",
     "@babel/preset-env": "^7.14.2",
+    "@parcel/packager-ts": "2.0.0-beta.2",
+    "@parcel/transformer-typescript-tsc": "^2.0.0-nightly.3",
+    "@parcel/transformer-typescript-types": "2.0.0-beta.2",
+    "@types/crypto-js": "^4.0.1",
+    "@types/node": "^15.6.0",
     "eslint": "^7.26.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "jest": "^26.6.3",
     "parcel": "^2.0.0-beta.2",
-    "prettier": "^2.3.0"
+    "prettier": "^2.3.0",
+    "typescript": "^4.2.4"
   },
   "dependencies": {
-    "crypto-js": "^4.0.0"
+    "crypto-js": "3.1.9-1"
   }
 }
