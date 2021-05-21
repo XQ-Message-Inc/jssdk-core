@@ -48,6 +48,9 @@ RolesEnum.parseValue = function (opt: number) {
       return "DEVICE";
     case this.ALIAS:
       return "ALIAS";
+    default: {
+      return "UNKNOWN";
+    }
   }
 };
 

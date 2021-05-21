@@ -34,7 +34,7 @@ interface XQSDKProps {
     maybePayload: Record<string, any>,
     requiresAPIKey: boolean,
     destination?: string
-  ) => ServerResponse;
+  ) => Promise<unknown>;
   buildQeryParams: (paramsObject: Record<string, any>) => string;
   getAlgorithm: (key: string) => any;
   getCache: () => XQSimpleCache;
@@ -389,11 +389,15 @@ class XQSDK {
       // Ensure that there is an active profile.
       let activeProfile = this.cache.getActiveProfile(true);
 
+      if (activeProfile == null) {
+        throw new StatusException(401, `No active profile found`);
+      }
+
       let preAuthToken = this.cache.getXQPreAuthToken(activeProfile);
       if (preAuthToken == null) {
         throw new StatusException(
           401,
-          `pre authorization Token not Found for ${activeProfile}`
+          `Pre-authorization token not found for ${activeProfile}`
         );
       }
       return preAuthToken;
@@ -408,6 +412,10 @@ class XQSDK {
       let activeProfile = this.cache.getActiveProfile(true);
       let accessToken = null;
 
+      if (activeProfile == null) {
+        throw new StatusException(401, `No active profile found`);
+      }
+
       switch (destination) {
         case Destination.XQ: {
           accessToken = this.cache.getXQAccess(activeProfile, true);
@@ -421,7 +429,7 @@ class XQSDK {
       if (accessToken == null) {
         throw new StatusException(
           401,
-          `Access Token not Found for ${activeProfile}`
+          `Access Token not found for ${activeProfile}`
         );
       }
       return accessToken;

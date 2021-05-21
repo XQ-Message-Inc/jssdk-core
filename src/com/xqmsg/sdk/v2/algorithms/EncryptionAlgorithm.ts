@@ -12,16 +12,18 @@ export type EncryptText = (
 ) => Promise<ServerResponse>;
 
 export type EncryptFile = (
-  sourceFile: any,
+  sourceFile: File,
   expandedKey: string | void,
   locatorToken: string
 ) => Promise<ServerResponse>;
 
 export type ExpandKey = (k: string, extendTo: number) => string | void;
+
 /**
  * @class
- * Super class for Encryption Algorithms supported by XQ Message: <br>
- * AESEncryption <br> OTPv2Encryption
+ * Super class for Encryption Algorithms supported by XQ Message:
+ * * AESEncryption
+ * * OTPv2Encryption
  */
 export default class EncryptionAlgorithm {
   encryptFile: EncryptFile;

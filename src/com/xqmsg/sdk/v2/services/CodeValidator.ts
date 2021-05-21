@@ -50,7 +50,7 @@ export default class CodeValidator extends XQModule {
           .then((validationResponse: ServerResponse) => {
             switch (validationResponse.status) {
               case ServerResponse.OK: {
-                return new ExchangeForAccessToken(self.sdk).supplyAsync(null);
+                return new ExchangeForAccessToken(self.sdk).supplyAsync({});
               }
               case ServerResponse.ERROR: {
                 console.info(validationResponse);
