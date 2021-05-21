@@ -1,6 +1,6 @@
 {
   "name": "@xqmsg/jssdk-core",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "A Javascript Implementation of XQ Message SDK, V.2",
   "main": "dist/index.js",
   "directories": {
@@ -8,7 +8,9 @@
   },
   "files": [
     "/dist/*.js",
-    "/dist/**/&.js"
+    "/dist/**/&.js",
+    "/dist/*.ts",
+    "/dist/**/&.ts"
   ],
   "types": "./dist/main.d.ts",
   "scripts": {
