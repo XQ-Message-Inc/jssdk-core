@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" media="screen" href="../../stylesheets/core-desktop.css">
+    <link rel="shortcut icon" type="image/png" href="../../images/favicon.png">
+    <title></title>
+</head>
+<body>
+<div class="centerBody">
+    <div class="row">
+
+        <div class="logoCell col-1-logo">
+            <img src="../../images/chatlogo.png" class="logo">
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-2-logo">
+            <div class="xqMsg"><small>Javascript SDK Demo</small></div>
+        </div>
+    </div>
+    <div id="label-content" class="section Row">
+        <label for="label-content" class="TertiaryText"></label>
+    </div>
+
+    <div class="section row">
+        <!-- this is where the encrypted message will be shown -->
+        <div id="current-identity"></div>
+        <div id="message-content"  style="display:none;"></div>
+
+
+        <div id="algorithms" style="display:none">
+            <select place id="algorithmSelectBox" style="font-family: ProximaNova, sans-serif; font-size: 24px;font-weight: 500;font-variant: normal;color: dodgerblue;"></select>
+            <div class="inputLightLine"></div>
+        </div>
+
+        <div>
+            <div class="form-group" id="recipient-list-div"  style="display:none">
+                <div class="inputText"><input type="text" id="recipient-list-input" placeholder="" value="" style="display:none;"></input></div>
+                <div class="inputLightLine"></div>
+            </div>
+            <div class="form-group">
+                <div class="inputText"><input type="text" id="user-input" placeholder="" value= ></input></div>
+                <div class="inputText"><input type="text" id="recipient-input" placeholder="" value="" style="display:none"></input></div>
+                <div class="inputText"><input type="text" id="encrypt-input" placeholder="" value="" style="display:none;"></div>
+                <div class="inputText"><input type="text" id="decrypt-input" placeholder="" value="" style="display:none" ></input></div>
+                <div class="inputText"><input type="text" id="pin-input" maxlength="6" placeholder="" value="" style="display:none"></input></div>
+                <div class="inputLightLine"></div>
+            </div>
+            <div class="topBoundary2 bottomSpacing">
+                <button id="sender-access-request-button" type="button" class="dropbtn">Request Access</button>
+                <button id="validate-access-request-button" type="button" style="display:none" class="dropbtn">Confirm</button>
+                <button id="encrypt-button" type="button" style="display:none" class="dropbtn">Encrypt</button>
+                <button id="recipient-access-request-button" type="button" style="display:none"class="dropbtn">Request Access</button>
+                <button id="refresh-button" type="button" style="display:none" class="dropbtn">Another Round Trip?</button>
+                <button id="decrypt-button" type="button" style="display:none" class="dropbtn">Decrypt</button>
+            </div>
+            </form>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <!-- SDK V2 START -->
+        <script src="../../../src/com/xqmsg/sdk/v2/algorithms/EncryptionAlgorithm" type="module"></script>
+        <script src="../../../src/com/xqmsg/sdk/v2/algorithms/OTPv2Encryption" type="module"></script>
+        <script src="../../../src/com/xqmsg/sdk/v2/algorithms/AESEncryption" type="module"></script>
+        <script src="../../../src/com/xqmsg/sdk/v2/CallMethod" type="module"></script>
+        <script src="../../../src/com/xqmsg/sdk/v2/ServerResponse" type="module"></script>
+        <script src="../../../src/com/xqmsg/sdk/v2/XQSDK" type="module"></script>
+        <script src="../../../src/com/xqmsg/sdk/v2/NotificationEnum" type="module"></script>
+
+          <!-- SERVICES START -->
+          <script src="../../../src/com/xqmsg/sdk/v2/services/Authorize" type="module"></script>
+          <script src="../../../src/com/xqmsg/sdk/v2/services/CodeValidator" type="module"></script>
+          <script src="../../../src/com/xqmsg/sdk/v2/services/ExchangeForAccessToken" type="module"></script>
+          <script src="../../../src/com/xqmsg/sdk/v2/quantum/FetchQuantumEntropy" type="module"></script>
+          <script src="../../../src/com/xqmsg/sdk/v2/services/Encrypt" type="module"></script>
+          <script src="../../../src/com/xqmsg/sdk/v2/services/GeneratePacket" type="module"></script>
+          <script src="../../../src/com/xqmsg/sdk/v2/services/ValidatePacket" type="module"></script>
+          <script src="../../../src/com/xqmsg/sdk/v2/services/FetchKey" type="module"></script>
+          <script src="../../../src/com/xqmsg/sdk/v2/services/Decrypt" type="module"></script>
+          <!-- SERVICES END -->
+          <!-- SDK V2  END -->
+          <!-- CODE CONTAINING THE TESTS -->
+          <script src="../../demo/demo.js" type="module"></script>
+    </div>
+</div>
+</body>
+</html>
+</html>
