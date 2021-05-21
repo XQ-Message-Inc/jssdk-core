@@ -1,0 +1,225 @@
+import StatusException from "../exceptions/StatusException";
+
+export default class XQSimpleCache {
+  ACTIVE_PROFILE_KEY: string;
+  DASHBOARD_PREFIX: string;
+  EXCHANGE_PREFIX: string;
+  PROFILE_LIST_KEY: string;
+  XQ_PREFIX: string;
+  clearAllProfiles: () => void;
+  getActiveProfile: (required: boolean) => string;
+  getDashboardAccess: (user: string, required?: boolean) => any;
+  getXQAccess: (user: string, required?: boolean) => any;
+  getXQPreAuthToken: (user: string) => any;
+  hasProfile: (user: string) => any;
+  listProfiles: () => string[];
+  makeDashboardAccessKey: (user: string) => string;
+  makeExchangeKey: (user: string) => string;
+  makeXQAccessKey: (user: string) => string;
+  putActiveProfile: (user: string) => void;
+  putDashboardAccess: (user: string, accessToken: any) => void;
+  putProfile: (user: string) => void;
+  putXQAccess: (user: string, accessToken: any) => void;
+  putXQPreAuthToken: (user: string, preAuthToken: any) => void;
+  removeDashboardAccess: (user: string) => void;
+  removeProfile: (user: string) => void;
+  removeXQAccess: (user: string) => void;
+  removeXQPreAuthToken: (user: string) => void;
+  storage: Storage;
+
+  /**
+   *
+   * @param {Storage} storage
+   */
+  constructor(storage: Storage) {
+    if (!("caches" in window)) {
+      prompt("no cache mechanism");
+    }
+    this.storage = storage;
+    this.XQ_PREFIX = "xq";
+    this.DASHBOARD_PREFIX = "dsb";
+    this.EXCHANGE_PREFIX = "exchange";
+    this.PROFILE_LIST_KEY = "available-profiles";
+    this.ACTIVE_PROFILE_KEY = "active-profile";
+
+    this.putXQPreAuthToken = (user, preAuthToken) => {
+      this.storage.setItem(this.makeExchangeKey(user), preAuthToken);
+    };
+
+    this.getXQPreAuthToken = (user) => {
+      const preAuthToken = this.storage.getItem(this.makeExchangeKey(user));
+      if (preAuthToken == undefined) {
+        return null;
+      }
+      return preAuthToken;
+    };
+
+    this.removeXQPreAuthToken = (user) => {
+      let xqPreAuthToken = this.getXQPreAuthToken(user);
+      if (xqPreAuthToken != null) {
+        this.storage.removeItem(this.makeExchangeKey(user));
+      }
+    };
+
+    this.putXQAccess = (user, accessToken) => {
+      this.storage.setItem(this.makeXQAccessKey(user), accessToken);
+    };
+
+    this.getXQAccess = (user, required) => {
+      const accessToken = this.storage.getItem(this.makeXQAccessKey(user));
+      if (required && accessToken == undefined) {
+        throw new StatusException(401, "401 Unauthorized");
+      } else {
+        return accessToken;
+      }
+    };
+
+    this.removeXQAccess = (user) => {
+      let accessToken = this.getXQAccess(user);
+      if (accessToken != null) {
+        let success = this.storage.removeItem(this.makeXQAccessKey(user));
+      }
+    };
+
+    this.putDashboardAccess = (user, accessToken) => {
+      this.storage.setItem(this.makeDashboardAccessKey(user), accessToken);
+    };
+
+    this.getDashboardAccess = (user, required = false) => {
+      const dashboardAccessToken = this.storage.getItem(
+        this.makeDashboardAccessKey(user)
+      );
+      if (required && dashboardAccessToken == undefined) {
+        throw new StatusException(401, "401 Unauthorized");
+      } else {
+        return dashboardAccessToken;
+      }
+    };
+
+    this.removeDashboardAccess = (user) => {
+      let dashboardAccessToken = this.getDashboardAccess(user);
+      if (dashboardAccessToken != null) {
+        let success = this.storage.removeItem(
+          this.makeDashboardAccessKey(user)
+        );
+      }
+    };
+
+    this.hasProfile = (user) => {
+      const availableProfiles = this.listProfiles();
+
+      return availableProfiles.includes(user);
+    };
+
+    this.putActiveProfile = (user) => {
+      let self = this;
+      let availableProfiles = this.listProfiles();
+      if (availableProfiles.length == 0) {
+        self.storage.setItem(this.PROFILE_LIST_KEY, JSON.stringify([user]));
+      } else {
+        if (!availableProfiles.includes(user)) {
+          availableProfiles.push(user);
+          let merged = availableProfiles.join(",");
+          self.storage.setItem(this.PROFILE_LIST_KEY, merged);
+        }
+      }
+      this.storage.setItem(this.ACTIVE_PROFILE_KEY, user);
+    };
+
+    this.putProfile = (user) => {
+      const availableProfiles = this.listProfiles();
+      if (availableProfiles.length == 0) {
+        this.storage.setItem(this.PROFILE_LIST_KEY, user);
+      } else {
+        availableProfiles.push(user);
+        let merged = availableProfiles.join(",");
+        this.storage.setItem(this.PROFILE_LIST_KEY, merged);
+      }
+
+      if (this.getActiveProfile(false) == null) {
+        this.storage.setItem(this.ACTIVE_PROFILE_KEY, user);
+      }
+    };
+
+    this.getActiveProfile = (required) => {
+      let activeProfile = this.storage.getItem(this.ACTIVE_PROFILE_KEY);
+
+      if (required && activeProfile == null) {
+        throw new StatusException(401, "401 Unauthorized");
+      } else {
+        if (activeProfile == null) {
+          return null;
+        }
+        return activeProfile;
+      }
+    };
+
+    this.removeProfile = (user) => {
+      const availableProfiles = this.listProfiles();
+      let profilesSansUser = availableProfiles.filter(
+        (profile) => profile != user
+      );
+      this.storage.setItem(
+        this.PROFILE_LIST_KEY,
+        JSON.stringify(profilesSansUser)
+      );
+      this.removeXQPreAuthToken(user);
+      this.removeXQAccess(user);
+      this.removeDashboardAccess(user);
+    };
+
+    this.clearAllProfiles = () => {
+      let availableProfiles = this.listProfiles();
+
+      for (var i = 0; i < availableProfiles.length; i++) {
+        let user = this.getActiveProfile(false);
+
+        this.removeXQPreAuthToken(user);
+        this.removeXQAccess(user);
+        this.removeDashboardAccess(user);
+        break;
+      }
+      this.storage.removeItem(this.ACTIVE_PROFILE_KEY);
+      this.storage.removeItem(this.PROFILE_LIST_KEY);
+    };
+
+    /**
+     * @returns {[]} profiles
+     */
+    this.listProfiles = () => {
+      let profiles = this.storage.getItem(this.PROFILE_LIST_KEY);
+      if (profiles != null) {
+        return profiles.split(",");
+      } else {
+        return [];
+      }
+    };
+
+    this.makeExchangeKey = (unvalidatedUser) => {
+      return `${this.EXCHANGE_PREFIX}-${this.XQ_PREFIX}-${unvalidatedUser}`;
+    };
+
+    this.makeXQAccessKey = (validatedUser) => {
+      return `${this.XQ_PREFIX}-${validatedUser}`;
+    };
+
+    this.makeDashboardAccessKey = (validatedUser) => {
+      return `${this.DASHBOARD_PREFIX}-${validatedUser}`;
+    };
+  }
+  // makeExchangeKey(user: string): any {
+  //   throw new Error("Method not implemented.");
+  // }
+  // makeXQAccessKey(user: string): any {
+  //   throw new Error("Method not implemented.");
+  // }
+  // makeDashboardAccessKey(user: string): any {
+  //   throw new Error("Method not implemented.");
+  // }
+  // listProfiles() {
+  //   throw new Error("Method not implemented.");
+  // }
+  // getActiveProfile(arg0: boolean) {
+  //   throw new Error("Method not implemented.");
+  // }
+}
