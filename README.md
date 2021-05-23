@@ -6,6 +6,10 @@ A Javascript Implementation of XQ Message SDK (V.2) which provides convenient ac
 
 XQ Message is an encryption-as-a-service (EaaS) platform which gives you the tools to encrypt and route data to and from devices like mobile phones, IoT, and connected devices that are at the "edge" of the internet. The XQ platform is a lightweight and highly secure cybersecurity solution that enables self protecting data for perimeterless [zero trust](https://en.wikipedia.org/wiki/Zero_trust_security_model) data protection, even to devices and apps that have no ability to do so natively.
 
+##### XQ Message JS SDK sample application
+
+If you would like to see the JS SDK in action, please navigate to the [jssdk-example repo](https://github.com/xqmsg/jssdk-example). The project is intended to give the user a high-level overview of the encryption and decryption flow, as well as some sample implementations of core components
+
 ## Table of contents
 
 - [Installation](#installation)
