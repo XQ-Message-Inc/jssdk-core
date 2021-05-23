@@ -1,6 +1,6 @@
 {
   "name": "@xqmsg/jssdk-core",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A Javascript Implementation of XQ Message SDK, V.2",
   "main": "dist/index.js",
   "directories": {
@@ -16,8 +16,6 @@
   "scripts": {
     "check-types": "tsc --noEmit",
     "build": "parcel build ./src/index.ts",
-    "dev": "parcel ./sample-application/demo/html/demo.html",
-    "dev-test": "parcel ./sample-application/tests/html/tests.html",
     "test": "jest",
     "lint": "eslint src/**/*.js"
   },
@@ -25,7 +23,7 @@
     "type": "git",
     "url": "git+https://github.com/xqmsg/jssdk-core.git"
   },
-  "keywords": [],
+  "keywords": ["security", "zero trust", "plug and play", "encryption", "AES", "XOR", "privacy", "quantum", "protection", "cyber", "cybersecurity"],
   "author": "XQ Message",
   "license": "ISC",
   "bugs": {
