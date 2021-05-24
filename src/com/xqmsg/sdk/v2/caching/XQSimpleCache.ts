@@ -1,34 +1,89 @@
 import StatusException from "../exceptions/StatusException";
+import ServerResponse from "../ServerResponse";
 
+/**
+ * @class [XQSimpleCache]
+ */
 export default class XQSimpleCache {
-  ACTIVE_PROFILE_KEY: string;
-  DASHBOARD_PREFIX: string;
-  EXCHANGE_PREFIX: string;
-  PROFILE_LIST_KEY: string;
-  XQ_PREFIX: string;
+  /** The field name for `storage` object representing the current active profile */
+  ACTIVE_PROFILE_KEY = "active-profile";
+
+  /** The prefix used for the dashboard application used in the `makeDashboardAccessKey` method. The prefix is prepended to the `user` and the result is used as a field name for the `storage` object */
+  DASHBOARD_PREFIX = "dsb";
+
+  /** A prefix used for the dashboard application used in the `makeXQAccessKey` method. The prefix is prepended to the `XQ_PREFIX` and `user` string and the result is used as a field name for the `storage` object */
+  EXCHANGE_PREFIX = "exchange";
+
+  /** The field name for `storage` object representing the lists of available profiles */
+  PROFILE_LIST_KEY = "available-profiles";
+
+  /** A prefix for xq used in various field names for the `storage` object */
+  XQ_PREFIX = "xq";
+
+  /** A function which removes all profiles from the `storage` object */
   clearAllProfiles: () => void;
+
+  /** A function which retrieves the active profile from the `storage` object */
   getActiveProfile: (required: boolean) => string | null;
-  getDashboardAccess: (user: string, required?: boolean) => any;
-  getXQAccess: (user: string, required?: boolean) => any;
-  getXQPreAuthToken: (user: string) => any;
-  hasProfile: (user: string) => any;
+
+  /** A function which is used to request dashboard access */
+  getDashboardAccess: (
+    user: string,
+    required?: boolean
+  ) => StatusException | string;
+
+  /** A function which is used to request general XQ access */
+  getXQAccess: (user: string, required?: boolean) => StatusException | string;
+
+  /** A function which is used to request an XQ pre-authentication token */
+  getXQPreAuthToken: (user: string) => string | null;
+
+  /** A function which is used to find if the requested user has a profile in the available profiles stored in the `storage` object */
+  hasProfile: (user: string) => boolean;
+
+  /** A function used to list all available profiles stored in the `storage` object */
   listProfiles: () => string[];
+
+  /** A function used to create a dashboard access key for a given user */
   makeDashboardAccessKey: (user: string) => string;
+
+  /** A function used to create a exchange access key for a given user */
   makeExchangeKey: (user: string) => string;
+
+  /** A function used to create an XQ access key for a given user */
   makeXQAccessKey: (user: string) => string;
+
+  /** A function used to store a user as an active profile in the `storage` object */
   putActiveProfile: (user: string) => void;
-  putDashboardAccess: (user: string, accessToken: any) => void;
+
+  /** A function used to grant a user dashboard access using an associated key and storing it in the `storage` object */
+  putDashboardAccess: (user: string, accessToken: string) => void;
+
+  /** A function used to store a user's profile in the `storage` object */
   putProfile: (user: string) => void;
-  putXQAccess: (user: string, accessToken: any) => void;
-  putXQPreAuthToken: (user: string, preAuthToken: any) => void;
+
+  /** A function used to grant a user general XQ access */
+  putXQAccess: (user: string, accessToken: string) => void;
+
+  /** A function used to store a user's pre-authentication token in the `storage` object */
+  putXQPreAuthToken: (user: string, preAuthToken: string) => void;
+
+  /** A function used to remove a user's access to the dashboard by removing their associated key from the `storage` object */
   removeDashboardAccess: (user: string) => void;
+
+  /** A function used to remove a user's profile by removing their associated key from the `storage` object */
   removeProfile: (user: string) => void;
+
+  /** A function used to remove a user's general XQ access by removing their associated key from the `storage` object */
   removeXQAccess: (user: string) => void;
+
+  /** A function used to remove a user's XQ pre-authentication token by removing their associated key from the `storage` object */
   removeXQPreAuthToken: (user: string) => void;
+
+  /** The local storage object */
   storage: Storage;
 
   /**
-   *
    * @param {Storage} storage
    */
   constructor(storage: Storage) {
@@ -48,14 +103,14 @@ export default class XQSimpleCache {
 
     this.getXQPreAuthToken = (user) => {
       const preAuthToken = this.storage.getItem(this.makeExchangeKey(user));
-      if (preAuthToken == undefined) {
+      if (!preAuthToken) {
         return null;
       }
       return preAuthToken;
     };
 
     this.removeXQPreAuthToken = (user) => {
-      let xqPreAuthToken = this.getXQPreAuthToken(user);
+      const xqPreAuthToken = this.getXQPreAuthToken(user);
       if (xqPreAuthToken != null) {
         this.storage.removeItem(this.makeExchangeKey(user));
       }
@@ -67,17 +122,23 @@ export default class XQSimpleCache {
 
     this.getXQAccess = (user, required) => {
       const accessToken = this.storage.getItem(this.makeXQAccessKey(user));
-      if (required && accessToken == undefined) {
+      if (required && !accessToken) {
         throw new StatusException(401, "401 Unauthorized");
       } else {
-        return accessToken;
+        return accessToken as string;
       }
     };
 
     this.removeXQAccess = (user) => {
-      let accessToken = this.getXQAccess(user);
-      if (accessToken != null) {
-        let success = this.storage.removeItem(this.makeXQAccessKey(user));
+      const accessToken = this.getXQAccess(user);
+      if (accessToken) {
+        this.storage.removeItem(this.makeXQAccessKey(user));
+
+        return new ServerResponse(
+          ServerResponse.ERROR,
+          200,
+          "Success. Removed XQ access."
+        );
       }
     };
 
@@ -89,18 +150,22 @@ export default class XQSimpleCache {
       const dashboardAccessToken = this.storage.getItem(
         this.makeDashboardAccessKey(user)
       );
-      if (required && dashboardAccessToken == undefined) {
+      if (required && !dashboardAccessToken) {
         throw new StatusException(401, "401 Unauthorized");
       } else {
-        return dashboardAccessToken;
+        return dashboardAccessToken as string;
       }
     };
 
     this.removeDashboardAccess = (user) => {
-      let dashboardAccessToken = this.getDashboardAccess(user);
-      if (dashboardAccessToken != null) {
-        let success = this.storage.removeItem(
-          this.makeDashboardAccessKey(user)
+      const dashboardAccessToken = this.getDashboardAccess(user);
+      if (dashboardAccessToken) {
+        this.storage.removeItem(this.makeDashboardAccessKey(user));
+
+        return new ServerResponse(
+          ServerResponse.ERROR,
+          200,
+          "Success. Removed Dashboard access."
         );
       }
     };
@@ -112,14 +177,14 @@ export default class XQSimpleCache {
     };
 
     this.putActiveProfile = (user) => {
-      let self = this;
-      let availableProfiles = this.listProfiles();
+      const self = this;
+      const availableProfiles = this.listProfiles();
       if (availableProfiles.length == 0) {
         self.storage.setItem(this.PROFILE_LIST_KEY, JSON.stringify([user]));
       } else {
         if (!availableProfiles.includes(user)) {
           availableProfiles.push(user);
-          let merged = availableProfiles.join(",");
+          const merged = availableProfiles.join(",");
           self.storage.setItem(this.PROFILE_LIST_KEY, merged);
         }
       }
@@ -132,7 +197,7 @@ export default class XQSimpleCache {
         this.storage.setItem(this.PROFILE_LIST_KEY, user);
       } else {
         availableProfiles.push(user);
-        let merged = availableProfiles.join(",");
+        const merged = availableProfiles.join(",");
         this.storage.setItem(this.PROFILE_LIST_KEY, merged);
       }
 
@@ -142,7 +207,7 @@ export default class XQSimpleCache {
     };
 
     this.getActiveProfile = (required) => {
-      let activeProfile = this.storage.getItem(this.ACTIVE_PROFILE_KEY);
+      const activeProfile = this.storage.getItem(this.ACTIVE_PROFILE_KEY);
 
       if (required && activeProfile == null) {
         throw new StatusException(401, "401 Unauthorized");
@@ -156,7 +221,7 @@ export default class XQSimpleCache {
 
     this.removeProfile = (user) => {
       const availableProfiles = this.listProfiles();
-      let profilesSansUser = availableProfiles.filter(
+      const profilesSansUser = availableProfiles.filter(
         (profile) => profile != user
       );
       this.storage.setItem(
@@ -169,10 +234,10 @@ export default class XQSimpleCache {
     };
 
     this.clearAllProfiles = () => {
-      let availableProfiles = this.listProfiles();
+      const availableProfiles = this.listProfiles();
 
       for (var i = 0; i < availableProfiles.length; i++) {
-        let user = this.getActiveProfile(false);
+        const user = this.getActiveProfile(false);
 
         if (user) {
           this.removeXQPreAuthToken(user);
@@ -186,11 +251,8 @@ export default class XQSimpleCache {
       this.storage.removeItem(this.PROFILE_LIST_KEY);
     };
 
-    /**
-     * @returns {[]} profiles
-     */
     this.listProfiles = () => {
-      let profiles = this.storage.getItem(this.PROFILE_LIST_KEY);
+      const profiles = this.storage.getItem(this.PROFILE_LIST_KEY);
       if (profiles != null) {
         return profiles.split(",");
       } else {

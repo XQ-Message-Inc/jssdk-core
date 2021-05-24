@@ -4,7 +4,7 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * A service which validates an API key and returns the scopes associated with it.
+ * A service which is utilized to validate an API key and returns the scopes associated with it.
  *
  * @class [CheckApiKey]
  */

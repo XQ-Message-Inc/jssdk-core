@@ -1,4 +1,4 @@
-type RoleEnumTypes =
+type RoleTypes =
   | "UNKNOWN"
   | "ADMIN"
   | "USER"
@@ -43,7 +43,7 @@ export default class RolesEnum {
    * @param {Number} opt - Selected Option
    * @return {String} - String Representation of the Option
    */
-  static parseValue: (opt: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7) => RoleEnumTypes;
+  static parseValue: (opt: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7) => RoleTypes;
 }
 
 RolesEnum.parseValue = function (opt) {

@@ -4,7 +4,7 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * A service which allows a user to create a very short-lived version of their access token in order to access certain
+ * A service which is utilized to allow a user to create a very short-lived version of their access token in order to access certain
  * services such as file encryption/decryption on the XQ websie without having to transmit their main access token.
  *
  * @class [AuthorizeDelegate]

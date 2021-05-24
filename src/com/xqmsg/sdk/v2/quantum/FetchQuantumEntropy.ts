@@ -1,33 +1,40 @@
-import XQModule, { SupplyAsync } from "../services/XQModule";
 import CallMethod from "../CallMethod";
-import XQSDK from "../XQSDK";
 import ServerResponse from "../ServerResponse";
+import XQModule from "../services/XQModule";
+import XQSDK from "../XQSDK";
 
 /**
- * Fetches quantum entropy from the server. When the user makes the request, <br>
+ * Fetches quantum entropy from the server. When the user makes the request,
  * they must include the number of entropy bits to fetch.
- * In order to reduce the amount of data the quantum server emits, <br>
- * the entropy is sent as a base64-encoded hex string. <br>
- * While the hex string itself can be used as entropy, to retrieve the actual bits ( if required ),<br>
- * the string should be decoded from base-64, and each hex character in the sequence converted to its <br>
+ * In order to reduce the amount of data the quantum server emits,
+ * the entropy is sent as a base64-encoded hex string.
+ *
+ * While the hex string itself can be used as entropy, to retrieve the actual bits ( if required ),
+ * the string should be decoded from base-64, and each hex character in the sequence converted to its
  * 4-bit binary representation.
  */
 export default class FetchQuantumEntropy extends XQModule {
-  supplyAsync: SupplyAsync;
-  static KS: string;
-  static _256: string;
+  /** Kolmogorov-Sinai entropy */
+  static KS: "ks";
+
+  /** The number of entropy bits to fetch */
+  static _256: "256";
+
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {String} ks -  The number of entropy bits to fetch
+   * @returns {Promise<ServerResponse<{payload:{data:string}}>>}
+   */
+  supplyAsync: (maybePayload: {
+    [FetchQuantumEntropy.KS]: string;
+  }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
 
-    /**
-     *
-     * @param {{}} maybePayLoad:
-     * @returns {Promise<ServerResponse<{payload:string}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           [XQSDK.CONTENT_TYPE]: XQSDK.TEXT_PLAIN_UTF_8,
         };
 
@@ -40,7 +47,7 @@ export default class FetchQuantumEntropy extends XQModule {
           false
         );
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -53,6 +60,3 @@ export default class FetchQuantumEntropy extends XQModule {
     };
   }
 }
-
-FetchQuantumEntropy.KS = "ks";
-FetchQuantumEntropy._256 = "256";

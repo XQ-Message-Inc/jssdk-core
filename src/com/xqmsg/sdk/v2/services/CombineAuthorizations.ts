@@ -4,8 +4,8 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * A service which is useful for merging two or more valid access tokens ( along with the access
- * token used to make the call ) into a single one that can be used for temporary read access.
+ * A service which is utilized to merge two or more valid access tokens (along with the access
+ * token used to make the call) into a single one that can be used for temporary read access.
  *
  * This is useful in situations where a user who has authenticated with multiple accounts wants
  * to get a key for a particular message without needing to know exactly which of their accounts

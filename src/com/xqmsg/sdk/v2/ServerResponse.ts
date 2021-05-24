@@ -1,17 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-redeclare */
-export interface ServerResponseProps {
-  status: string;
-  statusCode: number;
-  payload: any;
-}
-
-interface ServerResponse extends ServerResponseProps {}
 
 /**
  * @class [ServerResponse]
  */
-
 class ServerResponse {
   /** A binary reply from server */
   status: string;
@@ -28,9 +19,9 @@ class ServerResponse {
   /**
    * @param {Answered} status
    * @param {Number}  code
-   * @param {Map|Object} data
+   * @param {Map|Object|String} data
    */
-  constructor(status: string, code: number, data: string) {
+  constructor(status: string, code: number, data: any) {
     this.status = status;
     this.statusCode = code;
     this.payload = data;

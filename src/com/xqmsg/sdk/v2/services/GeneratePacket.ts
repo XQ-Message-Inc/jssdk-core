@@ -4,7 +4,7 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * A service used to generate an encrypted packet containing the encryption key that you want to
+ * A service which is utilized to generate an encrypted packet containing the encryption key that you want to
  * protect along with a list of the identities that are allowed to access it and how long it is allowed to be used.
  * @class [GeneratePacket]
  */

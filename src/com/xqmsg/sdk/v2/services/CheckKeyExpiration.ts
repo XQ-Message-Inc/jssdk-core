@@ -4,7 +4,7 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * A service which checks whether a particular key is expired or not without actually fetching it.
+ * A service which is utilized to check whether a particular key is expired or not without actually fetching it.
  *
  * @class [CheckKeyExpiration]
  */

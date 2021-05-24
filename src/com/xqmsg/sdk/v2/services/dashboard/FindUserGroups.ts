@@ -1,12 +1,12 @@
 import CallMethod from "../../CallMethod";
 import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
-import XQModule, { SupplyAsync } from "../XQModule";
+import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
 
 /**
- *
- *  Find a grouping of dashboard users. Can be optionally filtered by regex on ID
+ * A service which is utilized to find a grouping of dashboard users.
+ * Can be optionally filtered by regex on ID
  *
  * @class [FindUserGroups]
  */
@@ -16,26 +16,31 @@ export default class FindUserGroups extends XQModule {
 
   /** Specified name of the service */
   serviceName: string;
-  static GROUPS: string;
-  static ID: string;
-  supplyAsync: SupplyAsync;
+
+  /** The field name representing the dashboard user groups */
+  static GROUPS: "groups";
+
+  /** The field name representing the id of a user group */
+  static ID: "id";
+
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @returns {Promise<ServerResponse<{payload:{groups:[{id:int, name:string, bid:int}]}}>>}
+   */
+  supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
     this.serviceName = "usergroup";
     this.requiredFields = [];
 
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @returns {Promise<ServerResponse<{payload:{groups:[{id:int, name:string, bid:int}]}}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
-        let dashboardAccessToken = this.sdk.validateAccessToken(
+        const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + dashboardAccessToken,
         };
 
@@ -49,7 +54,7 @@ export default class FindUserGroups extends XQModule {
           Destination.DASHBOARD
         );
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,

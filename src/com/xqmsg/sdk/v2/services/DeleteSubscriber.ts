@@ -4,7 +4,7 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * A service which deletes the user specified by the access token.
+ * A service which is utilized to delete the user specified by the access token.
  * After an account is deleted, the subscriber will be sent an email notifying them of its deletion.
  *
  * @class [DeleteSubscriber]

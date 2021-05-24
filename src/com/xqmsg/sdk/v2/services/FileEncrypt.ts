@@ -7,7 +7,7 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * A service used to encrypt data stored in a file using the {@link EncryptionAlgorithm} provided.
+ * A service which is utilized to encrypt data stored in a file using the {@link EncryptionAlgorithm} provided.
  *
  * @class [FileEncrypt]
  */

@@ -4,7 +4,7 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * A service which revokes a key using its token.
+ * A service which is utilized to revoke a key using its token.
  * Only the user who sent the message will be able to revoke it.
  *
  * @class [DeleteAuthorization]

@@ -4,7 +4,7 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * A service used to fetch an encryption key using a valid locator key.
+ * A service which is used to fetch an encryption key using a valid locator key.
  *
  * The key will only be returned if the following hold true:
  * * The access token of the requesting user is valid and unexpired.
