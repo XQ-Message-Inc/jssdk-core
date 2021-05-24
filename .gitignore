@@ -121,8 +121,6 @@ out
 /xq-msg-javascript-sdk.iml
 xq-javascript-sdk.iml
 
-/tests/resources/utf-8-sampler.txt.xqf
-
 dist
 
 .vscode
