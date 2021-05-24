@@ -11,7 +11,10 @@ import XQSDK from "../../XQSDK";
  * @class [FindUserGroups]
  */
 export default class FindUserGroups extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
   static GROUPS: string;
   static ID: string;

@@ -9,28 +9,44 @@ type RoleEnumTypes =
   | "ALIAS";
 
 /**
- * Enum to specify Business Roles<br>
+ * An Enum used to specify Business Roles<
  *
  * @class [RolesEnum]
  **/
 export default class RolesEnum {
-  static ADMIN: number; // Can login to dashboard with will authority for the busines
-  static ALIAS: number; // An Alias role is similar is an anonymous alias that is trackable by an SMB.
-  static CUSTOMER: number; // Cannot login to dashboard
-  static DEVICE: number; // A virtual user is a generated email address that is fully tracked, but cannot be used to log into the dashboard at all.
-  static SUPER_USER: number; // Can do everything on an account, including billing
-  static UNKNOWN: number; // Cannot do anything
-  static USER: number; // Can login to dashboard with restricted permissions ( cannot add other users )
-  static VENDOR: number; // Cannot login to dashboard
-  static parseValue: (opt: number) => RoleEnumTypes;
+  /** A role which can login to dashboard with will authority for the business */
+  static ADMIN: 1;
+
+  /** An alias role which is similar to an anonymous alias that is trackable by an SMB. */
+  static ALIAS: 7;
+
+  /** A role for a customer which cannot login to dashboard */
+  static CUSTOMER: 3;
+
+  /** A role which represents a virtual user that is a generated email address which is fully tracked, but cannot be used to log into the dashboard at all. */
+  static DEVICE: 6;
+
+  /** A role which represents an admin user with full authority, including billing */
+  static SUPER_USER: 5;
+
+  /** A role which cannot do anything */
+  static UNKNOWN: 0;
+
+  /** A role which can login to dashboard with restricted permissions ( cannot add other users ) */
+  static USER: 2;
+
+  /** A role for a vendor which cannot login to dashboard */
+  static VENDOR: 4;
+
+  /**
+   * Maps numeric value to its respective textual representation
+   * @param {Number} opt - Selected Option
+   * @return {String} - String Representation of the Option
+   */
+  static parseValue: (opt: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7) => RoleEnumTypes;
 }
 
-/**
- * Maps numeric value to its respective textual representation
- * @param {Number} opt - Selected Option
- * @return {String} - String Representation of the Option
- */
-RolesEnum.parseValue = function (opt: number) {
+RolesEnum.parseValue = function (opt) {
   switch (opt) {
     case this.UNKNOWN:
       return "UNKNOWN";
@@ -48,17 +64,5 @@ RolesEnum.parseValue = function (opt: number) {
       return "DEVICE";
     case this.ALIAS:
       return "ALIAS";
-    default: {
-      return "UNKNOWN";
-    }
   }
 };
-
-RolesEnum.UNKNOWN = 0;
-RolesEnum.ADMIN = 1;
-RolesEnum.USER = 2;
-RolesEnum.CUSTOMER = 3;
-RolesEnum.VENDOR = 4;
-RolesEnum.SUPER_USER = 5;
-RolesEnum.DEVICE = 6;
-RolesEnum.ALIAS = 7;

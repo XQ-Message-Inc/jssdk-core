@@ -11,7 +11,10 @@ import XQSDK from "../../XQSDK";
  * @class [DisableContact]
  */
 export default class DisableContact extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
   static ID: string;
   supplyAsync: (maybePayLoad: Record<string, any>) => ServerResponse;

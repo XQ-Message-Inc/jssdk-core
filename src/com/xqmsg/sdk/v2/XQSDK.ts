@@ -1,3 +1,4 @@
+/* eslint-disable no-redeclare */
 import AESEncryption from "./algorithms/AESEncryption";
 import CallMethod from "./CallMethod";
 import Destination from "./Destination";
@@ -7,6 +8,7 @@ import SimpleXQCache from "./caching/XQSimpleCache";
 import StatusException from "./exceptions/StatusException";
 import ValidationException from "./exceptions/ValidationException";
 import XQSimpleCache from "./caching/XQSimpleCache";
+import EncryptionAlgorithm from "./algorithms/EncryptionAlgorithm";
 
 const SUBSCRIPTION_SERVER_URL = "https://subscription.xqmsg.net/v2";
 const VALIDATION_SERVER_URL = "https://validation.xqmsg.net/v2";
@@ -14,44 +16,123 @@ const KEY_SERVER_URL = "https://quantum.xqmsg.net/v2/";
 const DASHBOARD_SERVER_URL = "https://dashboard.xqmsg.net/v2";
 
 interface XQSDKProps {
+  /** A string representing the AES encryption algorithm */
   AES_ALGORITHM: string;
-  ALGORITHMS: Record<string, any>;
+
+  /** A object which contains encryption algorithm instances */
+  ALGORITHMS: Record<string, OTPv2Encryption | AESEncryption>;
+
+  /** A string representing the Dashboard API key*/
   DASHBOARD_API_KEY: string;
+
+  /** A string representing the Dashboard server URL */
   DASHBOARD_SERVER_URL: string;
+
+  /** A string representing the key server URL */
   KEY_SERVER_URL: string;
+
+  /** A string representing the OTP encryption algorithm */
   OTPv2_ALGORITHM: string;
+
+  /** A string representing the subscription server URL*/
   SUBSCRIPTION_SERVER_URL: string;
+
+  /** A string representing the validation server URL*/
   VALIDATION_SERVER_URL: string;
+
+  /** A string representing the XQ General API key */
   XQ_API_KEY: string;
+
+  /** The XQ Cache */
   cache: SimpleXQCache;
 
+  /**
+   *
+   * @param {boolean} condition
+   * @param {String} message
+   */
   assert: (condition: boolean, message: string) => void;
+
+  /**
+   * Wrapper method whose purpose is to construct the complete URL before it is passing its args to the underlying {@link makeRequest}
+   * @param {String} baseUrl
+   * @param {String} maybeService
+   * @param {CallMethod#String} method
+   * @param {{}}maybeHeaderProperties
+   * @param {{}}maybePayload
+   * @param {boolean}requiresAPIKey
+   * @param {Destination}destination
+   * @returns {Promise<ServerResponse<{}>>}
+   */
   call: (
     baseUrl: string,
     maybeService: string,
-    method: string,
-    maybeHeaderProperties: Record<string, any>,
-    maybePayload: Record<string, any>,
+    method: "POST" | "PATCH",
+    maybeHeaderProperties: Record<string, string>,
+    maybePayload: Record<string, string>,
     requiresAPIKey: boolean,
     destination?: string
   ) => Promise<unknown>;
-  buildQeryParams: (paramsObject: Record<string, any>) => string;
-  getAlgorithm: (key: string) => any;
+
+  /**
+   *
+   * @param {{}} paramsObject
+   * @returns {String} of query parameters
+   */
+  buildQueryParams: (paramsObject: Record<string, string>) => string;
+
+  /**
+   *
+   * @param {XQSDK#String}key
+   * @returns {OTPv2Encryption}
+   */
+  getAlgorithm: (key: string) => EncryptionAlgorithm;
+
+  /**
+   * @return SimpleXQCache
+   */
   getCache: () => XQSimpleCache;
+
+  /**
+   * Core communication with the server happens here, via {@link XMLHttpRequest}.
+   * @param {String} url
+   * @param {CallMethod#String} method
+   * @param {String} maybeService
+   * @param {{}} maybeHeaderProperties
+   * @param {{}} maybePayload
+   * @param {boolean} requiresAPIKey
+   * @param {Destination}destination
+   * @returns {Promise<ServerResponse<{}>>}
+   */
   makeRequest: (
     url: string,
-    method: string,
+    method: "POST" | "PATCH",
     maybeService: string,
-    maybeHeaderProperties: Record<string, any>,
-    maybePayload: Record<string, any>,
+    maybeHeaderProperties: Record<string, string>,
+    maybePayload: Record<string, string>,
     requiresAPIKey: boolean,
     destination: string
   ) => Promise<unknown>;
+
+  /**
+   *
+   * @param {Destination}destination
+   * @returns {string}
+   */
   validateAccessToken: (destination?: string) => string;
+
+  /**
+   * @method validateInput
+   * @param {Map} maybeArgs - The arguments supplied to this service
+   * @param {[String]} requiredFields - The necessary fields to be supplied for this service to function
+   * @throws Required Field Exception
+   * @returns {Map} validated arguments
+   */
   validateInput: (
-    maybeArgs: Record<string, any>,
+    maybeArgs: Record<string, string>,
     requiredFields: string[]
-  ) => Record<string, any>;
+  ) => Record<string, string>;
+
   validatePreAuthToken: () => string;
 }
 
@@ -61,17 +142,27 @@ interface XQSDK extends XQSDKProps {}
  * @class [XQSDK]
  */
 class XQSDK {
-  static API_KEY: string;
-  static ACCESS_CONTROL_ALLOW_ORIGIN: string;
-  static ANY: string;
-  static APPLICATION_JSON: string;
-  static CONTENT_TYPE: string;
-  static TEXT_PLAIN_UTF_8: string;
+  /** A field name representing the Access-Control-Allow-Origin request header */
+  static ACCESS_CONTROL_ALLOW_ORIGIN: "Access-Control-Allow-Origin";
 
-  constructor(credentials: Record<string, string>) {
+  /** A field name representing the any (wildcard) request header */
+  static ANY: "*";
+
+  /** A field name representing the api-key request header */
+  static API_KEY: "api-key";
+
+  /** A field name representing the application/json request header */
+  static APPLICATION_JSON: "application/json";
+
+  /** A field name representing the content-type request header */
+  static CONTENT_TYPE: "content-type";
+
+  static TEXT_PLAIN_UTF_8: "text/plain;charset=UTF-8";
+
+  constructor(credentials: { XQ_API_KEY: string; DASHBOARD_API_KEY: string }) {
     const { XQ_API_KEY, DASHBOARD_API_KEY } = credentials;
 
-    let config = {
+    const config = {
       application: {
         XQ_API_KEY,
         DASHBOARD_API_KEY,
@@ -98,17 +189,6 @@ class XQSDK {
     this.ALGORITHMS[this.OTPv2_ALGORITHM] = new OTPv2Encryption(this);
     this.ALGORITHMS[this.AES_ALGORITHM] = new AESEncryption(this);
 
-    /**
-     * Wrapper method whose purpose is to construct the complete URL before it is passing its args to the underlying {@link makeRequest}
-     * @param {String} baseUrl
-     * @param {String} maybeService
-     * @param {CallMethod#String} method
-     * @param {{}}maybeHeaderProperties
-     * @param {{}}maybePayload
-     * @param {boolean}requiresAPIKey
-     * @param {Destination}destination
-     * @returns {Promise<ServerResponse<{}>>}
-     */
     this.call = function (
       baseUrl,
       maybeService,
@@ -140,7 +220,7 @@ class XQSDK {
         var URL =
           baseUrl +
           (maybeService ? "/" + maybeService : "") +
-          (maybePayload ? "?" + this.buildQeryParams(maybePayload) : "");
+          (maybePayload ? "?" + this.buildQueryParams(maybePayload) : "");
 
         return this.makeRequest(
           URL,
@@ -154,17 +234,6 @@ class XQSDK {
       }
     };
 
-    /**
-     * Core communication with the server happens here, via {@link XMLHttpRequest}.
-     * @param {String} url
-     * @param {CallMethod#String} method
-     * @param {String} maybeService
-     * @param {{}} maybeHeaderProperties
-     * @param {{}} maybePayload
-     * @param {boolean} requiresAPIKey
-     * @param {Destination}destination
-     * @returns {Promise<ServerResponse<{}>>}
-     */
     this.makeRequest = (
       url,
       method,
@@ -174,9 +243,9 @@ class XQSDK {
       requiresAPIKey,
       destination
     ) => {
-      let self = this;
+      const self = this;
 
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         const xhttp = new XMLHttpRequest();
         const ASYNC = true;
         xhttp.open(method, url, ASYNC);
@@ -203,7 +272,7 @@ class XQSDK {
         }
         if (maybeHeaderProperties) {
           const entries = Object.entries(maybeHeaderProperties);
-          for (let [name, value] of entries) {
+          for (const [name, value] of entries) {
             xhttp.setRequestHeader(name, value as string);
           }
           if (!maybeHeaderProperties[XQSDK.CONTENT_TYPE]) {
@@ -212,7 +281,7 @@ class XQSDK {
         } else {
           xhttp.setRequestHeader(XQSDK.CONTENT_TYPE, XQSDK.APPLICATION_JSON);
         }
-        xhttp.ontimeout = function (e) {
+        xhttp.ontimeout = function () {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -221,7 +290,7 @@ class XQSDK {
             )
           );
         };
-        xhttp.onerror = function (e) {
+        xhttp.onerror = function () {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -233,7 +302,7 @@ class XQSDK {
         xhttp.onreadystatechange = function () {
           if (this.readyState == 4) {
             if (this.status >= 200 && this.status <= 299) {
-              let responseString = this.responseText;
+              const responseString = this.responseText;
               switch (responseString) {
                 case "":
                   return resolve(
@@ -306,25 +375,15 @@ class XQSDK {
       });
     };
 
-    /**
-     *
-     * @param {XQSDK#String}key
-     * @returns {OTPv2Encryption}
-     */
     this.getAlgorithm = (key) => {
       return this.ALGORITHMS[key];
     };
 
-    /**
-     *
-     * @param {{}} paramsObject
-     * @returns {String} of query parameters
-     */
-    this.buildQeryParams = (paramsObject: Record<string, string>) => {
+    this.buildQueryParams = (paramsObject: Record<string, string>) => {
       var i = 1;
       var buffer = "";
       const entries = Object.entries(paramsObject);
-      for (let [name, value] of entries) {
+      for (const [name, value] of entries) {
         buffer += name + "=" + encodeURIComponent(value);
         if (i < entries.length) {
           buffer += "&";
@@ -334,33 +393,18 @@ class XQSDK {
       return buffer;
     };
 
-    /**
-     *
-     * @param {boolean} condition
-     * @param {String} message
-     */
     this.assert = (condition, message) => {
       if (!condition) {
-        let msg = message || "Assertion failed";
+        const msg = message || "Assertion failed";
         console.info(msg);
         throw msg;
       }
     };
 
-    /**
-     * @return SimpleXQCache
-     */
     this.getCache = () => {
       return this.cache;
     };
 
-    /**
-     * @method validateInput
-     * @param {Map} maybeArgs - The arguments supplied to this service
-     * @param {[String]} requiredFields - The necessary fields to be supplied for this service to function
-     * @throws Required Field Exception
-     * @returns {Map} validated arguments
-     */
     this.validateInput = (maybeArgs, requiredFields) => {
       if (requiredFields.length == 0) {
         return maybeArgs;
@@ -371,14 +415,14 @@ class XQSDK {
           `Missing input parameters: [${requiredFields}]`
         );
       }
-      let input = Object.getOwnPropertyNames(maybeArgs);
+      const input = Object.getOwnPropertyNames(maybeArgs);
 
-      let missing = requiredFields.filter((m) => {
+      const missing = requiredFields.filter((m) => {
         return !input.includes(m);
       });
 
       if (missing.length > 0) {
-        let msg = "missing [" + missing + "] !";
+        const msg = "missing [" + missing + "] !";
         console.error(msg);
         throw msg;
       }
@@ -387,13 +431,13 @@ class XQSDK {
 
     this.validatePreAuthToken = () => {
       // Ensure that there is an active profile.
-      let activeProfile = this.cache.getActiveProfile(true);
+      const activeProfile = this.cache.getActiveProfile(true);
 
       if (activeProfile == null) {
         throw new StatusException(401, `No active profile found`);
       }
 
-      let preAuthToken = this.cache.getXQPreAuthToken(activeProfile);
+      const preAuthToken = this.cache.getXQPreAuthToken(activeProfile);
       if (preAuthToken == null) {
         throw new StatusException(
           401,
@@ -402,14 +446,10 @@ class XQSDK {
       }
       return preAuthToken;
     };
-    /**
-     *
-     * @param {Destination}destination
-     * @returns {string}
-     */
+
     this.validateAccessToken = (destination = Destination.XQ) => {
       // Ensure that there is an active profile.
-      let activeProfile = this.cache.getActiveProfile(true);
+      const activeProfile = this.cache.getActiveProfile(true);
       let accessToken = null;
 
       if (activeProfile == null) {
@@ -436,12 +476,5 @@ class XQSDK {
     };
   }
 }
-
-XQSDK.API_KEY = "api-key";
-XQSDK.CONTENT_TYPE = "content-type";
-XQSDK.ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
-XQSDK.APPLICATION_JSON = "application/json";
-XQSDK.TEXT_PLAIN_UTF_8 = "text/plain;charset=UTF-8";
-XQSDK.ANY = "*";
 
 export default XQSDK;

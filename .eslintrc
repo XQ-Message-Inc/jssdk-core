@@ -1,6 +1,6 @@
 {
-    "plugins": ["prettier"],
-    "parser": "@babel/eslint-parser",
+    "plugins": ["@typescript-eslint", "prettier"],
+    "parser": "@typescript-eslint/parser",
     "extends": ["eslint:recommended", "prettier"],
     "parserOptions": {
       "sourceType": "module"
@@ -14,7 +14,10 @@
     },
     "rules": {
       "prettier/prettier": "warn",
-      "no-unused-vars": 0
+      "@typescript-eslint/indent": ["error", 2],
+      "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+      "@typescript-eslint/no-explicit-any": "error",
+      "prefer-const": "error"
     }
 }
   

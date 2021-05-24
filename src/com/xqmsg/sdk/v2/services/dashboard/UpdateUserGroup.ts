@@ -11,7 +11,10 @@ import XQSDK from "../../XQSDK";
  * @class [UpdateUserGroup]
  */
 export default class UpdateUserGroup extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
   static ID: string;
   static MEMBERS: string;
