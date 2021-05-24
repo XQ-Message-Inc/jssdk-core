@@ -4,8 +4,8 @@ import XQModule, { SupplyAsync } from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- *  Validates your {@link GeneratePacket} call.<br>
- *  Returns the key locator token.
+ *  Validates the packet that is returned from {@link GeneratePacket}.<br>
+ *  Returns the key locator token<.br>
  *  @class [ValidatePacket]
  */
 export default class ValidatePacket extends XQModule {
