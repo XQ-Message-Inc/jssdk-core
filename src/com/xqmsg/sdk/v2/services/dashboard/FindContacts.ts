@@ -11,7 +11,10 @@ import XQSDK from "../../XQSDK";
  * @class [FindContacts]
  */
 export default class FindContacts extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
   static CONTACTS: string;
   static FILTER: string;

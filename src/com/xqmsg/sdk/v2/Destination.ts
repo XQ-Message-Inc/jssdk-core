@@ -4,9 +4,6 @@
  * @class [Destination]
  */
 export default class Destination {
-  static XQ: string;
-  static DASHBOARD: string;
+  static XQ: "XQ";
+  static DASHBOARD: "DASHBOARD";
 }
-
-Destination.XQ = "XQ";
-Destination.DASHBOARD = "DASHBOARD";

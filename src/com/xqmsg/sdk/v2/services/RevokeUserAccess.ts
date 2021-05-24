@@ -1,19 +1,38 @@
 import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
-import XQModule, { SupplyAsync } from "./XQModule";
+import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * This service will revoke access to keys for specific recipients without revoking the entire token.
+ * A service which is utilized to revoke access to keys for specific recipients without revoking the entire token.
  *
  * @class [RevokeUserAccess]
  */
 export default class RevokeUserAccess extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
+  requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
-  requiredFields: any[];
-  static RECIPIENTS: any;
-  static LOCATOR_KEY: any;
-  supplyAsync: SupplyAsync;
+
+  /** The field name representing the list of emails of users intended to have read access to the encrypted content */
+  static RECIPIENTS: "recipients";
+
+  /** The field name representing the locator key */
+  static LOCATOR_KEY: "locatorKey";
+
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {[String]} maybePayLoad.recipients! - the list of emails of users intended to have read access to the encrypted content removed.<br>
+   * @param {String} maybePayLoad.locatorKey! - thelocator key,  used as a URL to discover the key on  the server.
+   * The URL encoding part is handled internally in the service itself
+   * @see #encodeURIComponent function encodeURIComponent (built-in since ES-5)
+   * @returns {Promise<ServerResponse<{}>>}
+   */
+  supplyAsync: (maybePayload: {
+    recipients: string[];
+    locatorKey: string;
+  }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -24,24 +43,22 @@ export default class RevokeUserAccess extends XQModule {
       RevokeUserAccess.LOCATOR_KEY,
     ];
 
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {[String]} maybePayLoad.recipients! - List of emails of users intended to have read access to the encrypted content removed.<br>
-     * @param {String} maybePayLoad.locatorToken! - The  locator token,  used as a URL to discover the key on  the server.
-     *                                               The URL encoding part is handled internally in the service itself
-     * @see #encodeURIComponent function encodeURIComponent (built-in since ES-5)
-     * @returns {Promise<ServerResponse<{}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
-        let accessToken = this.sdk.validateAccessToken();
+        const accessToken = this.sdk.validateAccessToken();
 
-        let locatorKey = maybePayLoad[RevokeUserAccess.LOCATOR_KEY];
-        maybePayLoad[RevokeUserAccess.RECIPIENTS] =
+        const locatorKey = maybePayLoad[RevokeUserAccess.LOCATOR_KEY];
+
+        const flattenedRecipientList =
           maybePayLoad[RevokeUserAccess.RECIPIENTS].join(",");
 
-        let additionalHeaderProperties = {
+        const payload = {
+          ...maybePayLoad,
+          [RevokeUserAccess.RECIPIENTS]: flattenedRecipientList,
+        };
+
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };
 
@@ -50,11 +67,11 @@ export default class RevokeUserAccess extends XQModule {
           this.serviceName + "/" + encodeURIComponent(locatorKey),
           CallMethod.OPTIONS,
           additionalHeaderProperties,
-          maybePayLoad,
+          payload,
           true
         );
       } catch (validationException) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -67,6 +84,3 @@ export default class RevokeUserAccess extends XQModule {
     };
   }
 }
-
-RevokeUserAccess.LOCATOR_KEY = "locatorKey";
-RevokeUserAccess.RECIPIENTS = "recipients";

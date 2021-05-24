@@ -1,33 +1,35 @@
 import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
-import XQModule, { SupplyAsync } from "./XQModule";
+import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * Revokes a key using its token. <br>
+ * A service which revokes a key using its token.
  * Only the user who sent the message will be able to revoke it.
  *
  * @class [DeleteAuthorization]
  */
 export default class DeleteAuthorization extends XQModule {
+  /** Specified name of the service */
   serviceName: string;
-  supplyAsync: SupplyAsync;
+
+  /**
+   *
+   * @method supplyAsync
+   * @param {{}} [maybePayLoad=null]
+   * @returns {Promise<ServerResponse<{}>>}
+   */
+  supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
     this.serviceName = "authorization";
 
-    /**
-     *
-     * @method supplyAsync
-     * @param {{}} [maybePayLoad=null]
-     * @returns {Promise<ServerResponse<{}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
-        let accessToken = this.sdk.validateAccessToken();
+        const accessToken = this.sdk.validateAccessToken();
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };
 
@@ -40,7 +42,7 @@ export default class DeleteAuthorization extends XQModule {
           true
         );
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,

@@ -1,35 +1,42 @@
 import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQSDK from "../XQSDK";
-import XQModule, { SupplyAsync } from "./XQModule";
+import XQModule from "./XQModule";
 
 /**
- *
- * Gets the notification and newsletter settings for the current user.
+ * A service which is utilized to retrieve the notification and newsletter settings for the current user.
  *
  * @class [GetSettings]
  */
 export default class GetSettings extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
-  static NEWSLETTER: string;
-  static NOTIFICATIONS: string;
-  supplyAsync: SupplyAsync;
+
+  /** The field name which represents the boolean indicating whether the user receive notifications or not */
+  static NEWSLETTER: "newsLetter";
+
+  /** The field name which the boolean indicating whether the user receive newsletters or not. This is only valid for new users, and is ignored if the user already exists */
+  static NOTIFICATIONS: "notifications";
+
+  /**
+   * @param {{}} [maybePayLoad=null]
+   * @returns {Promise<ServerResponse<{payload:{notifications:NotificationEnum.options, newsLetter:boolean}}>>}
+   */
+  supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
     this.serviceName = "settings";
     this.requiredFields = [];
 
-    /**
-     * @param {{}} [maybePayLoad=null]
-     * @returns {Promise<ServerResponse<{payload:{notifications:NotificationEnum.options, newsLetter:boolean}}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
-        let accessToken = this.sdk.validateAccessToken();
+        const accessToken = this.sdk.validateAccessToken();
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };
 
@@ -42,7 +49,7 @@ export default class GetSettings extends XQModule {
           true
         );
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -55,8 +62,3 @@ export default class GetSettings extends XQModule {
     };
   }
 }
-
-/**Specifies the  notifications that the user should receive  */
-GetSettings.NOTIFICATIONS = "notifications";
-/**Should this user receive newsletters or not? <br>This is only valid for new users, and is ignored if the user already exists.*/
-GetSettings.NEWSLETTER = "newsletter";

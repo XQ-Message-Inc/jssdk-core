@@ -1,25 +1,46 @@
 import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
-import XQModule, { SupplyAsync } from "./XQModule";
+import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- *
- * Get User Information.
+ * A service which is utilized to retrieve a users information.
  *
  * @class [GetUserInfo]
  */
 export default class GetUserInfo extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
-  static ENDS: string;
-  static FIRST_NAME: string;
-  static ID: string;
-  static LAST_NAME: string;
-  static STARTS: string;
-  static SUBSCRIPTION_STATUS: string;
-  static USER: string;
-  supplyAsync: SupplyAsync;
+
+  /** The field name representing the datetime (in milliseconds) when the subscription will end */
+  static ENDS: "ends";
+
+  /** The field name representing the last name of the user */
+  static FIRST_NAME: "firstName";
+
+  /** The field name representing the id of the user*/
+  static ID: "id";
+
+  /** The field name representing the last name of the user */
+  static LAST_NAME: "lastName";
+
+  /** The field name representing the datetime (in milliseconds) when the subscription was activated */
+  static STARTS: "starts";
+
+  /** The field name representing the subscription status of the user */
+  static SUBSCRIPTION_STATUS: "sub";
+
+  /** The field name representing the user */
+  static USER: "user";
+
+  /**
+   * @param {Map} [maybePayLoad=null]
+   * @returns {Promise<ServerResponse<{payload:{id:long, usr:string, firstName:string, sub:string, starts:long, ends:Long}}>>}
+   */
+  supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -27,15 +48,11 @@ export default class GetUserInfo extends XQModule {
     this.serviceName = "subscriber";
     this.requiredFields = [];
 
-    /**
-     * @param {Map} [maybePayLoad=null]
-     * @returns {Promise<ServerResponse<{payload:{id:long, usr:string, firstName:string, sub:string, starts:long, ends:Long}}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
-        let accessToken = this.sdk.validateAccessToken();
+        const accessToken = this.sdk.validateAccessToken();
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };
 
@@ -48,7 +65,7 @@ export default class GetUserInfo extends XQModule {
           true
         );
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -61,14 +78,3 @@ export default class GetUserInfo extends XQModule {
     };
   }
 }
-
-GetUserInfo.ID = "id";
-GetUserInfo.FIRST_NAME = "firstName";
-GetUserInfo.LAST_NAME = "lastName";
-/** The user's email asddress.*/
-GetUserInfo.USER = "user";
-GetUserInfo.SUBSCRIPTION_STATUS = "sub";
-/**The datetime (in milliseconds) when the subscription was activated.*/
-GetUserInfo.STARTS = "starts";
-/**The datetime (in milliseconds) when the subscription will end*/
-GetUserInfo.ENDS = "ends";

@@ -1,16 +1,23 @@
 type NotificationEnumTypes = "NONE" | "USAGE_REPORTS" | "TUTORIALS" | "BOTH";
 
 /**
- * Enum to specify Notification Settings<br>
+ * An Enum used to specify Notification Settings
  *
  * @class [NotificationEnum]
  **/
 export default class NotificationEnum {
-  static parseValue: (opt: number) => NotificationEnumTypes;
-  static NONE: number;
-  static USAGE_REPORTS: number;
-  static TUTORIALS: number;
-  static BOTH: number;
+  static parseValue: (opt: 0 | 1 | 2 | 3) => NotificationEnumTypes;
+  /** The `NotificationEnum` numerical value representing: No Notifications */
+  static NONE: 0;
+
+  /** The `NotificationEnum` numerical value representing: Usage Reports */
+  static USAGE_REPORTS: 1;
+
+  /** The `NotificationEnum` numerical value representing: Tutorials */
+  static TUTORIALS: 2;
+
+  /** The `NotificationEnum` numerical value representing: Both */
+  static BOTH: 3;
 }
 
 /**
@@ -28,20 +35,5 @@ NotificationEnum.parseValue = function (opt) {
       return "TUTORIALS";
     case this.BOTH:
       return "BOTH";
-    default: {
-      return "NONE";
-    }
   }
 };
-
-/**
- * @type {NONE,USAGE_REPORTS,TUTORIALS,BOTH}
- * @property {Number} NONE  - No Notifications
- * @property {Number} USAGE_REPORTS  - Receive Usage Reports
- * @property {Number} TUTORIALS  - Receive Tutorials
- * @property {Number} BOTH  - Receive Both
- */
-NotificationEnum.NONE = 0;
-NotificationEnum.USAGE_REPORTS = 1;
-NotificationEnum.TUTORIALS = 2;
-NotificationEnum.BOTH = 3;

@@ -1,37 +1,45 @@
 import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
-import XQModule, { SupplyAsync } from "./XQModule";
+import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * This service validates an API key and returns the scopes associated with it.
+ * A service which validates an API key and returns the scopes associated with it.
  *
  * @class [CheckApiKey]
  */
 export default class CheckApiKey extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
-  static API_KEY: string;
-  static SCOPES: string;
-  supplyAsync: SupplyAsync;
+
+  /** The field name representing the API key */
+  static API_KEY: "api-key";
+
+  /** The field name representing the scopes associated to the API key */
+  static SCOPES: "scopes";
+
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {String} maybePayLoad.api-key - The API key whose scopes are to be checked
+   *
+   * @returns {Promise<ServerResponse<{payload:{scopes:[string]}}>>}
+   */
+  supplyAsync: (maybePayload: { api: string }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
     this.serviceName = "apikey";
     this.requiredFields = [CheckApiKey.API_KEY];
 
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {String} maybePayLoad.api-key - The API key whose scopes are to be checked
-     *
-     * @returns {Promise<ServerResponse<{payload:{scopes:[string]}}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
-        let accessToken = this.sdk.validateAccessToken();
+        const accessToken = this.sdk.validateAccessToken();
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };
 
@@ -44,7 +52,7 @@ export default class CheckApiKey extends XQModule {
           true
         );
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -57,6 +65,3 @@ export default class CheckApiKey extends XQModule {
     };
   }
 }
-
-CheckApiKey.API_KEY = "api-key";
-CheckApiKey.SCOPES = "scopes";

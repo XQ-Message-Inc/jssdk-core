@@ -1,18 +1,29 @@
 import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
-import XQModule, { SupplyAsync } from "./XQModule";
+import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- *  Validates your {@link Authorize} call.<br>
+ *  A service which is utilized to validate a {@link Authorize} service call
  *  Returns 204, "No Content" if successful.
  *  @class [ValidatePacket]
  */
 export default class ValidatePacket extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
+  requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
-  requiredFields: any[];
-  static PACKET: any;
-  supplyAsync: SupplyAsync;
+
+  /** The field name representing the packet data */
+  static PACKET: "data";
+
+  /**
+   *
+   * @param {{}} maybePayLoad:
+   * @returns {Promise<ServerResponse<{}>>}
+   */
+  supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -20,17 +31,12 @@ export default class ValidatePacket extends XQModule {
     this.serviceName = "packet";
     this.requiredFields = [ValidatePacket.PACKET];
 
-    /**
-     *
-     * @param {{}} maybePayLoad:
-     * @returns {Promise<ServerResponse<{}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
-        let accessToken = this.sdk.validateAccessToken();
+        const accessToken = this.sdk.validateAccessToken();
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
           [XQSDK.CONTENT_TYPE]: XQSDK.TEXT_PLAIN_UTF_8,
         };
@@ -44,7 +50,7 @@ export default class ValidatePacket extends XQModule {
           true
         );
       } catch (validationException) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -57,5 +63,3 @@ export default class ValidatePacket extends XQModule {
     };
   }
 }
-
-ValidatePacket.PACKET = "data";

@@ -11,7 +11,10 @@ import XQSDK from "../../XQSDK";
  * @class [AddContact]
  */
 export default class AddContact extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
   static EMAIL: string;
   static FIRST_NAME: string;

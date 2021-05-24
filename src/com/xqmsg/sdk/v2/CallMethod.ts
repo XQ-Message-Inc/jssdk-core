@@ -2,15 +2,18 @@
  * @class [CallMethod]
  */
 export default class CallMethod {
-  static POST: string;
-  static GET: string;
-  static PATCH: string;
-  static OPTIONS: string;
-  static DELETE: string;
-}
+  /** DELETE request */
+  static DELETE: "DELETE";
 
-CallMethod.POST = "POST";
-CallMethod.GET = "GET";
-CallMethod.PATCH = "PATCH";
-CallMethod.OPTIONS = "OPTIONS";
-CallMethod.DELETE = "DELETE";
+  /** GET request */
+  static GET: "GET";
+
+  /** OPTIONS request */
+  static OPTIONS: "OPTIONS";
+
+  /** PATCh request */
+  static PATCH: "PATCH";
+
+  /** POST request */
+  static POST: "POST";
+}
