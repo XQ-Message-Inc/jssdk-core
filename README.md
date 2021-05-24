@@ -1,10 +1,17 @@
-## jssdk-core
+## @xqmsg/jssdk-core
 
 A Javascript Implementation of XQ Message SDK (V.2) which provides convenient access to the XQ Message API.
 
+##### What is XQ Message?
+
+XQ Message is an encryption-as-a-service (EaaS) platform which gives you the tools to encrypt and route data to and from devices like mobile phones, IoT, and connected devices that are at the "edge" of the internet. The XQ platform is a lightweight and highly secure cybersecurity solution that enables self protecting data for perimeterless [zero trust](https://en.wikipedia.org/wiki/Zero_trust_security_model) data protection, even to devices and apps that have no ability to do so natively.
+
+##### XQ Message JS SDK sample application
+
+If you would like to see the JS SDK in action, please navigate to the [jssdk-example repo](https://github.com/xqmsg/jssdk-example). The project is intended to give the user a high-level overview of the encryption and decryption flow, as well as some sample implementations of core components
+
 ## Table of contents
 
-- [Sample Applications](#sample-applications)
 - [Installation](#installation)
 - [Generating API Keys](#api-keys)
 - [Basic Usage](#basic-usage)
@@ -14,69 +21,13 @@ A Javascript Implementation of XQ Message SDK (V.2) which provides convenient ac
 - [FileEncrypt](#encrypting-a-file)
 - [FileDecrypt](#decrypting-a-file)
 - [Authorize](#authorization)
-- [Revoke Key Access](#revoking-key-access)
+- [CodeValidator](#validating-pin-code)
+- [RevokeKeyAccess](#revoking-key-access)
 - [GrantUserAccess](#granting-and-revoking-user-access)
 - [DashboardLogin](#connecting-to-the-dashboard)
 - [AddUserGroup](#admin-managing-a-user-group)
 - [AddContact](#admin-using-an-external-id-based-contact-for-tracking)
 - [AuthorizeAlias](#admin-connect-to-an-alias-account)
-
----
-
-## Sample Applications
-
-Besides the core API code, the `jssdk-core` project also contains two web applications.
-
-They are intended to give the user a high-level overview of the encryption and decryption flow, as well as some sample implementations of core components. In order to run these applications you will need to generate XQ Message [API keys](#api-keys) and input them in both the `demo.js` and `TestLauncher.js` files.
-
-To run the sample applications, simply run:
-
-**Demo**
-To run the Demo application, first input your API keys in the `XQSDK` configuration in [demo.js](#./demo/demo.js) then run:
-
-```sh
-yarn dev
-```
-
-**Tests**
-To run the Tests application, first input your API keys in the `XQSDK` configuration in [TestLauncher.js](#./tests/TestLauncher.js) then run:
-
-```sh
-yarn dev-test
-```
-
-Initially the user will need to register with the XQ Framework. To do so, they click the **Register** button which promts them for their email. A PIN code will be sent to that email.
-
-When the PIN is then entered into the input field and **Confirm** is pressed, the registration is concluded. At this point the user is fully authenticated with XQ.
-
-Note that an access token will be stored in the local browser cache. This token is used to automatically authenticate the user with XQ for most interactions. The **Clear Credentials** can be pressed at any time to reauthenticate.
-
-The test suite has the following tests:
-
-- Test Get XQ Authorization Token From Active Profile
-- Test Dashboard Login
-- Test Get Dashboard Applications
-- Test Add Dashboard Group
-- Test Update Dashboard Group
-- Test Remove Dashboard Group
-- Test Add Dashboard Contact
-- Test Disable Dashboard Contact
-- Test Remove Dashboard Contact
-- Test Get User Info
-- Test Get User Settings
-- Test Update User Settings
-- Test Create Delegate Access Token
-- Test OTP V2 Algorithm
-- Test AES Algorithm
-- Test Encrypt And Decrypt Text Using OTP V2
-- Test Encrypt And Decrypt Text Using AES
-- Test File Encrypt And File Decrypt Text Using OTP V2
-- Test Combine Authorizations
-- Test Delete Authorization
-- Test Delete User
-- Test Authorize Alias
-- Test Check API Key
-- Test Key Manipulations
 
 ---
 
@@ -89,10 +40,6 @@ yarn add @xqmsg/jssdk-core
 # or
 npm install @xqmsg/jssdk-core
 ```
-
-#### Requirements
-
-Node 8, 10 or higher.
 
 #### API Keys
 
@@ -109,7 +56,7 @@ In order to utilize the XQ SDK and interact with XQ servers you will need both t
 
 #### Initializing the SDK
 
-To initialize an XQ SDK instance in your JavaScript application, provide the generated `XQ_API_KEY` (General) and `DASHBOARD_API_KEY` (Dashboard) API keys as shown below:
+To initialize an XQ SDK instance in your JavaScript application, provide the generated `XQ_API_KEY` (General) and `DASHBOARD_API_KEY` (Dashboard) API keys to the `XQSDK` class as shown below:
 
 ```javascript
 const sdk = new XQSDK({
@@ -125,6 +72,8 @@ const sdk = new XQSDK({
 The text to be encrypted should be submitted along with the email addresses of the intended recipients and the amount of time that the message should be available.
 
 ```javascript
+import { Encrypt, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+
 const sdk = new XQSDK({
   XQ_API_KEY: "YOUR_XQ_API_KEY",
   DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
@@ -162,6 +111,8 @@ new Encrypt(sdk, algorithm).supplyAsync(payload).then((response) => {
 To decrypt a message, the encrypted payload must be provided, along with the locator token received from XQ during encryption. The authenticated user must be one of the recipients that the message was originally sent to ( or the sender themselves).
 
 ```javascript
+import { Decrypt, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+
 const sdk = new XQSDK({
   XQ_API_KEY: "YOUR_XQ_API_KEY",
   DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
@@ -197,6 +148,8 @@ new Decrypt(sdk, algorithm).supplyAsync(payload).then((response) => {
 Here, a `File` object containing the data for encryption must be provided. Like message encryption, a list of recipients who will be able to decrypt the file, as well as the amount of time before expiration must also be provided.
 
 ```javascript
+import { FileEncrypt, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+
 const sdk = new XQSDK({
   XQ_API_KEY: "YOUR_XQ_API_KEY",
   DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
@@ -237,6 +190,8 @@ new FileEncrypt(sdk, algorithm)
 To decrypt a file, the URI to the XQ encrypted file must be provided. The user decrypting the file must be one of the recipients original specified ( or the sender ).
 
 ```javascript
+import { FileDecrypt, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+
 const sdk = new XQSDK({
   XQ_API_KEY: "YOUR_XQ_API_KEY",
   DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
@@ -275,6 +230,13 @@ Request an access token for a particular email address. If successful, the user 
 The service itself will return a pre-authorization token that can be exchanged for a full access token once validation is complete.
 
 ```javascript
+import { Authorize, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+
+const sdk = new XQSDK({
+  XQ_API_KEY: "YOUR_XQ_API_KEY",
+  DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
+});
+
 new Authorize(sdk)
   .supplyAsync({ [Authorize.USER]: "me@email.com" })
   .then((response) => {
@@ -293,11 +255,20 @@ new Authorize(sdk)
   });
 ```
 
-At this point,the user can submit the PIN they received using the `CodeValidator` class. Once submitted and validated, the temporary token they received previously will be replaced for a valid access token that can be used for other requests:
+#### Code Validator
+
+After requesting authorization via the `Authorize` class, the user can submit the PIN they received using the `CodeValidator` class. Once submitted and validated, the temporary token they received previously will be replaced for a valid access token that can be used for other requests:
 
 ```javascript
+import { CodeValidator, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+
+const sdk = new XQSDK({
+  XQ_API_KEY: "YOUR_XQ_API_KEY",
+  DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
+});
+
 new CodeValidator(sdk)
-  .supplyAsync({ [codeValidator.PIN]: "123456" })
+  .supplyAsync({ [CodeValidator.PIN]: "123456" })
   .then((response) => {
     switch (response.status) {
       case ServerResponse.OK: {
@@ -318,6 +289,17 @@ new CodeValidator(sdk)
 Alternatively, if the user clicks on the link in the email, they can simply exchange their pre-authorization token for a valid access token by using the `ExchangeForAccessToken` class directly. Note that the active user in the `sdk` should be the same as the one used to make the authorization call:
 
 ```javascript
+import {
+  ExchangeForAccessToken,
+  ServerResponse,
+  XQSDK,
+} from "@xqmsg/jssdk-core";
+
+const sdk = new XQSDK({
+  XQ_API_KEY: "YOUR_XQ_API_KEY",
+  DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
+});
+
 new ExchangeForAccessToken(sdk).supplyAsync(null).then((response) => {
   switch (response.status) {
     case ServerResponse.OK: {
@@ -336,9 +318,18 @@ new ExchangeForAccessToken(sdk).supplyAsync(null).then((response) => {
 
 #### Revoking Key Access
 
-Revokes a key using its token. Only the user who sent the message will be able to revoke it. **Note that this action is not reversible**
+Revokes a key using its token. Only the user who sent the message will be able to revoke it.
+
+**Warning: This action is not reversible.**
 
 ```javascript
+import { RevokeKeyAccess, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+
+const sdk = new XQSDK({
+  XQ_API_KEY: "YOUR_XQ_API_KEY",
+  DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
+});
+
 new RevokeKeyAccess(sdk)
   .supplyAsync({ [RevokeKeyAccess.LOCATOR_KEY]: "message_locator_token" })
   .then((response) => {
@@ -362,6 +353,13 @@ new RevokeKeyAccess(sdk)
 There may be cases where additional users need to be granted access to a previously sent message, or access needs to be revoked. This can be achieved via **GrantUserAccess** and **RevokeUserAccess** respectively:
 
 ```javascript
+import { GrantUserAccess, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+
+const sdk = new XQSDK({
+  XQ_API_KEY: "YOUR_XQ_API_KEY",
+  DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
+});
+
 // Grant access to additional users.
 new GrantUserAccess(sdk)
   .supplyAsync({
@@ -385,11 +383,18 @@ new GrantUserAccess(sdk)
 ```
 
 ```javascript
+import { RevokeUserAccess, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+
+const sdk = new XQSDK({
+  XQ_API_KEY: "YOUR_XQ_API_KEY",
+  DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
+});
+
 // Revoke access from particular users.
 new RevokeUserAccess(sdk)
   .supplyAsync({
-    [GrantUserAccess.RECIPIENTS]: ["jack@email.com"],
-    [GrantUserAccess.LOCATOR_TOKEN]: "message_locator_token",
+    [RevokeUserAccess.RECIPIENTS]: ["jack@email.com"],
+    [RevokeUserAccess.LOCATOR_TOKEN]: "message_locator_token",
   })
   .then((response) => {
     switch (response.status) {
@@ -412,6 +417,13 @@ new RevokeUserAccess(sdk)
 The SDK provides limited functionality for dashboard administration. Before using any dashboard-specific features, a user would perform the following after signing into XQ with an authorized email account associated with the management portal:
 
 ```javascript
+import { DashboardLogin, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+
+const sdk = new XQSDK({
+  XQ_API_KEY: "YOUR_XQ_API_KEY",
+  DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
+});
+
 new DashboardLogin(sdk).supplyAsync(null).then((response) => {
   switch (response.status) {
     case ServerResponse.OK: {
@@ -435,6 +447,13 @@ new DashboardLogin(sdk).supplyAsync(null).then((response) => {
 Users may group a number of emails accounts under a single alias. Doing this makes it possible to add all of the associated email accounts to an outgoing message by adding that alias as a message recipient instead. Note that changing the group members does not affect the access rights of messages that have previously been sent.
 
 ```javascript
+import { AddUserGroup, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+
+const sdk = new XQSDK({
+  XQ_API_KEY: "YOUR_XQ_API_KEY",
+  DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
+});
+
 new AddUserGroup(sdk)
   .supplyAsync({
     [AddUserGroup.NAME]: "New Test Generated User Group",
@@ -465,6 +484,13 @@ In situations where a user may want to associate an external account with an XQ 
 These type of accounts will allow user authorization using only an account ID. However, these accounts have similar restrictions to anonymous accounts: They will be incapable of account management, and also have no access to the dashboard. However - unlike basic anonymous accounts - they can be fully tracked in a dashboard portal.
 
 ```javascript
+import { AddContact, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+
+const sdk = new XQSDK({
+  XQ_API_KEY: "YOUR_XQ_API_KEY",
+  DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
+});
+
 new AddContact(sdk)
   .supplyAsync({
     [AddContact.EMAIL]: "1234567",
@@ -495,6 +521,13 @@ new AddContact(sdk)
 After creation, a user can connect to an Alias account by using the **`AuthorizeAlias`** endpoint:
 
 ```javascript
+import { AuthorizeAlias, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+
+const sdk = new XQSDK({
+  XQ_API_KEY: "YOUR_XQ_API_KEY",
+  DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
+});
+
 const aliasId = "1234567"; // The external user ID.
 
 new AuthorizeAlias(sdk)
