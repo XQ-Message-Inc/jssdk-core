@@ -1,32 +1,100 @@
-import EncryptionAlgorithm, {
-  EncryptFile,
-  EncryptText,
-} from "./EncryptionAlgorithm";
+import EncryptionAlgorithm from "./EncryptionAlgorithm";
 import ServerResponse from "../ServerResponse";
 import XQSDK from "../XQSDK";
 
+type ParsedFile = {
+  locator: string;
+  nameEncrypted: Uint8Array;
+  contentEncrypted: Uint8Array;
+};
+
 export default class OTPv2Encryption extends EncryptionAlgorithm {
-  prefix: string;
+  /**
+   * Takes an encrypted file and attempts to decrypt with the provided key.
+   * @param  {File} sourceFile - the file to decrypt.
+   * @param  {String} key The encryption key.
+   * @return {Promise<ServerResponse<{payload:{decryptedText:string}}>>} A Promise of the Response containing the decrypted text.
+   */
+  decryptFile: (
+    file: File,
+    retrieveKeyFunction: (locatorKey: string) => string
+  ) => Promise<unknown>;
+
+  /**
+   * Takes an OTPV2 encrypted text string and attempts to decrypt with the provided key.
+   * @param  {String} text - the text to decrypt.
+   * @param  {String} key - the encryption key.
+   * @return {Promise<ServerResponse<{payload:{decryptedText:string}}>>} A Promise of the Response containing the decrypted text.
+   */
+  decryptText: (text: string, key: string) => Promise<ServerResponse>;
+
+  /**
+   * Takes an OTPV2 encrypted Uint8Array and attempts to decrypt with the provided key.
+   * @param  {Uint8Array} encrypted - the Uint8Array to decrypt.
+   * @param  {String} key - the encryption key.
+   * @return {Uint8Array} the decrypted Uint8Array
+   */
+  decryptUint: (encrypted: Uint8Array, key: Uint8Array) => Uint8Array;
+
+  /**
+   * @param {ParsedFile} parsed - the parsed file to be decrypted
+   * @return {String} keyString - the quantum key used to decrypt the file
+   * @return {[File, String]} the decrypted file tuple
+   */
+  doDecrypt: (parsed: ParsedFile, keyString: string) => [File, string];
+
+  /**
+   * @param {Uint8Array} data - data to be encrypted
+   * @return {Uint8Array}
+   */
+  doEncrypt: (arg0: Uint8Array) => Uint8Array;
+
+  /**
+   * @param {File} file - the file to be encrypted
+   * @param {String} expandedKey - a key expanded to the length to that of the text that needs encryption.
+   * @param {String} locatorKey - the key used to fetch the encryption key from the server
+   * @return {Promise<ServerResponse<{payload:File}>>}} A Promise of the response containing encrypted File.
+   */
+  encryptFile: (
+    sourceFile: File,
+    expandedKey: string | void,
+    locatorKey: string
+  ) => Promise<ServerResponse>;
+
+  /**
+   * Takes a string and encrypts it using the provided quantum key.
+   *
+   * @param  {String} text The text to encrypt.
+   * @param  {String} key The encryption key.
+   * @return {Promise<ServerResponse>} The encrypted text.
+   */
+  encryptText: (text: string, key: string) => Promise<ServerResponse>;
+
+  /**
+   * Takes a string and XOR's it with a quantum key.
+   * XOR a.k.a Exclusive Disjunction means: output true only when inputs differ.
+   * @param  {String} text The text to encrypt.
+   * @param  {String} key The encryption key.
+   * @see #encodeURIComponent function encodeURIComponent (built-in since ES-5)
+   * @return {String} The encrypted text.
+   */
+  exclusiveDisjunction: (text: string, expandedKey: string) => string;
+
+  /** The current key position */
   keyPos: number;
+
+  /** The provided quantum key */
   key: Uint8Array;
 
-  decryptFile: (
-    file: string,
-    retrieveKeyFunction: (locatorToken: string) => string
-  ) => Promise<unknown>;
-  decryptText: (text: string, key: string) => Promise<unknown>;
-  decryptUint: (encrypted: Uint8Array, key: Uint8Array) => Uint8Array;
-  doDecrypt: (parsed: any, keyString: string) => Record<string, any>;
-  doEncrypt: (arg0: Uint8Array) => Uint8Array;
-  encryptFile: EncryptFile;
-  encryptText: EncryptText;
+  /**
+   *
+   * @param {File} file
+   * @return {Promise<{locator,nameEncrypted, contentEncrypted}>}
+   */
+  parseFileForDecrypt: (file: File) => Promise<ParsedFile>;
 
-  exclusiveDisjunction: (text: string, expandedKey: string) => string;
-  parseFileForDecrypt: (file: any) => Promise<{
-    locator: string;
-    nameEncrypted: string;
-    contentEncrypted: Uint8Array;
-  }>;
+  /** The prefix prepended to an `expandedKey` string  */
+  prefix: string;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -34,19 +102,12 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
     this.keyPos = 0;
     this.key;
 
-    /**
-     *
-     * Encrypt text given a crpyto key.
-     * @param  {String} text: the text to encrypt
-     * @param  {String} key: the crypto key used to encrypt the text.
-     * @return {Promise<ServerResponse<{payload:{encryptedText:string, key:string}}>>} A Promise of the response containing encrypted text.
-     */
     this.encryptText = (text, key) => {
       try {
         const self = this;
         self.sdk.validateAccessToken();
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           if (key === "" || key == undefined) {
             console.error("OTPv2 Source Key cannot be empty.");
             resolve(
@@ -77,7 +138,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
           );
         });
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -89,20 +150,14 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
       }
     };
 
-    /**
-     * @param {File} file
-     * @param {String} expandedKey
-     * @param {String} locatorToken
-     * @return {Promise<ServerResponse<{payload:File}>>}} A Promise of the response containing encrypted File.
-     */
-    this.encryptFile = (file, expandedKey, locatorToken) => {
+    this.encryptFile = (file, expandedKey, locatorKey) => {
       try {
         const self = this;
         self.sdk.validateAccessToken();
 
         this.key = new TextEncoder().encode(expandedKey as string);
-        let token = new TextEncoder().encode(locatorToken);
-        let stream = new ReadableStream({
+        const token = new TextEncoder().encode(locatorKey);
+        const stream = new ReadableStream({
           async start(controller) {
             controller.enqueue(
               new Uint8Array(new Uint32Array([token.length]).buffer)
@@ -136,7 +191,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
           .blob()
           .then(
             function (bob) {
-              return new Promise((resolve, reject) => {
+              return new Promise((resolve) => {
                 resolve(
                   new ServerResponse(
                     ServerResponse.OK,
@@ -152,7 +207,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
             }
           );
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -164,38 +219,25 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
       }
     };
 
-    /**
-     *
-     * @param {Uint8Array}data
-     * @return {Uint8Array}
-     */
     this.doEncrypt = (data) => {
       const result = new Uint8Array(data.length);
       for (let i = 0; i < result.length; i++) {
-        // eslint-disable-next-line no-bitwise
         result[i] = data[i] ^ this.key[this.keyPos % this.key.length];
         this.keyPos += 1;
       }
       return result;
     };
 
-    /**
-     * Takes an encrypted OTPv2 text string and attempts to decrypt with the provided key.
-     *
-     * @param  {String} text The text to decrypt.
-     * @param  {String} key The encryption key.
-     * @return {Promise<ServerResponse<{payload:{decryptedText:string}}>>} A Promise of the Response containing the decrypted text.
-     */
     this.decryptText = (text, key) => {
       try {
         const self = this;
         self.sdk.validateAccessToken();
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           try {
-            let payload = atob(text);
+            const payload = atob(text);
 
-            let encoder = new TextEncoder();
+            const encoder = new TextEncoder();
 
             const keyBytes = encoder.encode(key);
             const payloadBytes = encoder.encode(payload);
@@ -203,11 +245,11 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
             const j = [];
 
             for (let idx = 0; idx < payloadBytes.length; ++idx) {
-              let mi = idx % keyBytes.length;
+              const mi = idx % keyBytes.length;
               j.push(payloadBytes[idx] ^ keyBytes[mi]);
             }
 
-            let encoded = new TextDecoder("utf8").decode(new Uint8Array(j));
+            const encoded = new TextDecoder("utf8").decode(new Uint8Array(j));
 
             try {
               const decoded = decodeURIComponent(encoded);
@@ -228,7 +270,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
           }
         });
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -240,30 +282,22 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
       }
     };
 
-    /**
-     * Takes a string and XOR's it with a quantum key.
-     *  XOR a.k.a Exclusive Disjunction means: output true only when inputs differ.
-     * @param  {String} text The text to encrypt.
-     * @param  {String} key The encryption key.
-     * @see #encodeURIComponent function encodeURIComponent (built-in since ES-5)
-     * @return {String} The encrypted text.
-     */
     this.exclusiveDisjunction = (text: string, expandedKey: string): string => {
       try {
-        let encoder = new TextEncoder();
+        const encoder = new TextEncoder();
 
-        let keyBytes = encoder.encode(expandedKey);
-        let payloadBytes = encoder.encode(encodeURIComponent(text));
+        const keyBytes = encoder.encode(expandedKey);
+        const payloadBytes = encoder.encode(encodeURIComponent(text));
 
-        let j = [];
+        const j = [];
 
         for (let idx = 0; idx < payloadBytes.length; ++idx) {
-          let mi = idx % keyBytes.length;
+          const mi = idx % keyBytes.length;
           j.push(payloadBytes[idx] ^ keyBytes[mi]);
         }
 
-        let decoder = new TextDecoder("utf8");
-        let dt = decoder.decode(new Uint8Array(j));
+        const decoder = new TextDecoder("utf8");
+        const dt = decoder.decode(new Uint8Array(j));
 
         return btoa(dt);
       } catch (err) {
@@ -272,40 +306,28 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
       }
     };
 
-    /**
-     * A function to fetch the encryption key stored on the server.
-     * @callback Function<String,String>
-     * @param {String} locatorToken - The locator token used to fetch the key stored on the server.
-     * @return {String} the encryption key
-     */
-    /**
-     *
-     * @param {File} file
-     * @param {Function<String,String>} retrieveKeyFunction
-     * @return {Promise<ServerResponse<{payload:File}>>}
-     */
     this.decryptFile = (file, retrieveKeyFunction) => {
       try {
         const self = this;
         self.sdk.validateAccessToken();
 
-        return new Promise((resolve, reject) => {
-          let parsedFile: { locator: string };
+        return new Promise((resolve) => {
+          let parsedFile: ParsedFile;
           return self
             .parseFileForDecrypt(file)
-            .then((pf: { locator: string }) => {
+            .then((pf) => {
               parsedFile = pf;
               return retrieveKeyFunction(pf.locator);
             })
             .then((key) => {
               const result = self.doDecrypt(parsedFile, key);
-              let file = result[0] as Record<string, any>;
-              let name = result[1];
+              const file = result[0];
+              // const name = result[1];
               resolve(new ServerResponse(ServerResponse.OK, 200, file));
             });
         });
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -319,26 +341,15 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
 
     this.doDecrypt = (parsed, keyString) => {
       const key = new TextEncoder().encode(keyString);
-      const fileName = this.decryptUint(
-        parsed.nameEncrypted,
-        key
-      ) as unknown as BufferSource;
-      const content = this.decryptUint(
-        parsed.contentEncrypted,
-        key
-      ) as unknown as string;
+      const fileName = this.decryptUint(parsed.nameEncrypted, key);
+      const content = this.decryptUint(parsed.contentEncrypted, key);
+
       return [
         new File([content], new TextDecoder().decode(fileName)),
         new TextDecoder().decode(fileName),
       ];
     };
 
-    /**
-     *
-     * @param {Uint8Array} encrypted
-     * @param {Uint8Array} key
-     * @return {Uint8Array}
-     */
     this.decryptUint = (encrypted, key) => {
       const result = new Uint8Array(encrypted.length);
       for (let i = 0; i < result.length; i++) {
@@ -348,17 +359,12 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
       return result;
     };
 
-    /**
-     *
-     * @param {File} file
-     * @return {Promise<{locator,nameEncrypted, contentEncrypted}>}
-     */
     this.parseFileForDecrypt = (file) => {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         // Fetch the length of the token and the actual token. Wrapping in the "Response"
         // class because Safari does not support Blob.arrayBuffer
         resolve(
-          file.arrayBuffer().then((buffer: Buffer) => {
+          file.arrayBuffer().then((buffer: ArrayBuffer) => {
             let pos = 0;
             const locatorSize = new Uint32Array(buffer.slice(pos, pos + 4))[0];
             if (locatorSize > 256) {

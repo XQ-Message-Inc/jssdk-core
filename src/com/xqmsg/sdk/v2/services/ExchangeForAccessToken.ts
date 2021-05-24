@@ -1,34 +1,34 @@
 import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
-import XQModule, { SupplyAsync } from "./XQModule";
+import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- *  Exchange the temporary access token with a real access token used in all secured XQ Message interactions
+ *  A service which is utilized to exchange a temporary access token with a real access token used in all secured XQ Message interactions
  *  @class [ExchangeForAccessToken]
  */
 export default class ExchangeForAccessToken extends XQModule {
   serviceName: string;
   requiredFields: string[];
-  supplyAsync: SupplyAsync;
+  /**
+   * @param {Map} [maybePayLoad=null] - Container for the request parameters supplied to this method.
+   *
+   * @returns {Promise<ServerResponse<{payload:String}>>}
+   */
+  supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
     this.serviceName = "exchange";
     this.requiredFields = [];
 
-    /**
-     * @param {Map} [maybePayLoad=null] - Container for the request parameters supplied to this method.
-     *
-     * @returns {Promise<ServerResponse<{payload:String}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
-        let self = this;
+        const self = this;
 
-        let preAuthToken = this.sdk.validatePreAuthToken();
+        const preAuthToken = this.sdk.validatePreAuthToken();
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + preAuthToken,
         };
 
@@ -44,9 +44,9 @@ export default class ExchangeForAccessToken extends XQModule {
           .then((exchangeResponse: ServerResponse) => {
             switch (exchangeResponse.status) {
               case ServerResponse.OK: {
-                let accessToken = exchangeResponse.payload;
+                const accessToken = exchangeResponse.payload;
                 try {
-                  let activeProfile = self.cache.getActiveProfile(true);
+                  const activeProfile = self.cache.getActiveProfile(true);
                   self.cache.putXQAccess(activeProfile, accessToken);
                   self.cache.removeXQPreAuthToken(activeProfile);
                   return exchangeResponse;

@@ -1,39 +1,45 @@
-import XQModule from "../XQModule";
 import CallMethod from "../../CallMethod";
 import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
+import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
 
 /**
- *
- *  Disable a Contact
+ * A service which is utilized to disable a Contact
  *
  * @class [DisableContact]
  */
 export default class DisableContact extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
-  static ID: string;
-  supplyAsync: (maybePayLoad: Record<string, any>) => ServerResponse;
+
+  /** The field name representing the disabled Contact's ID */
+  static ID: "id";
+
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {String} id - the user id of the Contact that will be disabled
+   * @returns {Promise<ServerResponse<{payload:{id:int, status:string}}>>}
+   */
+  supplyAsync: (maybePayLoad: { id: string }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
     this.serviceName = "contact";
     this.requiredFields = [DisableContact.ID];
 
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @returns {Promise<ServerResponse<{payload:{id:int, status:string}}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
-        let dashboardAccessToken = this.sdk.validateAccessToken(
+        const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + dashboardAccessToken,
         };
 
@@ -47,7 +53,7 @@ export default class DisableContact extends XQModule {
           Destination.DASHBOARD
         );
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,

@@ -1,42 +1,57 @@
-import XQModule, { SupplyAsync } from "../XQModule";
 import CallMethod from "../../CallMethod";
 import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
+import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
 
 /**
- *
- *  Find a dashboard Contacts
+ * A service which is utilized to find a given dashboard's Contacts
  *
  * @class [FindContacts]
  */
 export default class FindContacts extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
-  static CONTACTS: string;
-  static FILTER: string;
-  static ID: string;
-  static LIMIT: string;
-  static PAGE: string;
-  static ROLE: string;
-  supplyAsync: SupplyAsync;
+
+  /** The field name representing the Contacts */
+  static CONTACTS: "contacts";
+
+  /** The field name representing the filter for the list of Contacts */
+  static FILTER: "filter";
+
+  /** The field name representing the id */
+  static ID: "id";
+
+  /** The field name representing the limit of the list of Contacts */
+  static LIMIT: "limit";
+
+  /** The field name representing the page of the list of Contacts */
+  static PAGE: "page";
+
+  /** The field name representing the role */
+  static ROLE: "role";
+
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @returns {Promise<ServerResponse<{payload:{groups:[{id:int, name:string, bid:int}]}}>>}
+   */
+  supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
     this.serviceName = "contact";
     this.requiredFields = [];
 
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @returns {Promise<ServerResponse<{payload:{groups:[{id:int, name:string, bid:int}]}}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
-        let dashboardAccessToken = this.sdk.validateAccessToken(
+        const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + dashboardAccessToken,
         };
 
@@ -50,7 +65,7 @@ export default class FindContacts extends XQModule {
           Destination.DASHBOARD
         );
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -63,10 +78,3 @@ export default class FindContacts extends XQModule {
     };
   }
 }
-
-FindContacts.ID = "id";
-FindContacts.CONTACTS = "contacts";
-FindContacts.FILTER = "filter";
-FindContacts.ROLE = "role";
-FindContacts.LIMIT = "limit";
-FindContacts.PAGE = "page";

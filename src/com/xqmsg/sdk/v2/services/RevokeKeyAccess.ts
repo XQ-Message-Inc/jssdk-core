@@ -1,19 +1,34 @@
 import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
-import XQModule, { SupplyAsync } from "./XQModule";
+import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * Revokes a key using its token.
+ * A service which is utilized to revoke a key using a locator token.
  * Only the user who sent the message will be able to revoke it.
  *
  * @class [RevokeKeyAccess]
  */
 export default class RevokeKeyAccess extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
-  static LOCATOR_KEY: string;
-  supplyAsync: SupplyAsync;
+
+  /** The field name representing the locator key */
+  static LOCATOR_KEY: "locatorKey";
+
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {[String]} maybePayLoad.locatorKey - the locator key used as a URL to discover the key on the server.
+   * The URL encoding part is handled internally in the service itself
+   * @see #encodeURIComponent function encodeURIComponent (built-in since ES-5)
+   * @returns {Promise<ServerResponse<{}>>}
+   */
+  supplyAsync: (maybePayload: {
+    locatorKey: string;
+  }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -21,20 +36,13 @@ export default class RevokeKeyAccess extends XQModule {
     this.serviceName = "key";
     this.requiredFields = [RevokeKeyAccess.LOCATOR_KEY];
 
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {[String]} maybePayLoad.locatorToken - The  locator token,  used as a URL to discover the key on  the server.]
-     *                 The URL encoding part is handled internally in the service itself
-     * @see #encodeURIComponent function encodeURIComponent (built-in since ES-5)
-     * @returns {Promise<ServerResponse<{}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
-        let accessToken = this.sdk.validateAccessToken();
-        let locatorKey = maybePayLoad[RevokeKeyAccess.LOCATOR_KEY];
+        const accessToken = this.sdk.validateAccessToken();
+        const locatorKey = maybePayLoad[RevokeKeyAccess.LOCATOR_KEY];
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };
 
@@ -47,7 +55,7 @@ export default class RevokeKeyAccess extends XQModule {
           true
         );
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -60,5 +68,3 @@ export default class RevokeKeyAccess extends XQModule {
     };
   }
 }
-
-RevokeKeyAccess.LOCATOR_KEY = "locatorKey";

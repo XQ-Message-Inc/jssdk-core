@@ -1,31 +1,64 @@
 import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
-import XQModule, { SupplyAsync } from "./XQModule";
+import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
+ * A service which is utilized request an access token when given an email address.
+ * If successful, the service itself will return a pre-authorization token that can be exchanged
+ * for a full access token after validation is complete.
  *
- * Request an access token given an email address.<br>
- * If successful, the service itself will return a pre-authorization token that can be exchanged<br>
- * for a full access token after validation is complete.<br>
- * The user will also receive an email containing:<br>
- *    1. validation PIN<br>
- *    2. validation Link<br>
- * The user can then choose to either click the link to complete the process or use the PIN.<br>
- * The pin servers as the input parameter of {@link ValidateAccessRequest}.<br>
+ * The user will also receive an email containing:
+ *    1. validation PIN - a two-factor authentication token used as input for the `CodeValidator` service
+ *    2. validation Link - a two-factor authentication token used as input for the `ExchangeForAccessToken` service
+ *
+ * The user can then choose to either click the link to complete the process or use the PIN.
+ * The pin servers as the input parameter of the `CodeValidator` service
  *  @class [Authorize]
  */
 
 export default class Authorize extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
-  static CODE_TYPE: string;
-  static FIRST_NAME: string;
-  static LAST_NAME: string;
-  static NEWS_LETTER: string;
-  static NOTIFICATIONS: string;
-  static USER: string;
-  supplyAsync: SupplyAsync;
+
+  /** if 'pin' is sent the validation email will only have the code and no confirmation button */
+  static CODE_TYPE: "codetype";
+
+  /** The field name representing the first name of the user */
+  static FIRST_NAME: "firstName";
+
+  /** The field name representing the last name of the user */
+  static LAST_NAME: "lastName";
+
+  /** The field name representing the news letter service */
+  static NEWSLETTER: "newsLetter";
+
+  /** The field name representing the notifications service */
+  static NOTIFICATIONS: "notifications";
+
+  /** The field name representing the email of the user */
+  static USER: "user";
+
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {String} maybePayLoad.user - Email of the user to be validated.
+   * @param {String} [maybePayLoad.firstName]  - First name of the user.
+   * @param {String} [maybePayLoad.lastName] - Last name of the user.
+   * @param {Boolean} [maybePayLoad.newsLetter=false] - Should the user receive a newsletter.
+   * @param {NotificationEnum} [maybePayLoad.notifications=0] Enum Value to specify Notification Settings
+   *
+   * @returns {Promise<ServerResponse<{payload:string}>>}
+   */
+  supplyAsync: (maybePayload: {
+    user: string;
+    firstName?: string;
+    lastName?: string;
+    newsLetter?: boolean;
+    notifications?: number;
+  }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -33,21 +66,11 @@ export default class Authorize extends XQModule {
     this.serviceName = "authorize";
     this.requiredFields = [Authorize.USER];
 
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {String} maybePayLoad.user - Email of the user to be validated.
-     * @param {String} [maybePayLoad.firstName]  - First name of the user.
-     * @param {String} [maybePayLoad.lastName] - Last name of the user.
-     * @param {Boolean} [maybePayLoad.newsLetter=false] - Should the user receive a newsletter.
-     * @param {NotificationEnum} [maybePayLoad.notifications=0] Enum Value to specify Notification Settings
-     *
-     * @returns {Promise<ServerResponse<{payload:string}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
-        let self = this;
+        const self = this;
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
-        let user = maybePayLoad[Authorize.USER];
+        const user = maybePayLoad[Authorize.USER];
 
         return this.sdk
           .call(
@@ -72,7 +95,7 @@ export default class Authorize extends XQModule {
             }
           });
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -85,16 +108,3 @@ export default class Authorize extends XQModule {
     };
   }
 }
-
-/** The email of the user*/
-Authorize.USER = "user";
-/** if 'pin' is sent the validation email will only have the code and no confirmation button */
-Authorize.CODE_TYPE = "codetype";
-/** The first name of the user */
-Authorize.FIRST_NAME = "firstName";
-/** The last name of the user*/
-Authorize.LAST_NAME = "lastName";
-/** The name of this service */
-Authorize.NEWS_LETTER = "newsLetter";
-/** The name of this service*/
-Authorize.NOTIFICATIONS = "notifications";

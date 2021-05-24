@@ -1,26 +1,54 @@
-import XQModule from "../XQModule";
 import CallMethod from "../../CallMethod";
 import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
+import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
 
 /**
- *
- *  Create a new Contact
+ * A service which is utilized to create a new Contact for the dashboard
  *
  * @class [AddContact]
  */
 export default class AddContact extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
-  static EMAIL: string;
-  static FIRST_NAME: string;
-  static ID: string;
-  static LAST_NAME: string;
-  static NOTIFICATIONS: string;
-  static ROLE: string;
-  static TITLE: string;
-  supplyAsync: (maybePayLoad: Record<string, any>) => any;
+
+  /** The field name representing the new contact's email */
+  static EMAIL: "email";
+
+  /** The field name representing the new contact's first name */
+  static FIRST_NAME: "firstName";
+
+  /** The field name representing the new contact's ID */
+  static ID: "id";
+
+  /** The field name representing the new contact's last name */
+  static LAST_NAME: "lastName";
+
+  /** The field name representing the notifications preferences for the new contact */
+  static NOTIFICATIONS: "notifications";
+
+  /** The field name representing the new contact's role */
+  static ROLE: "role";
+
+  /** The field name representing the new contact's title */
+  static TITLE: "title";
+
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {String} email - the email of the new Contact
+   * @param {String} role - the role of the new Contact
+   * @param {String} notifications - the notifications preference of the current user for the new Contact
+   * @returns {Promise<ServerResponse<{payload:{id:int, status:string}}>>}
+   */
+  supplyAsync: (maybePayLoad: {
+    email: string;
+    role: string;
+    notifications: boolean;
+  }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -31,19 +59,15 @@ export default class AddContact extends XQModule {
       AddContact.NOTIFICATIONS,
     ];
 
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @returns {Promise<ServerResponse<{payload:{id:int, status:string}}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
-        let dashboardAccessToken = this.sdk.validateAccessToken(
+        const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + dashboardAccessToken,
         };
 
@@ -57,7 +81,7 @@ export default class AddContact extends XQModule {
           Destination.DASHBOARD
         );
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -70,11 +94,3 @@ export default class AddContact extends XQModule {
     };
   }
 }
-
-AddContact.ID = "id";
-AddContact.EMAIL = "email";
-AddContact.ROLE = "role";
-AddContact.NOTIFICATIONS = "notifications";
-AddContact.LAST_NAME = "lastName";
-AddContact.FIRST_NAME = "firstName";
-AddContact.TITLE = "title";

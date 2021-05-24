@@ -1,12 +1,16 @@
 import AES from "crypto-js/aes";
-import EncryptionAlgorithm, {
-  DecryptText,
-  EncryptText,
-} from "./EncryptionAlgorithm";
+import EncryptionAlgorithm from "./EncryptionAlgorithm";
 import ServerResponse from "../ServerResponse";
 import XQSDK from "../XQSDK";
 import encodeUTF8 from "crypto-js/enc-utf8";
 
+/**
+ * A class for the [Advanced Encryption Standard (AES)](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard#Definitive_standards).
+ *
+ * The algorithm described by AES is a symmetric-key algorithm, meaning the same key is used for both encrypting and decrypting the data.
+ *
+ * @class [AESEncryption]
+ */
 export default class AESEncryption extends EncryptionAlgorithm {
   /**
    * Takes an encrypted AES text string and attempts to decrypt with the provided key.
@@ -14,7 +18,7 @@ export default class AESEncryption extends EncryptionAlgorithm {
    * @param  {String} key The encryption key.
    * @return {Promise<ServerResponse<{payload:{decryptedText:string}}>>} A Promise of the Response containing the decrypted text.
    */
-  decryptText: DecryptText;
+  decryptText: (text: string, key: string) => Promise<ServerResponse>;
 
   /**
    * Takes a string and AES encrypts it using the provided quantum key.
@@ -23,7 +27,7 @@ export default class AESEncryption extends EncryptionAlgorithm {
    * @param  {String} key The encryption key.
    * @return {Promise<ServerResponse>} The encrypted text.
    */
-  encryptText: EncryptText;
+  encryptText: (text: string, key: string) => Promise<ServerResponse>;
 
   prefix: string;
 
@@ -36,7 +40,7 @@ export default class AESEncryption extends EncryptionAlgorithm {
         const self = this;
         self.sdk.validateAccessToken();
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           try {
             if (key === "" || key == undefined) {
               console.error("AES Source Key cannot be empty.");
@@ -66,7 +70,7 @@ export default class AESEncryption extends EncryptionAlgorithm {
           }
         });
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -83,7 +87,7 @@ export default class AESEncryption extends EncryptionAlgorithm {
         const self = this;
         self.sdk.validateAccessToken();
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           try {
             if (key === "" || key == undefined) {
               console.error("AES Source Key cannot be empty.");
@@ -111,7 +115,7 @@ export default class AESEncryption extends EncryptionAlgorithm {
           }
         });
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,

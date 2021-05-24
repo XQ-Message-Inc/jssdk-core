@@ -1,19 +1,39 @@
 import EncryptionAlgorithm from "../algorithms/EncryptionAlgorithm";
 import FetchKey from "./FetchKey";
 import ServerResponse from "../ServerResponse";
-import XQModule, { SupplyAsync } from "./XQModule";
+import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
+ * A service which is utilized to decrypt encrypted textual data using the {@link EncryptionAlgorithm} provided.
+ *
  * @class [Decrypt]
  */
 export default class Decrypt extends XQModule {
-  accessToken: string;
-  algorithm: EncryptionAlgorithm;
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
-  static ENCRYPTED_TEXT: string;
-  static LOCATOR_KEY: string;
-  supplyAsync: SupplyAsync;
+
+  /** The token which represents the security credentials used to validate a user's identity */
+  accessToken: string;
+
+  /** The encryption algorithm used for this service */
+  algorithm: EncryptionAlgorithm;
+
+  /** The field name representing the encrypted text content */
+  static ENCRYPTED_TEXT: "encryptedText";
+
+  /** The field name representing the key used to fetch the encryption key from the server */
+  static LOCATOR_KEY: "locatorKey";
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {String} maybePayLoad.locatorKey - the key used to fetch the encryption key from the server
+   * @param {String} maybePayLoad.encryptedText  - the encrypted text to decrypt.
+   * @returns {Promise<ServerResponse<{payload:{decryptedText:string}}>>}
+   */
+  supplyAsync: (maybePayload: {
+    locatorKey: string;
+    encryptedText: string;
+  }) => Promise<ServerResponse | undefined>;
 
   constructor(sdk: XQSDK, algorithm: EncryptionAlgorithm) {
     super(sdk);
@@ -21,27 +41,21 @@ export default class Decrypt extends XQModule {
     this.algorithm = algorithm;
     this.requiredFields = [Decrypt.LOCATOR_KEY, Decrypt.ENCRYPTED_TEXT];
 
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {String} maybePayLoad.locatorToken - The locator token needed to fetch the encryption key from the server
-     * @param {String} maybePayLoad.encryptedText  - The text to decrypt.
-     * @returns {Promise<ServerResponse<{payload:{decryptedText:string}}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
-        const accessToken = this.accessToken;
+        // const accessToken = this.accessToken;
         const algorithm = this.algorithm;
-        let locatorKey = maybePayLoad[Decrypt.LOCATOR_KEY];
-        let encryptedText = maybePayLoad[Decrypt.ENCRYPTED_TEXT];
+        const locatorKey = maybePayLoad[Decrypt.LOCATOR_KEY];
+        const encryptedText = maybePayLoad[Decrypt.ENCRYPTED_TEXT];
 
         return new FetchKey(this.sdk)
           .supplyAsync({ [FetchKey.LOCATOR_KEY]: locatorKey })
           .then((keyRetrievalResponse: ServerResponse) => {
             switch (keyRetrievalResponse.status) {
               case ServerResponse.OK: {
-                let encryptionKey = keyRetrievalResponse.payload;
+                const encryptionKey = keyRetrievalResponse.payload;
                 return algorithm
                   .decryptText(encryptedText, encryptionKey)
                   .then((decryptResponse: ServerResponse) => {
@@ -65,7 +79,7 @@ export default class Decrypt extends XQModule {
             }
           });
       } catch (validationException) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -78,7 +92,3 @@ export default class Decrypt extends XQModule {
     };
   }
 }
-
-//**key to fetch the encryption key from the server*/
-Decrypt.LOCATOR_KEY = "locatorKey";
-Decrypt.ENCRYPTED_TEXT = "encryptedText";

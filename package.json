@@ -1,6 +1,6 @@
 {
   "name": "@xqmsg/jssdk-core",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A Javascript Implementation of XQ Message SDK, V.2",
   "main": "dist/index.js",
   "directories": {
@@ -17,13 +17,25 @@
     "check-types": "tsc --noEmit",
     "build": "parcel build ./src/index.ts",
     "test": "jest",
-    "lint": "eslint src/**/*.js"
+    "lint": "eslint src/**  --ext .ts"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xqmsg/jssdk-core.git"
   },
-  "keywords": ["security", "zero trust", "plug and play", "encryption", "AES", "XOR", "privacy", "quantum", "protection", "cyber", "cybersecurity"],
+  "keywords": [
+    "security",
+    "zero trust",
+    "plug and play",
+    "encryption",
+    "AES",
+    "XOR",
+    "privacy",
+    "quantum",
+    "protection",
+    "cyber",
+    "cybersecurity"
+  ],
   "author": "XQ Message",
   "license": "ISC",
   "bugs": {
@@ -39,7 +51,10 @@
     "@parcel/transformer-typescript-types": "2.0.0-beta.2",
     "@types/crypto-js": "^4.0.1",
     "@types/node": "^15.6.0",
-    "eslint": "^7.26.0",
+    "@typescript-eslint/eslint-plugin": "4.24.0",
+    "@typescript-eslint/parser": "4.24.0",
+    "eslint": "7.27.0",
+    "eslint-config-airbnb": "18.2.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "jest": "^26.6.3",

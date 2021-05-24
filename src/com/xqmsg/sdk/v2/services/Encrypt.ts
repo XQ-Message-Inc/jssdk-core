@@ -5,22 +5,52 @@ import ServerResponse from "../ServerResponse";
 import ValidatePacket from "./ValidatePacket";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
+
 /**
- *
- * Encrypts textual data using the {@link EncryptionAlgorithm} provided.
+ * A service which is utilized to encrypt textual data using the {@link EncryptionAlgorithm} provided.
  *
  * @class [Encrypt]
  */
 export default class Encrypt extends XQModule {
+  /** The encryption algorithm used for this service */
   algorithm: EncryptionAlgorithm;
+
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
-  static DELETE_ON_RECEIPT: string;
-  static ENCRYPTED_TEXT: string;
-  static EXPIRES_HOURS: string;
-  static LOCATOR_KEY: string;
-  static RECIPIENTS: string;
-  static TEXT: string;
-  supplyAsync: (maybePayLoad: Record<string, any>) => Promise<any>;
+
+  /** The field name representing the boolean value which specifies if the content should be deleted after opening */
+  static DELETE_ON_RECEIPT: "dor";
+
+  /** The field name representing the encrypted text */
+  static ENCRYPTED_TEXT: "encryptedText";
+
+  /** The field name representing the number of hours of life span until access to the encrypted text is expired */
+  static EXPIRES_HOURS: "expires";
+
+  /** The field name representing the key used to fetch the encryption key from the server */
+  static LOCATOR_KEY: "locatorKey";
+
+  /** The field name representing the list of emails of users intended to have read access to the encrypted content */
+  static RECIPIENTS: "recipients";
+
+  /** The field name representing the text that will be encrypted */
+  static TEXT: "text";
+
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {[String]} maybePayLoad.recipients  - the list of emails of users intended to have read access to the encrypted content
+   * @param {String} maybePayLoad.text - the text that will be encrypted
+   * @param {Long} maybePayLoad.expires - the number of hours of life span until access to the encrypted text is expired
+   * @param {Boolean} [maybePayLoad.dor=false] - the boolean value which specifies if the content should be deleted after opening
+   *
+   * @returns {Promise<ServerResponse<{payload:{locatorKey:string, encryptedText:string}}>>}
+   */
+  supplyAsync: (maybePayLoad: {
+    recipients: string[];
+    text: string;
+    expires: number;
+    dor: boolean;
+  }) => Promise<ServerResponse | undefined>;
 
   constructor(sdk: XQSDK, algorithm: EncryptionAlgorithm) {
     super(sdk);
@@ -32,15 +62,6 @@ export default class Encrypt extends XQModule {
       Encrypt.EXPIRES_HOURS,
     ];
 
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {[String]} maybePayLoad.recipients  - List of emails of users intended to have read access to the encrypted content.
-     * @param {String} maybePayLoad.text - Text to be encrypted.
-     * @param {Long} maybePayLoad.expires - Life span of the encrypted content, measured in hours.
-     * @param {Boolean} [maybePayLoad.dor=false] - Should the content be deleted after opening.
-     *
-     * @returns {Promise<ServerResponse<{payload:{locatorKey:string, encryptedText:string}}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
@@ -57,8 +78,9 @@ export default class Encrypt extends XQModule {
           .then((keyResponse: ServerResponse) => {
             switch (keyResponse.status) {
               case ServerResponse.OK: {
-                let initialKey = keyResponse.payload as string;
-                let expandedKey = algorithm.expandKey(
+                const initialKey = keyResponse.payload.data;
+
+                const expandedKey = algorithm.expandKey(
                   initialKey,
                   message.length > 4096 ? 4096 : Math.max(2048, message.length)
                 ) as string;
@@ -68,10 +90,10 @@ export default class Encrypt extends XQModule {
                   .then((encryptResponse: ServerResponse) => {
                     switch (encryptResponse.status) {
                       case ServerResponse.OK: {
-                        let encryptResult = encryptResponse.payload;
-                        let encryptedText =
+                        const encryptResult = encryptResponse.payload;
+                        const encryptedText =
                           encryptResult[EncryptionAlgorithm.ENCRYPTED_TEXT];
-                        let expandedKey =
+                        const expandedKey =
                           encryptResult[EncryptionAlgorithm.KEY];
 
                         return new GeneratePacket(sdk)
@@ -87,7 +109,7 @@ export default class Encrypt extends XQModule {
                           .then((uploadResponse: ServerResponse) => {
                             switch (uploadResponse.status) {
                               case ServerResponse.OK: {
-                                let packet = uploadResponse.payload;
+                                const packet = uploadResponse.payload;
                                 return new ValidatePacket(sdk)
                                   .supplyAsync({
                                     [ValidatePacket.PACKET]: packet,
@@ -98,7 +120,7 @@ export default class Encrypt extends XQModule {
                                     ) => {
                                       switch (packetValidationResponse.status) {
                                         case ServerResponse.OK: {
-                                          let locator =
+                                          const locator =
                                             packetValidationResponse.payload;
                                           return new ServerResponse(
                                             ServerResponse.OK,
@@ -160,17 +182,3 @@ export default class Encrypt extends XQModule {
     };
   }
 }
-
-/** List of emails of users intended to have read access to the encrypted content*/
-Encrypt.RECIPIENTS = "recipients";
-/** Should the content be deleted after opening*/
-Encrypt.DELETE_ON_RECEIPT = "dor";
-/** Life span of the encrypted content*/
-Encrypt.EXPIRES_HOURS = "expires";
-/** Text to be encrypted.*/
-Encrypt.TEXT = "text";
-
-/** Token by which to fetch the encryption key from the serve*/
-Encrypt.LOCATOR_KEY = "locatorKey";
-/** Encrypted Text*/
-Encrypt.ENCRYPTED_TEXT = "encryptedText";

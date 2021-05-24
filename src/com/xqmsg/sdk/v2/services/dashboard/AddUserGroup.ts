@@ -1,22 +1,30 @@
-import XQModule from "../XQModule";
 import CallMethod from "../../CallMethod";
 import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
+import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
 
 /**
- *
- *  Create a grouping of dashboard users
+ * A service which is utilized create a grouping of dashboard users
  *
  * @class [AddUserGroup]
  */
 export default class AddUserGroup extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
-  static ID: string;
-  static MEMBERS: string;
-  static NAME: string;
-  supplyAsync: (maybePayLoad: Record<string, any>) => ServerResponse;
+
+  /** The field name representing the new group's ID */
+  static ID: "id";
+
+  /** The field name representing the new group's members */
+  static MEMBERS: "members";
+
+  /** The field name representing the new group's name */
+  static NAME: "name";
+  supplyAsync: (maybePayLoad: { name: string }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -25,17 +33,18 @@ export default class AddUserGroup extends XQModule {
 
     /**
      * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+     * @param {String} name - the name of the new group
      * @returns {Promise<ServerResponse<{payload:{id:int, status:string}}>>}
      */
     this.supplyAsync = (maybePayLoad) => {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
-        let dashboardAccessToken = this.sdk.validateAccessToken(
+        const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + dashboardAccessToken,
         };
 
@@ -49,7 +58,7 @@ export default class AddUserGroup extends XQModule {
           Destination.DASHBOARD
         );
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -62,7 +71,3 @@ export default class AddUserGroup extends XQModule {
     };
   }
 }
-
-AddUserGroup.ID = "id";
-AddUserGroup.NAME = "name";
-AddUserGroup.MEMBERS = "members";

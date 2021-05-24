@@ -1,20 +1,32 @@
 import CallMethod from "../CallMethod";
 import ExchangeForAccessToken from "./ExchangeForAccessToken";
 import ServerResponse from "../ServerResponse";
-import XQModule, { SupplyAsync } from "./XQModule";
+import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * Authenticate the PIN which resulted from the preceding {@link Authorize} service call.<br>
- * If successful this service returns a server response containing the access token.
+ * A service which is utilized to authenticate the two-factor PIN which resulted from the preceding {@link Authorize} service call.
+ * If successful this service returns a `ServerResponse` containing the access token.
  *
  * @class [CodeValidator]
  */
 export default class CodeValidator extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
-  static PIN: string;
-  supplyAsync: SupplyAsync;
+
+  /** The field name representing the two-factor pin used to validate the `Authorize` service request */
+  static PIN: "pin";
+
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {String} maybePayLoad.pin - the two-factor pin used to validate the `Authorize` service request
+   *
+   * @returns {Promise<ServerResponse<{payload:String}>>} a `ServerResponse` containing the access token
+   */
+  supplyAsync: (maybePayload: { pin: string }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -22,19 +34,13 @@ export default class CodeValidator extends XQModule {
     this.serviceName = "codevalidation";
     this.requiredFields = [CodeValidator.PIN];
 
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {String} maybePayLoad.pin - Pin to validate the access request
-     *
-     * @returns {Promise<ServerResponse<{payload:String}>>}  the server response containing the access token
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
-        let self = this;
+        const self = this;
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
-        let preAuthToken = this.sdk.validatePreAuthToken();
+        const preAuthToken = this.sdk.validatePreAuthToken();
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + preAuthToken,
         };
 
@@ -50,7 +56,7 @@ export default class CodeValidator extends XQModule {
           .then((validationResponse: ServerResponse) => {
             switch (validationResponse.status) {
               case ServerResponse.OK: {
-                return new ExchangeForAccessToken(self.sdk).supplyAsync({});
+                return new ExchangeForAccessToken(self.sdk).supplyAsync(null);
               }
               case ServerResponse.ERROR: {
                 console.info(validationResponse);
@@ -59,7 +65,7 @@ export default class CodeValidator extends XQModule {
             }
           });
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -72,6 +78,3 @@ export default class CodeValidator extends XQModule {
     };
   }
 }
-
-/**Pin to validate the access request*/
-CodeValidator.PIN = "pin";

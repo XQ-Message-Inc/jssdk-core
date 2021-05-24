@@ -4,9 +4,8 @@
  * @class [Destination]
  */
 export default class Destination {
-  static XQ: string;
-  static DASHBOARD: string;
+  /** A value representing the destination server for XQ general API calls */
+  static XQ: "XQ";
+  /** A value representing the destination server for Dashboard API calls */
+  static DASHBOARD: "DASHBOARD";
 }
-
-Destination.XQ = "XQ";
-Destination.DASHBOARD = "DASHBOARD";

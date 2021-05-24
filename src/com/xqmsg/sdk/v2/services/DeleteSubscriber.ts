@@ -4,29 +4,31 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * Deletes the user specified by the access token.
+ * A service which is utilized to delete the user specified by the access token.
  * After an account is deleted, the subscriber will be sent an email notifying them of its deletion.
  *
  * @class [DeleteSubscriber]
  */
 export default class DeleteSubscriber extends XQModule {
+  /** Specified name of the service */
   serviceName: string;
-  supplyAsync: (maybePayLoad: any) => any;
+
+  /**
+   *
+   * @param {{}} [maybePayLoad=null]
+   * @returns {Promise<ServerResponse<{}>>}
+   */
+  supplyAsync: (maybePayLoad: null) => Promise<ServerResponse>;
   constructor(sdk: XQSDK) {
     super(sdk);
 
     this.serviceName = "subscriber";
 
-    /**
-     *
-     * @param {{}} [maybePayLoad=null]
-     * @returns {Promise<ServerResponse<{}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
-        let accessToken = this.sdk.validateAccessToken();
+        const accessToken = this.sdk.validateAccessToken();
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };
         return this.sdk.call(
@@ -38,7 +40,7 @@ export default class DeleteSubscriber extends XQModule {
           true
         );
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
