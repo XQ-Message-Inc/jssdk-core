@@ -4,6 +4,8 @@ import XQModule, { SupplyAsync } from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
+ * Uploads an expanded version of encryption, as well a metadata, such as for example
+ * recipients or key expiration time, on the server
  * @class [GeneratePacket]
  */
 
