@@ -2,37 +2,41 @@ import CallMethod from "../../CallMethod";
 import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQSDK from "../../XQSDK";
-import XQModule, { SupplyAsync } from "../XQModule";
+import XQModule from "../XQModule";
 
 /**
- *
- * Retrieves a listing of dashboard applications associated with the user
+ * A service which is utilized to retrieve a listing of dashboard applications associated with the user
  *
  * @class [GetApplications]
  */
 export default class GetApplications extends XQModule {
-  serviceName: string;
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
-  supplyAsync: SupplyAsync;
-  static APPS: string;
+
+  /** Specified name of the service */
+  serviceName: string;
+
+  /** The field name representing the list of apps returned by the `GetApplications` service */
+  static APPS: "apps";
+
+  /**
+   * @param {{}} [maybePayLoad=null]
+   * @returns {Promise<ServerResponse<{payload:{apps:[{id:int, name:string, description:string}]}}>>}
+   */
+  supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
     this.serviceName = "devapps";
     this.requiredFields = [];
 
-    /**
-     * @param {{}} [maybePayLoad=null]
-     * @returns {Promise<ServerResponse<{payload:{apps:[{id:int, name:string, description:string}]}}>>}
-
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
-        let dashboardAccessToken = this.sdk.validateAccessToken(
+        const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + dashboardAccessToken,
         };
 
@@ -46,7 +50,7 @@ export default class GetApplications extends XQModule {
           Destination.DASHBOARD
         );
       } catch (exception) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -59,5 +63,3 @@ export default class GetApplications extends XQModule {
     };
   }
 }
-
-GetApplications.APPS = "apps";

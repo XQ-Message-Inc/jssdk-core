@@ -1,41 +1,46 @@
-import XQModule from "../XQModule";
 import CallMethod from "../../CallMethod";
 import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
+import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
 
 /**
- * Log into Dashboard Application<br>
- * This requires you to previously have been authorized via <br>
- *   * {@link Authorize}
- *   * {@link ValidatePacket}
- *   * {@link ExchangeForAccessToken}
+ * A service utilized to log a user into Dashboard application
+ * This requires the user to previously have been authorized via
+ *   * `Authorize`
+ *   * `ValidatePacket`
+ *   * `ExchangeForAccessToken`
  *
  *   @class [DashboardLogin]
  */
 export default class DashboardLogin extends XQModule {
-  serviceName: string;
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
-  supplyAsync: (maybePayLoad: Record<string, any>) => ServerResponse;
-  static REQUEST: string;
+
+  /** Specified name of the service */
+  serviceName: string;
+
+  /** The field name representing the represent */
+  static REQUEST: "request";
+
+  /**
+   * @param {Map} [maybePayLoad=null] - Container for the request parameters supplied to this method.
+   * @returns {Promise<ServerResponse<{payload:String}>>}
+   */
+  supplyAsync: (maybePayLoad: null) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
     this.serviceName = "login/verify";
     this.requiredFields = [];
 
-    /**
-     * @param {Map} [maybePayLoad=null] - Container for the request parameters supplied to this method.
-     *
-     * @returns {Promise<ServerResponse<{payload:String}>>}
-     */
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = () => {
       try {
-        let self = this;
+        const self = this;
 
-        let xqAccessToken = this.sdk.validateAccessToken();
+        const xqAccessToken = this.sdk.validateAccessToken();
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + xqAccessToken,
         };
 
@@ -52,9 +57,9 @@ export default class DashboardLogin extends XQModule {
           .then((exchangeResponse: ServerResponse) => {
             switch (exchangeResponse.status) {
               case ServerResponse.OK: {
-                let dashboardAccessToken = exchangeResponse.payload;
+                const dashboardAccessToken = exchangeResponse.payload;
                 try {
-                  let activeProfile = self.cache.getActiveProfile(true);
+                  const activeProfile = self.cache.getActiveProfile(true);
                   self.cache.putDashboardAccess(
                     activeProfile,
                     dashboardAccessToken
@@ -80,5 +85,3 @@ export default class DashboardLogin extends XQModule {
     };
   }
 }
-
-DashboardLogin.REQUEST = "request";

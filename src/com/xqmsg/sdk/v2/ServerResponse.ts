@@ -1,32 +1,25 @@
-export interface ServerResponseProps {
-  status: string;
-  statusCode: number;
-  payload: any;
-}
-
-interface ServerResponse extends ServerResponseProps {}
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- *
- * @property {Answered} status - binary reply from server.
- * @property {Number} code - A numeric representation of the actual status returned from the server. To be used for more specific error handling.
- * @property {Map<String,Any>} payload - The data that is being returned form the server
- *
- *  @class [ServerResponse]
+ * @class [ServerResponse]
  */
-
 class ServerResponse {
+  /** A binary reply from server */
   status: string;
+
+  /** A numeric representation of the actual status returned from the server. To be used for more specific error handling. */
   statusCode: number;
+
+  /** The data that is being returned form the server */
   payload: any;
 
-  static OK: string;
-  static ERROR: string;
+  static OK: "OK";
+  static ERROR: "ERROR";
 
   /**
    * @param {Answered} status
    * @param {Number}  code
-   * @param {Map|Object} data
+   * @param {Map|Object|String} data
    */
   constructor(status: string, code: number, data: any) {
     this.status = status;
@@ -34,8 +27,5 @@ class ServerResponse {
     this.payload = data;
   }
 }
-
-ServerResponse.OK = "OK";
-ServerResponse.ERROR = "ERROR";
 
 export default ServerResponse;

@@ -1,21 +1,51 @@
 import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
-import XQModule, { SupplyAsync } from "./XQModule";
+import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
+ * A service which is utilized to generate an encrypted packet containing the encryption key that you want to
+ * protect along with a list of the identities that are allowed to access it and how long it is allowed to be used.
  * @class [GeneratePacket]
  */
 
 export default class GeneratePacket extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
+
+  /** Specified name of the service */
   serviceName: string;
-  static DELETE_ON_RECEIPT: string;
-  static EXPIRES_HOURS: string;
-  static KEY: string;
-  static RECIPIENTS: string;
-  static TYPE: string;
-  supplyAsync: SupplyAsync;
+
+  /** The field name representing the boolean value which specifies if the content should be deleted after opening */
+  static DELETE_ON_RECEIPT: "dor";
+
+  /** The field name representing the number of hours of life span until access to the encrypted text is expired */
+  static EXPIRES_HOURS: "expires";
+
+  /** The field name representing the encryption key */
+  static KEY: "key";
+
+  /** The field name representing the list of emails of users intended to have read access to the encrypted content */
+  static RECIPIENTS: "recipients";
+
+  /** The field name representing the type */
+  static TYPE: "type";
+
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {String} maybePayLoad.key - The secret key that the user wants to protect.
+   * @param {Long} maybePayLoad.expires - The number of hours that this key will remain valid for. After this time, it will no longer be accessible.
+   * @param {[String]} maybePayLoad.recipients  -  list of emails of those recipients who are allowed to access the key.
+   * @param {Boolean} [maybePayLoad.dor=false] - Should the content be deleted after opening.
+   *
+   * @returns {Promise<ServerResponse<{payload:string}>>}
+   */
+  supplyAsync: (maybePayload: {
+    key: string;
+    expires: number;
+    recipients: string[];
+    dor: boolean;
+  }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -26,37 +56,34 @@ export default class GeneratePacket extends XQModule {
       GeneratePacket.RECIPIENTS,
       GeneratePacket.EXPIRES_HOURS,
     ];
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {String} maybePayLoad.key - The secret key that the user wants to protect.
-     * @param {Long} maybePayLoad.expires - The number of hours that this key will remain valid for. After this time, it will no longer be accessible.
-     * @param {[String]} maybePayLoad.recipients  -  list of emails of those recipients who are allowed to access the key.
-     * @param {Boolean} [maybePayLoad.dor=false] - Should the content be deleted after opening.
-     *
-     * @returns {Promise<ServerResponse<{payload:string}>>}
-     */
+
     this.supplyAsync = (maybePayLoad) => {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
-        let accessToken = this.sdk.validateAccessToken();
+        const accessToken = this.sdk.validateAccessToken();
 
-        let additionalHeaderProperties = {
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };
 
-        maybePayLoad[GeneratePacket.RECIPIENTS] =
+        const flattenedRecipientList =
           maybePayLoad[GeneratePacket.RECIPIENTS].join(",");
+
+        const payload = {
+          ...maybePayLoad,
+          [GeneratePacket.RECIPIENTS]: flattenedRecipientList,
+        };
 
         return this.sdk.call(
           this.sdk.SUBSCRIPTION_SERVER_URL,
           this.serviceName,
           CallMethod.POST,
           additionalHeaderProperties,
-          maybePayLoad,
+          payload,
           true
         );
       } catch (validationException) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -69,9 +96,3 @@ export default class GeneratePacket extends XQModule {
     };
   }
 }
-
-GeneratePacket.KEY = "key";
-GeneratePacket.RECIPIENTS = "recipients";
-GeneratePacket.EXPIRES_HOURS = "expires";
-GeneratePacket.DELETE_ON_RECEIPT = "dor";
-GeneratePacket.TYPE = "type";

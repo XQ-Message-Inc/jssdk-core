@@ -1,46 +1,77 @@
 import ServerResponse from "../ServerResponse";
 import XQSDK from "../XQSDK";
 
-export type DecryptText = (
-  text: string,
-  key: string
-) => Promise<ServerResponse>;
-
-export type EncryptText = (
-  text: string,
-  key: string
-) => Promise<ServerResponse>;
-
-export type EncryptFile = (
-  sourceFile: File,
-  expandedKey: string | void,
-  locatorToken: string
-) => Promise<ServerResponse>;
-
-export type ExpandKey = (k: string, extendTo: number) => string | void;
-
 /**
- * @class
  * Super class for Encryption Algorithms supported by XQ Message:
  * * AESEncryption
  * * OTPv2Encryption
+ *
+ * @class [EncryptionAlgorithm]
  */
 export default class EncryptionAlgorithm {
-  encryptFile: EncryptFile;
-  encryptText: EncryptText;
-  expandKey: ExpandKey;
+  /**
+   * Takes an encrypted text string and attempts to decrypt with the provided key.
+   * @param  {String} text - the text to decrypt.
+   * @param  {String} key - the encryption key.
+   * @return {Promise<ServerResponse<{payload:{decryptedText:string}}>>} A Promise of the Response containing the decrypted text.
+   */
+  decryptText: (text: string, key: string) => Promise<ServerResponse>;
+
+  /**
+   * Takes an file and attempts to encrypt with the provided quantum key.
+   * @param  {File} sourceFile - the file to decrypt.
+   * @param  {String} key The encryption key.
+   * @return {Promise<ServerResponse<{payload:{decryptedText:string}}>>} A Promise of the Response containing the decrypted text.
+   */
+  encryptFile: (
+    sourceFile: File,
+    expandedKey: string | void,
+    locatorToken: string
+  ) => Promise<ServerResponse>;
+
+  /**
+   * Takes a string and encrypts it using the provided quantum key.
+   *
+   * @param  {String} text The text to encrypt.
+   * @param  {String} key The encryption key.
+   * @return {Promise<ServerResponse>} The encrypted text.
+   */
+  encryptText: (text: string, key: string) => Promise<ServerResponse>;
+
+  /**
+   * Expand a key length to that of the text that needs encryption.
+   * @param {String} k - the original key ( cannot be empty
+   * @param {Number} extendTo - the key length that we require
+   * @returns {String} Expanded Key
+   */
+  expandKey: (k: string, extendTo: number) => string | void;
+
+  /** The prefix prepended to an `expandedKey` string  */
   prefix: string;
+
+  /** The XQ SDK instance */
   sdk: XQSDK;
-  static DECRYPTED_TEXT: string;
-  static ENCRYPTED_TEXT: string;
-  static KEY: string;
-  decryptText: any;
+
+  /** A function which takes `s` of type `String` and shuffles the elements of the string
+   * @param {String} s - the string to be shuffled
+   * @returns {String} shuffled string
+   */
+  shuffle: (s: string) => string;
+
+  /** The field name representing the decrypted text value */
+  static DECRYPTED_TEXT: "decryptedText";
+
+  /** The field name representing the encrypted text value */
+  static ENCRYPTED_TEXT: "encrpytedText";
+
+  /** The field name representing the encryption key */
+  static KEY: "key";
 
   constructor(sdk: XQSDK) {
     this.sdk = sdk;
 
     this.expandKey = (k, extendTo) => {
-      let key = k.replace(/\n$/, "");
+      const key = k.replace(/\n$/, "");
       if (key.length > extendTo) {
         return this.shuffle(key.substring(0, extendTo));
       }
@@ -51,7 +82,7 @@ export default class EncryptionAlgorithm {
       return g;
     };
 
-    this.shuffle = (s) => {
+    this.shuffle = (s: string) => {
       const a = s.split("");
       const n = a.length;
       for (let i = n - 1; i > 0; i--) {
@@ -63,11 +94,4 @@ export default class EncryptionAlgorithm {
       return a.join("");
     };
   }
-  shuffle(arg0: any) {
-    throw new Error("Method not implemented.");
-  }
 }
-
-EncryptionAlgorithm.ENCRYPTED_TEXT = "encrpytedText";
-EncryptionAlgorithm.DECRYPTED_TEXT = "decryptedText";
-EncryptionAlgorithm.KEY = "key";

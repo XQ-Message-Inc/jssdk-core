@@ -1,11 +1,5 @@
-import ServerResponse from "../ServerResponse";
-import StatusException from "../exceptions/StatusException";
-import ValidationException from "../exceptions/ValidationException";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import XQSDK from "../XQSDK";
-
-export type SupplyAsync = (
-  maybePayLoad: Record<string, any>
-) => Promise<ServerResponse>;
 
 /**
  * @class [XQModule]
@@ -22,7 +16,7 @@ export default class XQModule {
 
     this.assert = (condition, message) => {
       if (!condition) {
-        let msg = message || "Assertion failed";
+        const msg = message || "Assertion failed";
         console.info(msg);
         throw msg;
       }

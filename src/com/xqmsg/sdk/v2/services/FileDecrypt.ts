@@ -5,22 +5,33 @@ import XQSDK from "../XQSDK";
 
 type EncryptionAlgorithm = {
   decryptFile: (
-    sourceFile: string,
-    locate: (aLocatorToken: string) => Promise<Record<string, any>>
+    sourceFile: File,
+    locateFn: (aLocatorToken: string) => Promise<Record<string, string>>
   ) => void;
 };
 
 /**
- *
- * Decrypts data stored in a file using the {@link EncryptionAlgorithm} provided.
+ * A service which is utilized to decrypt data stored in a file using the {@link EncryptionAlgorithm} provided.
  *
  * @class [FileDecrypt]
  */
 export default class FileDecrypt extends XQModule {
+  /** The encryption algorithm used for this service */
   algorithm: EncryptionAlgorithm;
+
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
-  static SOURCE_FILE: string;
-  supplyAsync: (maybePayload: Record<string, any>) => void;
+
+  /** The field name representing the specified source file to decrypt */
+  static SOURCE_FILE: "sourceFile";
+
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {File} maybePayLoad.sourceFile - The file to be decrypted.
+   *
+   *  @returns {Promise<ServerResponse<{payload:File}>>}
+   */
+  supplyAsync: (maybePayload: { sourceFile: File }) => void;
 
   constructor(sdk: XQSDK, algorithm: EncryptionAlgorithm) {
     super(sdk);
@@ -28,17 +39,11 @@ export default class FileDecrypt extends XQModule {
     this.algorithm = algorithm;
     this.requiredFields = [FileDecrypt.SOURCE_FILE];
 
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {File} maybePayLoad.sourceFile - The file to be decrypted.
-     *
-     *  @returns {Promise<ServerResponse<{payload:File}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
       } catch (validationException) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -72,5 +77,3 @@ export default class FileDecrypt extends XQModule {
     };
   }
 }
-
-FileDecrypt.SOURCE_FILE = "sourceFile";

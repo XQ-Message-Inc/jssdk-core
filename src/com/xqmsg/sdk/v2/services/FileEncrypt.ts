@@ -1,30 +1,64 @@
-import XQModule from "./XQModule";
-import ServerResponse from "../ServerResponse";
+import EncryptionAlgorithm from "../algorithms/EncryptionAlgorithm";
 import FetchQuantumEntropy from "../quantum/FetchQuantumEntropy";
 import GeneratePacket from "./GeneratePacket";
+import ServerResponse from "../ServerResponse";
 import ValidatePacket from "./ValidatePacket";
+import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-import AESEncryption from "../algorithms/AESEncryption";
-import OTPv2Encryption from "../algorithms/OTPv2Encryption";
 
-type Blank = AESEncryption | OTPv2Encryption;
 /**
- *
- * Encrypts data stored in a file using the {@link EncryptionAlgorithm} provided.
+ * A service which is utilized to encrypt data stored in a file using the {@link EncryptionAlgorithm} provided.
  *
  * @class [FileEncrypt]
  */
 export default class FileEncrypt extends XQModule {
-  algorithm: Blank;
-  requiredFields: string[];
-  static DELETE_ON_RECEIPT: any;
-  static EXPIRES_HOURS: any;
-  static KEY: any;
-  static RECIPIENTS: any;
-  static SOURCE_FILE: any;
-  supplyAsync: (maybePayLoad: any) => void | Promise<unknown>;
+  /** The encryption algorithm used for this service */
+  algorithm: EncryptionAlgorithm;
 
-  constructor(sdk: XQSDK, algorithm: Blank) {
+  /** The required fields of the payload needed to utilize the service */
+  requiredFields: string[];
+
+  /** The field name representing the boolean value which specifies if the content should be deleted after opening */
+  static DELETE_ON_RECEIPT: "dor";
+
+  /** The field name representing the encrypted text */
+  static ENCRYPTED_TEXT: "encryptedText";
+
+  /** The field name representing the number of hours of life span until access to the encrypted text is expired */
+  static EXPIRES_HOURS: "expires";
+
+  /** The field name representing the encryption key */
+  static KEY: "key";
+
+  /** The field name representing the key used to fetch the encryption key from the server */
+  static LOCATOR_KEY: "locatorKey";
+
+  /** The field name representing the list of emails of users intended to have read access to the encrypted content */
+  static RECIPIENTS: "recipients";
+
+  /** The field name representing the specified source file to encrypt */
+  static SOURCE_FILE: "sourceFile";
+
+  /** The field name representing the text that will be encrypted */
+  static TEXT: "text";
+
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {File} maybePayLoad.sourceFile - The file to be encrypted.
+   * @param {[String]} maybePayLoad.recipients  - List of emails of users intended to have read access to the encrypted content.
+   * @param {Long} maybePayLoad.expires - Life span of the encrypted content, measured in hours.
+   * @param {Boolean} [maybePayLoad.dor=false] - Should the content be deleted after opening.
+   *
+   * @returns {Promise<ServerResponse<{payload:File}>>}
+   */
+  supplyAsync: (maybePayLoad: {
+    sourceFile: File;
+    recipients: string[];
+    expires: number;
+    dor: boolean;
+  }) => void | Promise<unknown>;
+
+  constructor(sdk: XQSDK, algorithm: EncryptionAlgorithm) {
     super(sdk);
 
     this.algorithm = algorithm;
@@ -33,15 +67,7 @@ export default class FileEncrypt extends XQModule {
       FileEncrypt.RECIPIENTS,
       FileEncrypt.EXPIRES_HOURS,
     ];
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {File} maybePayLoad.sourceFile - The file to be encrypted.
-     * @param {[String]} maybePayLoad.recipients  - List of emails of users intended to have read access to the encrypted content.
-     * @param {Long} maybePayLoad.expires - Life span of the encrypted content, measured in hours.
-     * @param {Boolean} [maybePayLoad.dor=false] - Should the content be deleted after opening.
-     *
-     * @returns {Promise<ServerResponse<{payload:File}>>}
-     */
+
     this.supplyAsync = (maybePayLoad) => {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
@@ -59,7 +85,7 @@ export default class FileEncrypt extends XQModule {
             switch (keyResponse.status) {
               case ServerResponse.OK: {
                 const initialKey = keyResponse.payload;
-                let expandedKey = algorithm.expandKey(
+                const expandedKey = algorithm.expandKey(
                   initialKey,
                   sourceFile.size > 4096
                     ? 4096
@@ -147,14 +173,3 @@ export default class FileEncrypt extends XQModule {
     };
   }
 }
-
-/** Encryption Key.*/
-FileEncrypt.KEY = "key";
-/** The File to be encrypted.*/
-FileEncrypt.SOURCE_FILE = "sourceFile";
-/** List of emails of users intended to have read access to the encrypted content*/
-FileEncrypt.RECIPIENTS = "recipients";
-/** Should the content be deleted after opening*/
-FileEncrypt.DELETE_ON_RECEIPT = "dor";
-/** Life span of the encrypted content*/
-FileEncrypt.EXPIRES_HOURS = "expires";

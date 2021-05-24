@@ -4,20 +4,35 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
+ * A service which is used to fetch an encryption key using a valid locator key.
+ *
  * The key will only be returned if the following hold true:
- * The access token of the requesting user is valid and unexpired.
- * The expiration time specified for the key has not elapsed.
- * The person requesting the key was listed as a valid recipient by the sender.
- * The key is either not geofenced, or is being accessed from an authorized location.
+ * * The access token of the requesting user is valid and unexpired.
+ * * The expiration time specified for the key has not elapsed.
+ * * The user requesting the key was listed as a valid recipient by the sender.
+ * * The key is either not geofenced, or is being accessed from an authorized location.
  * If any of these is not true, an error will be returned instead.
  *
  * @class [FetchKey]
  */
 export default class FetchKey extends XQModule {
-  serviceName: string;
+  /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
-  static LOCATOR_KEY: string;
-  supplyAsync: (maybePayLoad: Record<string, string>) => Promise<any>;
+
+  /** Specified name of the service */
+  serviceName: string;
+
+  /** The field name representing the key used to fetch the encryption key from the server */
+  static LOCATOR_KEY: "locatorKey";
+
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {String} maybePayLoad.locatorKey - the key used to fetch the encryption key from the server
+   * @returns {Promise<ServerResponse<{payload:string}>>}
+   */
+  supplyAsync: (maybePayLoad: {
+    locatorKey: string;
+  }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -26,19 +41,13 @@ export default class FetchKey extends XQModule {
     this.serviceName = "key";
     this.requiredFields = [FetchKey.LOCATOR_KEY];
 
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {String} maybePayLoad.locatorToken - The  locator token,  used as a URL to discover the key on  the server
-     *                The URL encoding part is handled internally in the service itself
-     * @returns {Promise<ServerResponse<{payload:string}>>}
-     */
     this.supplyAsync = (maybePayLoad) => {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
-        let accessToken = this.sdk.validateAccessToken();
+        const accessToken = this.sdk.validateAccessToken();
 
-        let locatorKey = maybePayLoad[FetchKey.LOCATOR_KEY];
-        let additionalHeaderProperties = {
+        const locatorKey = maybePayLoad[FetchKey.LOCATOR_KEY];
+        const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };
 
@@ -52,7 +61,7 @@ export default class FetchKey extends XQModule {
             true
           )
           .then((serverResponse: ServerResponse) => {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
               switch (serverResponse.status) {
                 case ServerResponse.OK: {
                   let key = serverResponse.payload;
@@ -72,7 +81,7 @@ export default class FetchKey extends XQModule {
             });
           });
       } catch (validationException) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           resolve(
             new ServerResponse(
               ServerResponse.ERROR,
@@ -85,5 +94,3 @@ export default class FetchKey extends XQModule {
     };
   }
 }
-
-FetchKey.LOCATOR_KEY = "locatorKey";
