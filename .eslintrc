@@ -10,12 +10,11 @@
       "es6": true,
       "jest": true,
       "jquery": true,
-      "node": true,
+      "node": true
     },
     "rules": {
       "prettier/prettier": "warn",
       "no-unused-vars": 0
-    },
-    "ignorePatterns": ["**/Commons.js"]
-  }
+    }
+}
   
