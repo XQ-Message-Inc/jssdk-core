@@ -4,8 +4,8 @@ import XQModule, { SupplyAsync } from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * Uploads an expanded version of the encryption key as well a metadata such as, for example
- * recipients or key expiration time, on the server
+ * Uploads an expanded version of the encryption key as well a metadata about it to the subscription server and returns a packet<br>
+ * Examples of metadata are: recipients or key expiration time
  * @class [GeneratePacket]
  */
 
@@ -35,7 +35,7 @@ export default class GeneratePacket extends XQModule {
      * @param {[String]} maybePayLoad.recipients  -  list of emails of those recipients who are allowed to access the key.
      * @param {Boolean} [maybePayLoad.dor=false] - Should the content be deleted after opening.
      *
-     * @returns {Promise<ServerResponse<{payload:string}>>}
+     * @returns {Promise<ServerResponse<{payload:string}>>} the server response containing the packet
      */
     this.supplyAsync = (maybePayLoad) => {
       try {
