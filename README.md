@@ -8,7 +8,7 @@ XQ Message is an encryption-as-a-service (EaaS) platform which gives you the too
 
 ##### XQ Message JS SDK sample application
 
-If you would like to see the JS SDK in action, please navigate to the [jssdk-example repo](https://github.com/xqmsg/jssdk-example). The project is intended to give the user a high-level overview of the encryption and decryption flow, as well as some sample implementations of core components
+If you would like to see the JS SDK in action, please navigate to the [JSSDK examples repository](https://github.com/xqmsg/jssdk-examples). The project is intended to give the user a high-level overview of the encryption and decryption flow, as well as some sample implementations of core components
 
 ## Table of contents
 
