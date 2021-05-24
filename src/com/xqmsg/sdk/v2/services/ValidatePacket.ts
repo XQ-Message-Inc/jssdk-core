@@ -4,8 +4,8 @@ import XQModule, { SupplyAsync } from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- *  Validates your {@link Authorize} call.<br>
- *  Returns 204, "No Content" if successful.
+ *  Validates your {@link GeneratePacket} call.<br>
+ *  Returns the key locator token.
  *  @class [ValidatePacket]
  */
 export default class ValidatePacket extends XQModule {
@@ -23,7 +23,7 @@ export default class ValidatePacket extends XQModule {
     /**
      *
      * @param {{}} maybePayLoad:
-     * @returns {Promise<ServerResponse<{}>>}
+     * @returns {Promise<ServerResponse<{payload:String}>>} the server response containing the key locator token
      */
     this.supplyAsync = (maybePayLoad) => {
       try {
