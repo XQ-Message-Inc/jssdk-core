@@ -5,9 +5,9 @@ import ServerResponse from "../ServerResponse";
 import ValidatePacket from "./ValidatePacket";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
+
 /**
- *
- * A service which encrypts textual data using the {@link EncryptionAlgorithm} provided.
+ * A service which is utilized to encrypt textual data using the {@link EncryptionAlgorithm} provided.
  *
  * @class [Encrypt]
  */
@@ -78,7 +78,8 @@ export default class Encrypt extends XQModule {
           .then((keyResponse: ServerResponse) => {
             switch (keyResponse.status) {
               case ServerResponse.OK: {
-                const initialKey = keyResponse.payload as string;
+                const initialKey = keyResponse.payload.data;
+
                 const expandedKey = algorithm.expandKey(
                   initialKey,
                   message.length > 4096 ? 4096 : Math.max(2048, message.length)
@@ -181,17 +182,3 @@ export default class Encrypt extends XQModule {
     };
   }
 }
-
-/** List of emails of users intended to have read access to the encrypted content*/
-Encrypt.RECIPIENTS = "recipients";
-/** Should the content be deleted after opening*/
-Encrypt.DELETE_ON_RECEIPT = "dor";
-/** Life span of the encrypted content*/
-Encrypt.EXPIRES_HOURS = "expires";
-/** Text to be encrypted.*/
-Encrypt.TEXT = "text";
-
-/** Token by which to fetch the encryption key from the serve*/
-Encrypt.LOCATOR_KEY = "locatorKey";
-/** Encrypted Text*/
-Encrypt.ENCRYPTED_TEXT = "encryptedText";

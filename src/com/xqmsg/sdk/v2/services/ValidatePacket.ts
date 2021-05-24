@@ -23,7 +23,9 @@ export default class ValidatePacket extends XQModule {
    * @param {{}} maybePayLoad:
    * @returns {Promise<ServerResponse<{}>>}
    */
-  supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: {
+    data: Record<string, unknown>;
+  }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);

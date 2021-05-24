@@ -5,7 +5,7 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * A service which authenticates the two-factor PIN which resulted from the preceding {@link Authorize} service call.
+ * A service which is utilized to authenticate the two-factor PIN which resulted from the preceding {@link Authorize} service call.
  * If successful this service returns a `ServerResponse` containing the access token.
  *
  * @class [CodeValidator]

@@ -4,7 +4,7 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * A services which adds new users to XQ system.
+ * A service which is utilized to add new users to XQ system.
  * It is a variant of `Authorize` which adds the user without validating a given email via PIN.
  * However, its use is limited to basic encryption and decryption.
  * @class [AuthorizeAlias]

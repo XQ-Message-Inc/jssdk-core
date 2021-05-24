@@ -11,7 +11,7 @@ type EncryptionAlgorithm = {
 };
 
 /**
- * A service used to decrypt data stored in a file using the {@link EncryptionAlgorithm} provided.
+ * A service which is utilized to decrypt data stored in a file using the {@link EncryptionAlgorithm} provided.
  *
  * @class [FileDecrypt]
  */

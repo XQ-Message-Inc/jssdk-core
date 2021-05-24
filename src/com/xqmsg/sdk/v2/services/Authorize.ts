@@ -4,7 +4,7 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * A service which when given an email address is used to request an access token.
+ * A service which is utilized request an access token when given an email address.
  * If successful, the service itself will return a pre-authorization token that can be exchanged
  * for a full access token after validation is complete.
  *

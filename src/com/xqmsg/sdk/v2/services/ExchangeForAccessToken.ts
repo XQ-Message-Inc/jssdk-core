@@ -4,7 +4,7 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- *  A service which is used to exchange a temporary access token with a real access token used in all secured XQ Message interactions
+ *  A service which is utilized to exchange a temporary access token with a real access token used in all secured XQ Message interactions
  *  @class [ExchangeForAccessToken]
  */
 export default class ExchangeForAccessToken extends XQModule {

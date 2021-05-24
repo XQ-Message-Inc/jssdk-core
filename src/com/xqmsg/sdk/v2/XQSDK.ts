@@ -119,7 +119,7 @@ interface XQSDKProps {
    * @param {Destination}destination
    * @returns {string}
    */
-  validateAccessToken: (destination?: string) => string;
+  validateAccessToken: (destination?: string) => StatusException | string;
 
   /**
    * @method validateInput

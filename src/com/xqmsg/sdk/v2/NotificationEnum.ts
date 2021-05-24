@@ -1,4 +1,4 @@
-type NotificationEnumTypes = "NONE" | "USAGE_REPORTS" | "TUTORIALS" | "BOTH";
+type NotificationTypes = "NONE" | "USAGE_REPORTS" | "TUTORIALS" | "BOTH";
 
 /**
  * An Enum used to specify Notification Settings
@@ -6,7 +6,7 @@ type NotificationEnumTypes = "NONE" | "USAGE_REPORTS" | "TUTORIALS" | "BOTH";
  * @class [NotificationEnum]
  **/
 export default class NotificationEnum {
-  static parseValue: (opt: 0 | 1 | 2 | 3) => NotificationEnumTypes;
+  static parseValue: (opt: 0 | 1 | 2 | 3) => NotificationTypes;
   /** The `NotificationEnum` numerical value representing: No Notifications */
   static NONE: 0;
 

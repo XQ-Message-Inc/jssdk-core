@@ -5,8 +5,7 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- *
- * A service which decrypts encrypted textual data using the {@link EncryptionAlgorithm} provided.
+ * A service which is utilized to decrypt encrypted textual data using the {@link EncryptionAlgorithm} provided.
  *
  * @class [Decrypt]
  */
@@ -34,7 +33,7 @@ export default class Decrypt extends XQModule {
   supplyAsync: (maybePayload: {
     locatorKey: string;
     encryptedText: string;
-  }) => Promise<ServerResponse>;
+  }) => Promise<ServerResponse | undefined>;
 
   constructor(sdk: XQSDK, algorithm: EncryptionAlgorithm) {
     super(sdk);
