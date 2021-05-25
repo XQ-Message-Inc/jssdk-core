@@ -4,8 +4,8 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- *  A service which is utilized to validate a {@link Authorize} service call
- *  Returns 204, "No Content" if successful.
+ *  Validates the packet that is returned from {@link GeneratePacket}.<br>
+ *  Returns the key locator token<.br>
  *  @class [ValidatePacket]
  */
 export default class ValidatePacket extends XQModule {
@@ -33,6 +33,11 @@ export default class ValidatePacket extends XQModule {
     this.serviceName = "packet";
     this.requiredFields = [ValidatePacket.PACKET];
 
+    /**
+     *
+     * @param {{}} maybePayLoad:
+     * @returns {Promise<ServerResponse<{payload:String}>>} the server response containing the key locator token
+     */
     this.supplyAsync = (maybePayLoad) => {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
@@ -65,3 +70,5 @@ export default class ValidatePacket extends XQModule {
     };
   }
 }
+
+ValidatePacket.PACKET = "data";
