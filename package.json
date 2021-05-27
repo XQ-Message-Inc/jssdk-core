@@ -16,7 +16,6 @@
   "scripts": {
     "check-types": "tsc --noEmit",
     "build": "parcel build ./src/index.ts",
-    "test": "jest",
     "lint": "eslint src/**  --ext .ts"
   },
   "repository": {
