@@ -4,8 +4,8 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * Uploads an expanded version of the encryption key as well a metadata about it to the subscription server and returns a packet<br>
- * Examples of metadata are: recipients or key expiration time
+ * A service which is utilized to generate an encrypted packet containing the encryption key that you want to
+ * protect along with a list of the identities that are allowed to access it and how long it is allowed to be used.
  * @class [GeneratePacket]
  */
 
@@ -56,15 +56,7 @@ export default class GeneratePacket extends XQModule {
       GeneratePacket.RECIPIENTS,
       GeneratePacket.EXPIRES_HOURS,
     ];
-    /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-     * @param {String} maybePayLoad.key - The secret key that the user wants to protect.
-     * @param {Long} maybePayLoad.expires - The number of hours that this key will remain valid for. After this time, it will no longer be accessible.
-     * @param {[String]} maybePayLoad.recipients  -  list of emails of those recipients who are allowed to access the key.
-     * @param {Boolean} [maybePayLoad.dor=false] - Should the content be deleted after opening.
-     *
-     * @returns {Promise<ServerResponse<{payload:string}>>} the server response containing the packet
-     */
+
     this.supplyAsync = (maybePayLoad) => {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
