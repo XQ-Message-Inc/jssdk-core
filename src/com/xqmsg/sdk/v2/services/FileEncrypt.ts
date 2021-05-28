@@ -2,7 +2,6 @@ import EncryptionAlgorithm from "../algorithms/EncryptionAlgorithm";
 import FetchQuantumEntropy from "../quantum/FetchQuantumEntropy";
 import GeneratePacket from "./GeneratePacket";
 import ServerResponse from "../ServerResponse";
-import ValidatePacket from "./ValidatePacket";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
@@ -104,44 +103,24 @@ export default class FileEncrypt extends XQModule {
                   .then((uploadResponse) => {
                     switch (uploadResponse.status) {
                       case ServerResponse.OK: {
-                        const packet = uploadResponse.payload;
-                        return new ValidatePacket(sdk)
-                          .supplyAsync({ [ValidatePacket.PACKET]: packet })
-                          .then((validateResponse) => {
-                            switch (validateResponse.status) {
+                        const locatorToken = uploadResponse.payload;
+                        return algorithm
+                          .encryptFile(sourceFile, expandedKey, locatorToken)
+                          .then((fileEncryptResponse: ServerResponse) => {
+                            switch (fileEncryptResponse.status) {
                               case ServerResponse.OK: {
-                                const locatorToken = validateResponse.payload;
-                                return algorithm
-                                  .encryptFile(
-                                    sourceFile,
-                                    expandedKey,
-                                    locatorToken
-                                  )
-                                  .then(
-                                    (fileEncryptResponse: ServerResponse) => {
-                                      switch (fileEncryptResponse.status) {
-                                        case ServerResponse.OK: {
-                                          return fileEncryptResponse;
-                                        }
-                                        case ServerResponse.ERROR: {
-                                          console.error(
-                                            `${algorithm.constructor.name}.encryptFile() failed, code: ${fileEncryptResponse.statusCode}, reason: ${fileEncryptResponse.payload}`
-                                          );
-                                          return fileEncryptResponse;
-                                        }
-                                      }
-                                    }
-                                  );
+                                return fileEncryptResponse;
                               }
                               case ServerResponse.ERROR: {
                                 console.error(
-                                  `ValidateNewKeyPacket failed, code: ${validateResponse.statusCode}, reason: ${validateResponse.payload}`
+                                  `${algorithm.constructor.name}.encryptFile() failed, code: ${fileEncryptResponse.statusCode}, reason: ${fileEncryptResponse.payload}`
                                 );
-                                return validateResponse;
+                                return fileEncryptResponse;
                               }
                             }
                           });
                       }
+
                       case ServerResponse.ERROR: {
                         console.error(
                           `GeneratePacket failed, code: ${uploadResponse.statusCode}, reason: ${uploadResponse.payload}`

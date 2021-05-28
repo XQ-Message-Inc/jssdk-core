@@ -88,7 +88,7 @@ export default class XQSimpleCache {
    */
   constructor(storage: Storage) {
     if (!("caches" in window)) {
-      prompt("no cache mechanism");
+      console.error("no cache mechanism");
     }
     this.storage = storage;
     this.XQ_PREFIX = "xq";
