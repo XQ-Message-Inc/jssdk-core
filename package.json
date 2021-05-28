@@ -2,21 +2,21 @@
   "name": "@xqmsg/jssdk-core",
   "version": "1.0.9",
   "description": "A Javascript Implementation of XQ Message SDK, V.2",
-  "main": "dist/index.js",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "browser": "dist/browser/algosdk.min.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist/"
+  ],
   "directories": {
     "test": "tests"
   },
-  "files": [
-    "/dist/*.js",
-    "/dist/**/&.js",
-    "/dist/*.ts",
-    "/dist/**/&.ts"
-  ],
-  "types": "./dist/main.d.ts",
   "scripts": {
     "check-types": "tsc --noEmit",
-    "build": "parcel build ./src/index.ts",
-    "lint": "eslint src/**  --ext .ts"
+    "build": "concurrently \"webpack --config webpack.config.js\" \"tsc -p tsconfig-esm.json\" \"tsc -p tsconfig-cjs.json\"",
+    "lint": "eslint src/**  --ext .ts",
+    "clean": "rm -rf node_modules && rm -rf dist"
   },
   "repository": {
     "type": "git",
@@ -45,21 +45,23 @@
     "@babel/core": "^7.14.2",
     "@babel/eslint-parser": "^7.14.2",
     "@babel/preset-env": "^7.14.2",
-    "@parcel/packager-ts": "2.0.0-beta.2",
-    "@parcel/transformer-typescript-tsc": "^2.0.0-nightly.3",
-    "@parcel/transformer-typescript-types": "2.0.0-beta.2",
     "@types/crypto-js": "^4.0.1",
     "@types/node": "^15.6.0",
     "@typescript-eslint/eslint-plugin": "4.24.0",
     "@typescript-eslint/parser": "4.24.0",
+    "concurrently": "^6.2.0",
     "eslint": "7.27.0",
     "eslint-config-airbnb": "18.2.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "jest": "^26.6.3",
-    "parcel": "^2.0.0-beta.2",
+    "path-browserify": "^1.0.1",
     "prettier": "^2.3.0",
-    "typescript": "^4.2.4"
+    "source-map-loader": "^3.0.0",
+    "ts-loader": "^9.2.2",
+    "typescript": "^4.2.4",
+    "webpack": "^5.5.1",
+    "webpack-cli": "^4.2.0"
   },
   "dependencies": {
     "crypto-js": "3.1.9-1"
