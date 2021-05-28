@@ -8,7 +8,6 @@ import XQSDK from "../../XQSDK";
  * A service utilized to log a user into Dashboard application
  * This requires the user to previously have been authorized via
  *   * `Authorize`
- *   * `ValidatePacket`
  *   * `ExchangeForAccessToken`
  *
  *   @class [DashboardLogin]

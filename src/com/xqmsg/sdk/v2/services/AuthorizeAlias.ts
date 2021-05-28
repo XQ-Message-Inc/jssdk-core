@@ -3,6 +3,11 @@ import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
+interface IAuthorizeAliasParams {
+  user: string;
+  firstName?: string;
+  lastName?: string;
+}
 /**
  * A service which is utilized to add new users to XQ system.
  * It is a variant of `Authorize` which adds the user without validating a given email via PIN.
@@ -17,13 +22,13 @@ export default class AuthorizeAlias extends XQModule {
   serviceName: string;
 
   /** The field name representing the first name of the user */
-  static FIRST_NAME: "firstName";
+  static FIRST_NAME: string = "firstName";
 
   /** The field name representing the last name of the user */
-  static LAST_NAME: "lastName";
+  static LAST_NAME: string = "lastName";
 
   /** The field name representing the news letter service */
-  static USER: "user";
+  static USER: string = "user";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
@@ -33,11 +38,7 @@ export default class AuthorizeAlias extends XQModule {
    *
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
-  supplyAsync: (maybePayload: {
-    user: string;
-    firstName?: string;
-    lastName?: string;
-  }) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: IAuthorizeAliasParams) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -49,9 +50,14 @@ export default class AuthorizeAlias extends XQModule {
       try {
         const self = this;
 
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(
+          maybePayLoad as Record<string, any>,
+          this.requiredFields
+        );
 
-        const aliasUser = maybePayLoad[AuthorizeAlias.USER];
+        const aliasUser =
+          maybePayLoad[AuthorizeAlias.USER as keyof IAuthorizeAliasParams] ??
+          "";
 
         return this.sdk
           .call(

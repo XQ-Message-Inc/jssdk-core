@@ -74,14 +74,32 @@ export default class GeneratePacket extends XQModule {
           [GeneratePacket.RECIPIENTS]: flattenedRecipientList,
         };
 
-        return this.sdk.call(
-          this.sdk.SUBSCRIPTION_SERVER_URL,
-          this.serviceName,
-          CallMethod.POST,
-          additionalHeaderProperties,
-          payload,
-          true
-        );
+        return this.sdk
+          .call(
+            this.sdk.SUBSCRIPTION_SERVER_URL,
+            this.serviceName,
+            CallMethod.POST,
+            additionalHeaderProperties,
+            payload,
+            true
+          )
+          .then((response: ServerResponse) => {
+            switch (response.status) {
+              case ServerResponse.OK: {
+                return this.sdk.call(
+                  this.sdk.VALIDATION_SERVER_URL,
+                  this.serviceName,
+                  CallMethod.POST,
+                  additionalHeaderProperties,
+                  { data: response.payload },
+                  true
+                );
+              }
+              default: {
+                return response;
+              }
+            }
+          });
       } catch (validationException) {
         return new Promise((resolve) => {
           resolve(

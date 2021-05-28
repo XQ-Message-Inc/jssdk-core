@@ -2,7 +2,6 @@ import EncryptionAlgorithm from "../algorithms/EncryptionAlgorithm";
 import FetchQuantumEntropy from "../quantum/FetchQuantumEntropy";
 import GeneratePacket from "./GeneratePacket";
 import ServerResponse from "../ServerResponse";
-import ValidatePacket from "./ValidatePacket";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
@@ -109,42 +108,20 @@ export default class Encrypt extends XQModule {
                           .then((uploadResponse: ServerResponse) => {
                             switch (uploadResponse.status) {
                               case ServerResponse.OK: {
-                                const packet = uploadResponse.payload;
-                                return new ValidatePacket(sdk)
-                                  .supplyAsync({
-                                    [ValidatePacket.PACKET]: packet,
-                                  })
-                                  .then(
-                                    (
-                                      packetValidationResponse: ServerResponse
-                                    ) => {
-                                      switch (packetValidationResponse.status) {
-                                        case ServerResponse.OK: {
-                                          const locator =
-                                            packetValidationResponse.payload;
-                                          return new ServerResponse(
-                                            ServerResponse.OK,
-                                            200,
-                                            {
-                                              [Encrypt.LOCATOR_KEY]: locator,
-                                              [Encrypt.ENCRYPTED_TEXT]:
-                                                encryptedText,
-                                            }
-                                          );
-                                        }
-                                        case ServerResponse.ERROR: {
-                                          console.error(
-                                            `PacketValidation failed, code: ${packetValidationResponse.statusCode}, reason: ${packetValidationResponse.payload}`
-                                          );
-                                          return packetValidationResponse;
-                                        }
-                                      }
-                                    }
-                                  );
+                                const locator = uploadResponse.payload;
+                                return new ServerResponse(
+                                  ServerResponse.OK,
+                                  200,
+                                  {
+                                    [Encrypt.LOCATOR_KEY]: locator,
+                                    [Encrypt.ENCRYPTED_TEXT]: encryptedText,
+                                  }
+                                );
                               }
+
                               case ServerResponse.ERROR: {
                                 console.error(
-                                  `GeneratePacket failed, code: ${uploadResponse.statusCode}, reason: ${uploadResponse.payload}`
+                                  `PacketValidation failed, code: ${uploadResponse.statusCode}, reason: ${uploadResponse.payload}`
                                 );
                                 return uploadResponse;
                               }
