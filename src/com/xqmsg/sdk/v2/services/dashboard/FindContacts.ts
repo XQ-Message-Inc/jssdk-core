@@ -17,22 +17,22 @@ export default class FindContacts extends XQModule {
   serviceName: string;
 
   /** The field name representing the Contacts */
-  static CONTACTS: "contacts";
+  static CONTACTS: "contacts" = "contacts";
 
   /** The field name representing the filter for the list of Contacts */
-  static FILTER: "filter";
+  static FILTER: "filter" = "filter";
 
   /** The field name representing the id */
-  static ID: "id";
+  static ID: "id" = "id";
 
   /** The field name representing the limit of the list of Contacts */
-  static LIMIT: "limit";
+  static LIMIT: "limit" = "limit";
 
   /** The field name representing the page of the list of Contacts */
-  static PAGE: "page";
+  static PAGE: "page" = "page";
 
   /** The field name representing the role */
-  static ROLE: "role";
+  static ROLE: "role" = "role";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.

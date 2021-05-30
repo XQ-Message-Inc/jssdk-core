@@ -15,28 +15,28 @@ type RoleTypes =
  **/
 export default class RolesEnum {
   /** A role which can login to dashboard with will authority for the business */
-  static ADMIN: 1;
+  static ADMIN: 1 = 1;
 
   /** An alias role which is similar to an anonymous alias that is trackable by an SMB. */
-  static ALIAS: 7;
+  static ALIAS: 7 = 7;
 
   /** A role for a customer which cannot login to dashboard */
-  static CUSTOMER: 3;
+  static CUSTOMER: 3 = 3;
 
   /** A role which represents a virtual user that is a generated email address which is fully tracked, but cannot be used to log into the dashboard at all. */
-  static DEVICE: 6;
+  static DEVICE: 6 = 6;
 
   /** A role which represents an admin user with full authority, including billing */
-  static SUPER_USER: 5;
+  static SUPER_USER: 5 = 5;
 
   /** A role which cannot do anything */
-  static UNKNOWN: 0;
+  static UNKNOWN: 0 = 0;
 
   /** A role which can login to dashboard with restricted permissions ( cannot add other users ) */
-  static USER: 2;
+  static USER: 2 = 2;
 
   /** A role for a vendor which cannot login to dashboard */
-  static VENDOR: 4;
+  static VENDOR: 4 = 4;
 
   /**
    * Maps numeric value to its respective textual representation

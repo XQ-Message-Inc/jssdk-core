@@ -20,7 +20,7 @@ export default class DashboardLogin extends XQModule {
   serviceName: string;
 
   /** The field name representing the represent */
-  static REQUEST: "request";
+  static REQUEST: "request" = "request";
 
   /**
    * @param {Map} [maybePayLoad=null] - Container for the request parameters supplied to this method.

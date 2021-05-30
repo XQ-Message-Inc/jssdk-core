@@ -22,13 +22,13 @@ export default class AuthorizeAlias extends XQModule {
   serviceName: string;
 
   /** The field name representing the first name of the user */
-  static FIRST_NAME: string = "firstName";
+  static FIRST_NAME: "firstName" = "firstName";
 
   /** The field name representing the last name of the user */
-  static LAST_NAME: string = "lastName";
+  static LAST_NAME: "lastName" = "lastName";
 
   /** The field name representing the news letter service */
-  static USER: string = "user";
+  static USER: "user" = "user";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
@@ -50,10 +50,7 @@ export default class AuthorizeAlias extends XQModule {
       try {
         const self = this;
 
-        this.sdk.validateInput(
-          maybePayLoad as Record<string, any>,
-          this.requiredFields
-        );
+        this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
         const aliasUser =
           maybePayLoad[AuthorizeAlias.USER as keyof IAuthorizeAliasParams] ??

@@ -59,13 +59,13 @@ export default class EncryptionAlgorithm {
   shuffle: (s: string) => string;
 
   /** The field name representing the decrypted text value */
-  static DECRYPTED_TEXT: "decryptedText";
+  static DECRYPTED_TEXT: "decryptedText" = "decryptedText";
 
   /** The field name representing the encrypted text value */
-  static ENCRYPTED_TEXT: "encrpytedText";
+  static ENCRYPTED_TEXT: "encrpytedText" = "encrpytedText";
 
   /** The field name representing the encryption key */
-  static KEY: "key";
+  static KEY: "key" = "key";
 
   constructor(sdk: XQSDK) {
     this.sdk = sdk;

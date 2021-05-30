@@ -5,6 +5,13 @@ import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
+interface IEncryptParams {
+  recipients: string[];
+  text: string;
+  expires: number;
+  dor?: boolean;
+}
+
 /**
  * A service which is utilized to encrypt textual data using the {@link EncryptionAlgorithm} provided.
  *
@@ -18,22 +25,22 @@ export default class Encrypt extends XQModule {
   requiredFields: string[];
 
   /** The field name representing the boolean value which specifies if the content should be deleted after opening */
-  static DELETE_ON_RECEIPT: "dor";
+  static DELETE_ON_RECEIPT: "dor" = "dor";
 
   /** The field name representing the encrypted text */
-  static ENCRYPTED_TEXT: "encryptedText";
+  static ENCRYPTED_TEXT: "encryptedText" = "encryptedText";
 
   /** The field name representing the number of hours of life span until access to the encrypted text is expired */
-  static EXPIRES_HOURS: "expires";
+  static EXPIRES_HOURS: "expires" = "expires";
 
   /** The field name representing the key used to fetch the encryption key from the server */
-  static LOCATOR_KEY: "locatorKey";
+  static LOCATOR_KEY: "locatorKey" = "locatorKey";
 
   /** The field name representing the list of emails of users intended to have read access to the encrypted content */
-  static RECIPIENTS: "recipients";
+  static RECIPIENTS: "recipients" = "recipients";
 
   /** The field name representing the text that will be encrypted */
-  static TEXT: "text";
+  static TEXT: "text" = "text";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
@@ -44,12 +51,9 @@ export default class Encrypt extends XQModule {
    *
    * @returns {Promise<ServerResponse<{payload:{locatorKey:string, encryptedText:string}}>>}
    */
-  supplyAsync: (maybePayLoad: {
-    recipients: string[];
-    text: string;
-    expires: number;
-    dor: boolean;
-  }) => Promise<ServerResponse | undefined>;
+  supplyAsync: (
+    maybePayLoad: IEncryptParams
+  ) => Promise<ServerResponse | undefined>;
 
   constructor(sdk: XQSDK, algorithm: EncryptionAlgorithm) {
     super(sdk);
@@ -77,7 +81,7 @@ export default class Encrypt extends XQModule {
           .then((keyResponse: ServerResponse) => {
             switch (keyResponse.status) {
               case ServerResponse.OK: {
-                const initialKey = keyResponse.payload.data;
+                const initialKey = keyResponse.payload;
 
                 const expandedKey = algorithm.expandKey(
                   initialKey,

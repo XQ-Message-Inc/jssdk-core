@@ -17,7 +17,7 @@ export default class GetApplications extends XQModule {
   serviceName: string;
 
   /** The field name representing the list of apps returned by the `GetApplications` service */
-  static APPS: "apps";
+  static APPS: "apps" = "apps";
 
   /**
    * @param {{}} [maybePayLoad=null]

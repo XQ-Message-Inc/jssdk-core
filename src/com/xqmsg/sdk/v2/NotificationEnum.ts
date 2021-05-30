@@ -8,16 +8,16 @@ type NotificationTypes = "NONE" | "USAGE_REPORTS" | "TUTORIALS" | "BOTH";
 export default class NotificationEnum {
   static parseValue: (opt: 0 | 1 | 2 | 3) => NotificationTypes;
   /** The `NotificationEnum` numerical value representing: No Notifications */
-  static NONE: 0;
+  static NONE: 0 = 0;
 
   /** The `NotificationEnum` numerical value representing: Usage Reports */
-  static USAGE_REPORTS: 1;
+  static USAGE_REPORTS: 1 = 1;
 
   /** The `NotificationEnum` numerical value representing: Tutorials */
-  static TUTORIALS: 2;
+  static TUTORIALS: 2 = 2;
 
   /** The `NotificationEnum` numerical value representing: Both */
-  static BOTH: 3;
+  static BOTH: 3 = 3;
 }
 
 /**

@@ -17,7 +17,7 @@ export default class DisableContact extends XQModule {
   serviceName: string;
 
   /** The field name representing the disabled Contact's ID */
-  static ID: "id";
+  static ID: "id" = "id";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.

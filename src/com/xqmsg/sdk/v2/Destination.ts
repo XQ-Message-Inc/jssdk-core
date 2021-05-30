@@ -5,7 +5,7 @@
  */
 export default class Destination {
   /** A value representing the destination server for XQ general API calls */
-  static XQ: "XQ";
+  static XQ: "XQ" = "XQ";
   /** A value representing the destination server for Dashboard API calls */
-  static DASHBOARD: "DASHBOARD";
+  static DASHBOARD: "DASHBOARD" = "DASHBOARD";
 }

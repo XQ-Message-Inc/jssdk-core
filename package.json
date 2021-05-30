@@ -4,7 +4,7 @@
   "description": "A Javascript Implementation of XQ Message SDK, V.2",
   "main": "dist/index.js",
   "directories": {
-    "test": "tests"
+    "test": "__tests__"
   },
   "files": [
     "/dist/*.js",
