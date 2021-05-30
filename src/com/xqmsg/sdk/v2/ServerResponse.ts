@@ -13,8 +13,8 @@ class ServerResponse {
   /** The data that is being returned form the server */
   payload: any;
 
-  static OK: "OK";
-  static ERROR: "ERROR";
+  static OK: "OK" = "OK";
+  static ERROR: "ERROR" = "ERROR";
 
   /**
    * @param {Answered} status

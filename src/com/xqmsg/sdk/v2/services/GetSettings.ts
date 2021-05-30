@@ -16,10 +16,10 @@ export default class GetSettings extends XQModule {
   serviceName: string;
 
   /** The field name which represents the boolean indicating whether the user receive notifications or not */
-  static NEWSLETTER: "newsLetter";
+  static NEWSLETTER: "newsLetter" = "newsLetter";
 
   /** The field name which the boolean indicating whether the user receive newsletters or not. This is only valid for new users, and is ignored if the user already exists */
-  static NOTIFICATIONS: "notifications";
+  static NOTIFICATIONS: "notifications" = "notifications";
 
   /**
    * @param {{}} [maybePayLoad=null]

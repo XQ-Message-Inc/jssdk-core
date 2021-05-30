@@ -20,10 +20,10 @@ export default class Decrypt extends XQModule {
   algorithm: EncryptionAlgorithm;
 
   /** The field name representing the encrypted text content */
-  static ENCRYPTED_TEXT: "encryptedText";
+  static ENCRYPTED_TEXT: "encryptedText" = "encryptedText";
 
   /** The field name representing the key used to fetch the encryption key from the server */
-  static LOCATOR_KEY: "locatorKey";
+  static LOCATOR_KEY: "locatorKey" = "locatorKey";
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
    * @param {String} maybePayLoad.locatorKey - the key used to fetch the encryption key from the server

@@ -17,10 +17,10 @@ export default class GrantUserAccess extends XQModule {
   serviceName: string;
 
   /** The field name representing the locator token */
-  static LOCATOR_TOKEN: "locatorToken";
+  static LOCATOR_TOKEN: "locatorToken" = "locatorToken";
 
   /** The field name representing the list of recipients */
-  static RECIPIENTS: "recipients";
+  static RECIPIENTS: "recipients" = "recipients";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.

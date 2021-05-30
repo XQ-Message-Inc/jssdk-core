@@ -25,22 +25,22 @@ export default class Authorize extends XQModule {
   serviceName: string;
 
   /** if 'pin' is sent the validation email will only have the code and no confirmation button */
-  static CODE_TYPE: "codetype";
+  static CODE_TYPE: "codetype" = "codetype";
 
   /** The field name representing the first name of the user */
-  static FIRST_NAME: "firstName";
+  static FIRST_NAME: "firstName" = "firstName";
 
   /** The field name representing the last name of the user */
-  static LAST_NAME: "lastName";
+  static LAST_NAME: "lastName" = "lastName";
 
   /** The field name representing the news letter service */
-  static NEWSLETTER: "newsLetter";
+  static NEWSLETTER: "newsLetter" = "newsLetter";
 
   /** The field name representing the notifications service */
-  static NOTIFICATIONS: "notifications";
+  static NOTIFICATIONS: "notifications" = "notifications";
 
   /** The field name representing the email of the user */
-  static USER: "user";
+  static USER: "user" = "user";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.

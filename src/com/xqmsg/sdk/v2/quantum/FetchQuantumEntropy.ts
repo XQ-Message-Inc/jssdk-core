@@ -15,10 +15,10 @@ import XQSDK from "../XQSDK";
  */
 export default class FetchQuantumEntropy extends XQModule {
   /** Kolmogorov-Sinai entropy */
-  static KS: "ks";
+  static KS: "ks" = "ks";
 
   /** The number of entropy bits to fetch */
-  static _256: "256";
+  static _256: "256" = "256";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.

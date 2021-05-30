@@ -16,10 +16,10 @@ export default class CheckKeyExpiration extends XQModule {
   serviceName: string;
 
   /** The field name representing number of seconds before this token expires.<br>If the token is already expired, this will be 0*/
-  static EXPIRES_IN: "expiresOn";
+  static EXPIRES_IN: "expiresOn" = "expiresOn";
 
   /** The field name representing the key to fetch the encryption key from the server */
-  static LOCATOR_KEY: "locatorKey";
+  static LOCATOR_KEY: "locatorKey" = "locatorKey";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.

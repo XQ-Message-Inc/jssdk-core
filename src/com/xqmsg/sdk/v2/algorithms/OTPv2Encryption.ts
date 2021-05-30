@@ -2,6 +2,8 @@ import EncryptionAlgorithm from "./EncryptionAlgorithm";
 import ServerResponse from "../ServerResponse";
 import XQSDK from "../XQSDK";
 
+import { TextDecoder, TextEncoder } from "util";
+
 type ParsedFile = {
   locator: string;
   nameEncrypted: Uint8Array;
@@ -109,12 +111,12 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
 
         return new Promise((resolve) => {
           if (key === "" || key == undefined) {
-            console.error("OTPv2 Source Key cannot be empty.");
+            console.error("OTPV2 Source Key cannot be empty.");
             resolve(
               new ServerResponse(
                 ServerResponse.ERROR,
                 500,
-                "OTPv2 Source Key cannot be empty."
+                "OTPV2 Source Key cannot be empty."
               )
             );
           }
@@ -296,7 +298,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
           j.push(payloadBytes[idx] ^ keyBytes[mi]);
         }
 
-        const decoder = new TextDecoder("utf8");
+        const decoder = new TextDecoder();
         const dt = decoder.decode(new Uint8Array(j));
 
         return btoa(dt);

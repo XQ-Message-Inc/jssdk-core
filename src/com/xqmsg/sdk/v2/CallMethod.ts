@@ -3,17 +3,17 @@
  */
 export default class CallMethod {
   /** DELETE request */
-  static DELETE: string = "DELETE";
+  static DELETE: "DELETE" = "DELETE";
 
   /** GET request */
-  static GET: string = "GET";
+  static GET: "GET" = "GET";
 
   /** OPTIONS request */
-  static OPTIONS: string = "OPTIONS";
+  static OPTIONS: "OPTIONS" = "OPTIONS";
 
   /** PATCh request */
-  static PATCH: string = "PATCH";
+  static PATCH: "PATCH" = "PATCH";
 
   /** POST request */
-  static POST: string = "POST";
+  static POST: "POST" = "POST";
 }

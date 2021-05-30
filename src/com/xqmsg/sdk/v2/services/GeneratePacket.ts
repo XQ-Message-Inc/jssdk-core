@@ -17,19 +17,19 @@ export default class GeneratePacket extends XQModule {
   serviceName: string;
 
   /** The field name representing the boolean value which specifies if the content should be deleted after opening */
-  static DELETE_ON_RECEIPT: "dor";
+  static DELETE_ON_RECEIPT: "dor" = "dor";
 
   /** The field name representing the number of hours of life span until access to the encrypted text is expired */
-  static EXPIRES_HOURS: "expires";
+  static EXPIRES_HOURS: "expires" = "expires";
 
   /** The field name representing the encryption key */
-  static KEY: "key";
+  static KEY: "key" = "key";
 
   /** The field name representing the list of emails of users intended to have read access to the encrypted content */
-  static RECIPIENTS: "recipients";
+  static RECIPIENTS: "recipients" = "recipients";
 
   /** The field name representing the type */
-  static TYPE: "type";
+  static TYPE: "type" = "type";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
@@ -90,10 +90,19 @@ export default class GeneratePacket extends XQModule {
                   this.sdk.VALIDATION_SERVER_URL,
                   this.serviceName,
                   CallMethod.POST,
-                  additionalHeaderProperties,
+                  {
+                    ...additionalHeaderProperties,
+                    [XQSDK.CONTENT_TYPE]: XQSDK.TEXT_PLAIN_UTF_8,
+                  },
                   { data: response.payload },
                   true
                 );
+              }
+              case ServerResponse.ERROR: {
+                console.error(
+                  `GeneratePacket failed, code: ${response.statusCode}, reason: ${response.payload}`
+                );
+                return response;
               }
               default: {
                 return response;
