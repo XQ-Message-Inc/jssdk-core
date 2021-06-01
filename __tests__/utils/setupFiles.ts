@@ -66,3 +66,8 @@ export interface IDecryptParams {
   locatorKey: string;
   encryptedText: string;
 }
+
+// eslint-disable-next-line no-global-assign
+global.TextDecoder = require("text-encoding").TextDecoder;
+// eslint-disable-next-line no-global-assign
+global.TextEncoder = require("text-encoding").TextEncoder;
