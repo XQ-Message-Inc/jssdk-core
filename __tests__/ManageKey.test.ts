@@ -1,11 +1,11 @@
 import {
   AuthorizeAlias,
-  GeneratePacket,
   FetchKey,
+  GeneratePacket,
   ServerResponse,
 } from "../src";
 
-import { sdk, testEmail } from "./utils/setupFiles";
+import { ensureCredentialsPresent, sdk, testEmail } from "./utils/setupFiles";
 
 describe("Testing manual key management", () => {
   const authorizeUser = (user: string) =>
@@ -62,6 +62,8 @@ describe("Testing manual key management", () => {
           }
         }
       });
+
+  beforeAll(() => ensureCredentialsPresent());
 
   it(`should successfully generate and fetch key packet`, async () =>
     expect(

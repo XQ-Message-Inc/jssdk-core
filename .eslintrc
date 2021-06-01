@@ -17,7 +17,22 @@
       "@typescript-eslint/indent": ["error", 2],
       "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
       "@typescript-eslint/no-explicit-any": "error",
-      "prefer-const": "error"
-    }
+      "prefer-const": "error",
+      "sort-imports": ["error", {
+        "ignoreCase": false,
+        "ignoreDeclarationSort": false,
+        "ignoreMemberSort": false,
+        "memberSyntaxSortOrder": ["none", "all", "multiple", "single"],
+        "allowSeparatedGroups": false
+    }]
+    },
+    "overrides": [
+      {
+        "files": ["src/index.ts"],
+        "rules": {
+          "sort-imports": "off"
+        }
+      }
+    ]
 }
   

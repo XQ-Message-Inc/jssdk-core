@@ -1,8 +1,8 @@
 import CallMethod from "../../CallMethod";
 import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
-import XQSDK from "../../XQSDK";
 import XQModule from "../XQModule";
+import XQSDK from "../../XQSDK";
 
 /**
  * A service which is utilized to retrieve a listing of dashboard applications associated with the user
