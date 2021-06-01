@@ -1,4 +1,3 @@
-import { TextDecoder, TextEncoder } from "util";
 import EncryptionAlgorithm from "./EncryptionAlgorithm";
 import ServerResponse from "../ServerResponse";
 import XQSDK from "../XQSDK";
