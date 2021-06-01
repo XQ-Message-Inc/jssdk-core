@@ -16,10 +16,10 @@ export default class CheckApiKey extends XQModule {
   serviceName: string;
 
   /** The field name representing the API key */
-  static API_KEY: "api-key";
+  static API_KEY: "api-key" = "api-key";
 
   /** The field name representing the scopes associated to the API key */
-  static SCOPES: "scopes";
+  static SCOPES: "scopes" = "scopes";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.

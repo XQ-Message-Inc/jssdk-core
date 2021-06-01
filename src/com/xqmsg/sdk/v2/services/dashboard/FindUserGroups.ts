@@ -18,10 +18,10 @@ export default class FindUserGroups extends XQModule {
   serviceName: string;
 
   /** The field name representing the dashboard user groups */
-  static GROUPS: "groups";
+  static GROUPS: "groups" = "groups";
 
   /** The field name representing the id of a user group */
-  static ID: "id";
+  static ID: "id" = "id";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.

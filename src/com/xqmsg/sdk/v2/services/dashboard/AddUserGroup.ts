@@ -17,13 +17,19 @@ export default class AddUserGroup extends XQModule {
   serviceName: string;
 
   /** The field name representing the new group's ID */
-  static ID: "id";
+  static ID: "id" = "id";
 
   /** The field name representing the new group's members */
-  static MEMBERS: "members";
+  static MEMBERS: "members" = "members";
 
   /** The field name representing the new group's name */
-  static NAME: "name";
+  static NAME: "name" = "name";
+
+  /**
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {[String]} maybePayLoad.name - the name of the user group
+   * @returns {Promise<ServerResponse<{}>>}
+   */
   supplyAsync: (maybePayLoad: { name: string }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {

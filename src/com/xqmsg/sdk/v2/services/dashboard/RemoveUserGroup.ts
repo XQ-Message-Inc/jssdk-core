@@ -17,7 +17,7 @@ export default class RemoveUserGroup extends XQModule {
   serviceName: string;
 
   /** A field name representing the id of the user group to be removed */
-  static ID: "id";
+  static ID: "id" = "id";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.

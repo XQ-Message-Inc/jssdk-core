@@ -16,10 +16,10 @@ export default class RevokeUserAccess extends XQModule {
   serviceName: string;
 
   /** The field name representing the list of emails of users intended to have read access to the encrypted content */
-  static RECIPIENTS: "recipients";
+  static RECIPIENTS: "recipients" = "recipients";
 
   /** The field name representing the locator key */
-  static LOCATOR_KEY: "locatorKey";
+  static LOCATOR_KEY: "locatorKey" = "locatorKey";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
