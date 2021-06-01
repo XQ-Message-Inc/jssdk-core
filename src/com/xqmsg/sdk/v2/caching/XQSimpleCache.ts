@@ -1,5 +1,5 @@
-import StatusException from "../exceptions/StatusException";
 import ServerResponse from "../ServerResponse";
+import StatusException from "../exceptions/StatusException";
 
 /**
  * @class [XQSimpleCache]
@@ -87,9 +87,6 @@ export default class XQSimpleCache {
    * @param {Storage} storage
    */
   constructor(storage: Storage) {
-    if (!("caches" in window)) {
-      console.error("no cache mechanism");
-    }
     this.storage = storage;
     this.XQ_PREFIX = "xq";
     this.DASHBOARD_PREFIX = "dsb";

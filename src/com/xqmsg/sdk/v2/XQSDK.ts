@@ -3,12 +3,12 @@
 import AESEncryption from "./algorithms/AESEncryption";
 import CallMethod from "./CallMethod";
 import Destination from "./Destination";
+import EncryptionAlgorithm from "./algorithms/EncryptionAlgorithm";
 import OTPv2Encryption from "./algorithms/OTPv2Encryption";
 import ServerResponse from "./ServerResponse";
 import StatusException from "./exceptions/StatusException";
 import ValidationException from "./exceptions/ValidationException";
 import XQSimpleCache from "./caching/XQSimpleCache";
-import EncryptionAlgorithm from "./algorithms/EncryptionAlgorithm";
 
 const SUBSCRIPTION_SERVER_URL = "https://subscription.xqmsg.net/v2";
 const VALIDATION_SERVER_URL = "https://validation.xqmsg.net/v2";
