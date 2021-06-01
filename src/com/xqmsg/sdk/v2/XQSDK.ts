@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/indent */
 /* eslint-disable no-redeclare */
 import AESEncryption from "./algorithms/AESEncryption";
 import CallMethod from "./CallMethod";
 import Destination from "./Destination";
 import OTPv2Encryption from "./algorithms/OTPv2Encryption";
 import ServerResponse from "./ServerResponse";
-import SimpleXQCache from "./caching/XQSimpleCache";
 import StatusException from "./exceptions/StatusException";
 import ValidationException from "./exceptions/ValidationException";
 import XQSimpleCache from "./caching/XQSimpleCache";
@@ -44,7 +44,7 @@ interface XQSDKProps {
   XQ_API_KEY: string;
 
   /** The XQ Cache */
-  cache: SimpleXQCache;
+  cache: XQSimpleCache;
 
   /**
    *
@@ -143,21 +143,23 @@ interface XQSDK extends XQSDKProps {}
  */
 class XQSDK {
   /** A field name representing the Access-Control-Allow-Origin request header */
-  static ACCESS_CONTROL_ALLOW_ORIGIN: "Access-Control-Allow-Origin";
+  static ACCESS_CONTROL_ALLOW_ORIGIN: "Access-Control-Allow-Origin" =
+    "Access-Control-Allow-Origin";
 
   /** A field name representing the any (wildcard) request header */
-  static ANY: "*";
+  static ANY: "*" = "*";
 
   /** A field name representing the api-key request header */
-  static API_KEY: "api-key";
+  static API_KEY: "api-key" = "api-key";
 
   /** A field name representing the application/json request header */
-  static APPLICATION_JSON: "application/json";
+  static APPLICATION_JSON: "application/json" = "application/json";
 
   /** A field name representing the content-type request header */
-  static CONTENT_TYPE: "content-type";
+  static CONTENT_TYPE: "content-type" = "content-type";
 
-  static TEXT_PLAIN_UTF_8: "text/plain;charset=UTF-8";
+  static TEXT_PLAIN_UTF_8: "text/plain;charset=UTF-8" =
+    "text/plain;charset=UTF-8";
 
   constructor(credentials: { XQ_API_KEY: string; DASHBOARD_API_KEY: string }) {
     const { XQ_API_KEY, DASHBOARD_API_KEY } = credentials;
@@ -176,7 +178,7 @@ class XQSDK {
     this.XQ_API_KEY = config.application.XQ_API_KEY;
     this.DASHBOARD_API_KEY = config.application.DASHBOARD_API_KEY;
 
-    this.cache = new SimpleXQCache(localStorage);
+    this.cache = new XQSimpleCache(localStorage);
     this.OTPv2_ALGORITHM = "OTPV2";
     this.AES_ALGORITHM = "AES";
 

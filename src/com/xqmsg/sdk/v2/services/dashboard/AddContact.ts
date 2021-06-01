@@ -17,25 +17,25 @@ export default class AddContact extends XQModule {
   serviceName: string;
 
   /** The field name representing the new contact's email */
-  static EMAIL: "email";
+  static EMAIL: "email" = "email";
 
   /** The field name representing the new contact's first name */
-  static FIRST_NAME: "firstName";
+  static FIRST_NAME: "firstName" = "firstName";
 
   /** The field name representing the new contact's ID */
-  static ID: "id";
+  static ID: "id" = "id";
 
   /** The field name representing the new contact's last name */
-  static LAST_NAME: "lastName";
+  static LAST_NAME: "lastName" = "lastName";
 
   /** The field name representing the notifications preferences for the new contact */
-  static NOTIFICATIONS: "notifications";
+  static NOTIFICATIONS: "notifications" = "notifications";
 
   /** The field name representing the new contact's role */
-  static ROLE: "role";
+  static ROLE: "role" = "role";
 
   /** The field name representing the new contact's title */
-  static TITLE: "title";
+  static TITLE: "title" = "title";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.

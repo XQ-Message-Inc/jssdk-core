@@ -16,25 +16,25 @@ export default class GetUserInfo extends XQModule {
   serviceName: string;
 
   /** The field name representing the datetime (in milliseconds) when the subscription will end */
-  static ENDS: "ends";
+  static ENDS: "ends" = "ends";
 
   /** The field name representing the last name of the user */
-  static FIRST_NAME: "firstName";
+  static FIRST_NAME: "firstName" = "firstName";
 
   /** The field name representing the id of the user*/
-  static ID: "id";
+  static ID: "id" = "id";
 
   /** The field name representing the last name of the user */
-  static LAST_NAME: "lastName";
+  static LAST_NAME: "lastName" = "lastName";
 
   /** The field name representing the datetime (in milliseconds) when the subscription was activated */
-  static STARTS: "starts";
+  static STARTS: "starts" = "starts";
 
   /** The field name representing the subscription status of the user */
-  static SUBSCRIPTION_STATUS: "sub";
+  static SUBSCRIPTION_STATUS: "sub" = "sub";
 
   /** The field name representing the user */
-  static USER: "user";
+  static USER: "user" = "user";
 
   /**
    * @param {Map} [maybePayLoad=null]

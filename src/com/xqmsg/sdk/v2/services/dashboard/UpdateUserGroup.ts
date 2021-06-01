@@ -17,13 +17,13 @@ export default class UpdateUserGroup extends XQModule {
   serviceName: string;
 
   /** The field name representing the id of the user group */
-  static ID: "id";
+  static ID: "id" = "id";
 
   /** The field name representing the members of the user group */
-  static MEMBERS: "members";
+  static MEMBERS: "members" = "members";
 
   /** The field name representing the name of the user group */
-  static NAME: "name";
+  static NAME: "name" = "name";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.

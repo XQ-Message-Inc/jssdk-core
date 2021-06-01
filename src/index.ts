@@ -27,7 +27,6 @@ import RevokeUserAccess from "./com/xqmsg/sdk/v2/services/RevokeUserAccess";
 import RolesEnum from "./com/xqmsg/sdk/v2/RolesEnum";
 import ServerResponse from "./com/xqmsg/sdk/v2/ServerResponse";
 import UpdateSettings from "./com/xqmsg/sdk/v2/services/UpdateSettings";
-import ValidatePacket from "./com/xqmsg/sdk/v2/services/ValidatePacket";
 import XQSDK from "./com/xqmsg/sdk/v2/XQSDK";
 
 /**
@@ -81,6 +80,5 @@ export {
   ServerResponse,
   UpdateSettings,
   UpdateUserGroup,
-  ValidatePacket,
   XQSDK,
 };

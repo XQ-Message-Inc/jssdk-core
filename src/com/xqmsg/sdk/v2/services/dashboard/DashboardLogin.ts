@@ -8,7 +8,6 @@ import XQSDK from "../../XQSDK";
  * A service utilized to log a user into Dashboard application
  * This requires the user to previously have been authorized via
  *   * `Authorize`
- *   * `ValidatePacket`
  *   * `ExchangeForAccessToken`
  *
  *   @class [DashboardLogin]
@@ -21,7 +20,7 @@ export default class DashboardLogin extends XQModule {
   serviceName: string;
 
   /** The field name representing the represent */
-  static REQUEST: "request";
+  static REQUEST: "request" = "request";
 
   /**
    * @param {Map} [maybePayLoad=null] - Container for the request parameters supplied to this method.

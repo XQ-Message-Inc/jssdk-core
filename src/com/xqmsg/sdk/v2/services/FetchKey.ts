@@ -23,7 +23,7 @@ export default class FetchKey extends XQModule {
   serviceName: string;
 
   /** The field name representing the key used to fetch the encryption key from the server */
-  static LOCATOR_KEY: "locatorKey";
+  static LOCATOR_KEY: "locatorKey" = "locatorKey";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
@@ -65,8 +65,7 @@ export default class FetchKey extends XQModule {
               switch (serverResponse.status) {
                 case ServerResponse.OK: {
                   let key = serverResponse.payload;
-                  key = key.substr(2);
-
+                  if (key.startsWith(".")) key = key.substr(2);
                   resolve(new ServerResponse(ServerResponse.OK, 200, key));
                   break;
                 }

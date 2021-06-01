@@ -23,7 +23,7 @@ export default class FileDecrypt extends XQModule {
   requiredFields: string[];
 
   /** The field name representing the specified source file to decrypt */
-  static SOURCE_FILE: "sourceFile";
+  static SOURCE_FILE: "sourceFile" = "sourceFile";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.

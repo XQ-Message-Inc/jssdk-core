@@ -18,7 +18,7 @@ export default class CodeValidator extends XQModule {
   serviceName: string;
 
   /** The field name representing the two-factor pin used to validate the `Authorize` service request */
-  static PIN: "pin";
+  static PIN: "pin" = "pin";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
