@@ -1,4 +1,16 @@
 import {
+  AESAlgorithm,
+  IDecryptParams,
+  IEncryptParams,
+  OTPv2Algorithm,
+  ensureCredentialsPresent,
+  sdk,
+  testEmail,
+  testToFailEncryptionPayload,
+  testToSucceedEncryptionPayload,
+} from "./utils/setupFiles";
+
+import {
   AuthorizeAlias,
   Decrypt,
   Encrypt,
@@ -6,18 +18,8 @@ import {
   ServerResponse,
 } from "../src";
 
-import {
-  AESAlgorithm,
-  IDecryptParams,
-  IEncryptParams,
-  OTPv2Algorithm,
-  sdk,
-  testEmail,
-  testToFailEncryptionPayload,
-  testToSucceedEncryptionPayload,
-} from "./utils/setupFiles";
-
 describe("Testing `Decrypt` service", () => {
+  // Step 1. Authorize User
   const authorizeUser = () =>
     new AuthorizeAlias(sdk)
       .supplyAsync({ [AuthorizeAlias.USER]: testEmail })
@@ -32,6 +34,7 @@ describe("Testing `Decrypt` service", () => {
         }
       });
 
+  // Step 2. Encrypt the message
   const encryptMessage = (
     payload: IEncryptParams,
     algorithm: EncryptionAlgorithm
@@ -40,6 +43,7 @@ describe("Testing `Decrypt` service", () => {
       if (!response) {
         return false;
       }
+
       switch (response.status) {
         case ServerResponse.OK: {
           return response;
@@ -50,6 +54,7 @@ describe("Testing `Decrypt` service", () => {
       }
     });
 
+  // Step 3. Decrypt the encrypted message
   const decryptMessage = (
     payload: IDecryptParams,
     algorithm: EncryptionAlgorithm
@@ -98,6 +103,8 @@ describe("Testing `Decrypt` service", () => {
     });
   };
 
+  beforeAll(() => ensureCredentialsPresent());
+
   it(`should successfully encrypt the given text via AES algorithm`, async () =>
     expect(
       await testDecrypt(testToSucceedEncryptionPayload, AESAlgorithm)
@@ -108,13 +115,25 @@ describe("Testing `Decrypt` service", () => {
       await testDecrypt(testToSucceedEncryptionPayload, OTPv2Algorithm)
     ).toEqual(true));
 
-  it(`should fail to encrypt the given text via AES algorithm`, async () =>
+  it(`should fail to encrypt the given text via AES algorithm`, async () => {
+    const originalError = console.error;
+    console.error = jest.fn();
+
     expect(
       await testDecrypt(testToFailEncryptionPayload, AESAlgorithm)
-    ).toEqual(false));
+    ).toEqual(false);
 
-  it(`should fail to encrypt the given text via OTPV2 algorithm`, async () =>
+    console.error = originalError;
+  });
+
+  it(`should fail to encrypt the given text via OTPV2 algorithm`, async () => {
+    const originalError = console.error;
+    console.error = jest.fn();
+
     expect(
-      await testDecrypt(testToFailEncryptionPayload, OTPv2Algorithm)
-    ).toEqual(false));
+      await testDecrypt(testToFailEncryptionPayload, AESAlgorithm)
+    ).toEqual(false);
+
+    console.error = originalError;
+  });
 });

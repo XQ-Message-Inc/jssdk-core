@@ -1,18 +1,18 @@
 import {
+  AESAlgorithm,
+  IEncryptParams,
+  OTPv2Algorithm,
+  ensureCredentialsPresent,
+  sdk,
+  testToSucceedEncryptionPayload,
+} from "./utils/setupFiles";
+
+import {
   AuthorizeAlias,
   Encrypt,
   EncryptionAlgorithm,
   ServerResponse,
 } from "../src";
-
-import {
-  AESAlgorithm,
-  IEncryptParams,
-  OTPv2Algorithm,
-  sdk,
-  testEmail,
-  testToSucceedEncryptionPayload,
-} from "./utils/setupFiles";
 
 describe("Testing `Encrypt` service", () => {
   const authorizeUser = (user: string) =>
@@ -55,14 +55,12 @@ describe("Testing `Encrypt` service", () => {
   ) => {
     const userToAuthorize = payload.recipients[0];
 
-    sdk.getCache().putActiveProfile(userToAuthorize);
-
-    return authorizeUser(testEmail).then((response) => {
+    return authorizeUser(userToAuthorize).then((response) => {
       if (!response) {
         return false;
       }
 
-      sdk.getCache().putActiveProfile(payload.recipients[0]);
+      sdk.getCache().putActiveProfile(userToAuthorize);
 
       return encryptMessage(payload, algorithm).then((response) => {
         if (!response) {
@@ -79,6 +77,8 @@ describe("Testing `Encrypt` service", () => {
       });
     });
   };
+
+  beforeAll(() => ensureCredentialsPresent());
 
   it(`should successfully encrypt the given text via AES algorithm`, async () =>
     expect(
