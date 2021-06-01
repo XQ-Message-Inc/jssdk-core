@@ -1,7 +1,7 @@
 import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
-import XQSDK from "../XQSDK";
 import XQModule from "./XQModule";
+import XQSDK from "../XQSDK";
 
 /**
  * A service which is utilized to retrieve the notification and newsletter settings for the current user.

@@ -1,8 +1,7 @@
+import { TextDecoder, TextEncoder } from "util";
 import EncryptionAlgorithm from "./EncryptionAlgorithm";
 import ServerResponse from "../ServerResponse";
 import XQSDK from "../XQSDK";
-
-import { TextDecoder, TextEncoder } from "util";
 
 type ParsedFile = {
   locator: string;

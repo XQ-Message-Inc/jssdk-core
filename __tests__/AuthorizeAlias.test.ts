@@ -1,5 +1,10 @@
 import { AuthorizeAlias, ServerResponse } from "../src";
-import { sdk, testEmail, testPhone } from "./utils/setupFiles";
+import {
+  ensureCredentialsPresent,
+  sdk,
+  testEmail,
+  testPhone,
+} from "./utils/setupFiles";
 
 describe("Testing `AuthorizeAlias` service", () => {
   const testAuthorization = async (user: string) =>
@@ -15,6 +20,8 @@ describe("Testing `AuthorizeAlias` service", () => {
           }
         }
       });
+
+  beforeAll(() => ensureCredentialsPresent());
 
   it(`should successfully test authorization for a given email: ${testEmail}`, async () =>
     expect(await testAuthorization(testEmail)).toEqual(true));
