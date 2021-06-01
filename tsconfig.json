@@ -5,12 +5,17 @@
       "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
       "declaration": true,
       "forceConsistentCasingInFileNames": true, /* Disallow inconsistently-cased references to the same file. */
+      "lib": ["es5", "es2015.promise", "dom", "es2015"],
       "module": "commonjs" /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */,
+      "moduleResolution": "node",
       "noImplicitAny": true,
       "outDir": "./dist" /* Redirect output structure to the directory. */,
+      "resolveJsonModule": true,
       "rootDir": "./" /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */,
+      "sourceMap": true,
       "strict": true /* Enable all strict type-checking options. */,
       "strictPropertyInitialization": false,
-      "target": "ESNEXT" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */
-    }
+      "target": "esnext" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */
+    },
+    "include": ["index.ts"]
    }
