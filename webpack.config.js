@@ -1,5 +1,4 @@
 const path = require("path");
-const webpack = require("webpack");
 
 module.exports = {
   mode: "production",
@@ -22,11 +21,6 @@ module.exports = {
       path: require.resolve("path-browserify"),
     },
   },
-  plugins: [
-    new webpack.ProvidePlugin({
-      Buffer: ["buffer", "Buffer"],
-    }),
-  ],
   module: {
     rules: [
       // All files with a '.ts' extension will be handled by 'ts-loader'.

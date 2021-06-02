@@ -249,7 +249,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
               j.push(payloadBytes[idx] ^ keyBytes[mi]);
             }
 
-            const encoded = new TextDecoder("utf8").decode(new Uint8Array(j));
+            const encoded = new TextDecoder().decode(new Uint8Array(j));
 
             try {
               const decoded = decodeURIComponent(encoded);
