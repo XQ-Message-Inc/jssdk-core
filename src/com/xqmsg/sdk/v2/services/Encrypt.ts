@@ -1,4 +1,5 @@
 import EncryptionAlgorithm from "../algorithms/EncryptionAlgorithm";
+import FetchKey from "./FetchKey";
 import FetchQuantumEntropy from "../quantum/FetchQuantumEntropy";
 import GeneratePacket from "./GeneratePacket";
 import ServerResponse from "../ServerResponse";
@@ -10,6 +11,8 @@ interface IEncryptParams {
   text: string;
   expires: number;
   dor?: boolean;
+  locatorKey?: string;
+  encryptionKey: string;
 }
 
 /**
@@ -35,6 +38,9 @@ export default class Encrypt extends XQModule {
 
   /** The field name representing the key used to fetch the encryption key from the server */
   static LOCATOR_KEY: "locatorKey" = "locatorKey";
+
+  /** The field name representing a (optional) previously generated encryption key */
+  static ENCRYPTION_KEY: "encryptionKey" = "encryptionKey";
 
   /** The field name representing the list of emails of users intended to have read access to the encrypted content */
   static RECIPIENTS: "recipients" = "recipients";
@@ -76,6 +82,83 @@ export default class Encrypt extends XQModule {
         const expiresHours = maybePayLoad[Encrypt.EXPIRES_HOURS];
         const deleteOnReceipt = maybePayLoad[Encrypt.DELETE_ON_RECEIPT];
 
+        const locatorKey = maybePayLoad[Encrypt.LOCATOR_KEY];
+        const encryptionKey = maybePayLoad[Encrypt.ENCRYPTION_KEY];
+
+        /**
+         * A function utilized to take an encryption key and encrypt textual data.
+         * @param expandedKey - the encryption key
+         * @returns {locatorKey: string, encryptedText: string }
+         */
+        const encryptText = (expandedKey: string) => {
+          return algorithm
+            .encryptText(message, expandedKey)
+            .then((encryptResponse: ServerResponse) => {
+              switch (encryptResponse.status) {
+                case ServerResponse.OK: {
+                  const encryptResult = encryptResponse.payload;
+                  const encryptedText =
+                    encryptResult[EncryptionAlgorithm.ENCRYPTED_TEXT];
+                  const expandedKey = encryptResult[EncryptionAlgorithm.KEY];
+
+                  return new GeneratePacket(sdk)
+                    .supplyAsync({
+                      [GeneratePacket.KEY]: algorithm.prefix + expandedKey,
+                      [GeneratePacket.RECIPIENTS]: recipients,
+                      [GeneratePacket.EXPIRES_HOURS]: expiresHours,
+                      [GeneratePacket.DELETE_ON_RECEIPT]: deleteOnReceipt
+                        ? deleteOnReceipt
+                        : false,
+                    })
+                    .then((uploadResponse: ServerResponse) => {
+                      switch (uploadResponse.status) {
+                        case ServerResponse.OK: {
+                          const locator = uploadResponse.payload;
+                          return new ServerResponse(ServerResponse.OK, 200, {
+                            [Encrypt.LOCATOR_KEY]: locator,
+                            [Encrypt.ENCRYPTED_TEXT]: encryptedText,
+                          });
+                        }
+
+                        case ServerResponse.ERROR: {
+                          console.error(
+                            `PacketValidation failed, code: ${uploadResponse.statusCode}, reason: ${uploadResponse.payload}`
+                          );
+                          return uploadResponse;
+                        }
+                      }
+                    });
+                }
+                case ServerResponse.ERROR: {
+                  console.error(
+                    `${algorithm.constructor.name}.encryptText(...) failed,  code: ${encryptResponse.statusCode}, reason: ${encryptResponse.payload}`
+                  );
+                  return encryptResponse;
+                }
+              }
+            });
+        };
+
+        if (locatorKey) {
+          // OPTIONAL - if the user has an encryption key to use
+          if (!encryptionKey) {
+            return encryptText(encryptionKey);
+          }
+
+          // OPTIONAL - if the user has a locator key to re-use but needs to fetch the encryption key
+          return new FetchKey(sdk)
+            .supplyAsync({ locatorKey })
+            .then((fetchKeyResponse: ServerResponse) => {
+              const encryptionKey = fetchKeyResponse.payload;
+              return encryptText(encryptionKey);
+            });
+        }
+
+        // OPTIONAL - if the user has an encryption key to use
+        if (encryptionKey) {
+          return encryptText(encryptionKey);
+        }
+
         return new FetchQuantumEntropy(sdk)
           .supplyAsync({ [FetchQuantumEntropy.KS]: FetchQuantumEntropy._256 })
           .then((keyResponse: ServerResponse) => {
@@ -88,58 +171,7 @@ export default class Encrypt extends XQModule {
                   message.length > 4096 ? 4096 : Math.max(2048, message.length)
                 ) as string;
 
-                return algorithm
-                  .encryptText(message, expandedKey)
-                  .then((encryptResponse: ServerResponse) => {
-                    switch (encryptResponse.status) {
-                      case ServerResponse.OK: {
-                        const encryptResult = encryptResponse.payload;
-                        const encryptedText =
-                          encryptResult[EncryptionAlgorithm.ENCRYPTED_TEXT];
-                        const expandedKey =
-                          encryptResult[EncryptionAlgorithm.KEY];
-
-                        return new GeneratePacket(sdk)
-                          .supplyAsync({
-                            [GeneratePacket.KEY]:
-                              algorithm.prefix + expandedKey,
-                            [GeneratePacket.RECIPIENTS]: recipients,
-                            [GeneratePacket.EXPIRES_HOURS]: expiresHours,
-                            [GeneratePacket.DELETE_ON_RECEIPT]: deleteOnReceipt
-                              ? deleteOnReceipt
-                              : false,
-                          })
-                          .then((uploadResponse: ServerResponse) => {
-                            switch (uploadResponse.status) {
-                              case ServerResponse.OK: {
-                                const locator = uploadResponse.payload;
-                                return new ServerResponse(
-                                  ServerResponse.OK,
-                                  200,
-                                  {
-                                    [Encrypt.LOCATOR_KEY]: locator,
-                                    [Encrypt.ENCRYPTED_TEXT]: encryptedText,
-                                  }
-                                );
-                              }
-
-                              case ServerResponse.ERROR: {
-                                console.error(
-                                  `PacketValidation failed, code: ${uploadResponse.statusCode}, reason: ${uploadResponse.payload}`
-                                );
-                                return uploadResponse;
-                              }
-                            }
-                          });
-                      }
-                      case ServerResponse.ERROR: {
-                        console.error(
-                          `${algorithm.constructor.name}.encryptText(...) failed,  code: ${encryptResponse.statusCode}, reason: ${encryptResponse.payload}`
-                        );
-                        return encryptResponse;
-                      }
-                    }
-                  });
+                return encryptText(expandedKey);
               }
               case ServerResponse.ERROR: {
                 console.error(
