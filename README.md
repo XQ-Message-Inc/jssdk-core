@@ -65,6 +65,18 @@ const sdk = new XQSDK({
 
 **_Note: You only need to generate one SDK instance for use across your application._**
 
+
+### Authenticating the SDK
+
+Before making most XQ API calls, the user will need a required bearer token. To get one, a user must first request access, upon which they get a pre-auth token. After they confirm their account, they will send the pre-auth token to the server in return for an access token.
+
+The user may utilize [Authorize](#authorization) to request an access token for a particular email address or telephone number, then use [CodeValidator](#code-validator) to validate and replace the temporary token they received previously for a valid access token.
+
+Optionally the user may utilize [AuthorizeAlias](#connect-to-an-alias-account) which allows them to immediately authorize an access token for a particular email address or telephone number. It should only be considered in situations wher 2FA is problematic/unecessary, such as IoT devices or trusted applications that have a different method for authenticating user information.
+
+**_Note: This method only works for new email addresses/phone numbers that are not registered with XQ. If a previously registered account is used, an error will be returned._**
+
+
 #### Encrypting a message
 
 The text to be encrypted should be submitted along with the email addresses of the intended recipients, as well as the amount of time that the message should be available.
