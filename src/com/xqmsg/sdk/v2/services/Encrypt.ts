@@ -141,13 +141,13 @@ export default class Encrypt extends XQModule {
             });
         };
 
+        // allow the user to utilize a pre-existing locator key, if available
         if (locatorKey) {
-          // OPTIONAL - if the user has an encryption key to use
-          if (!encryptionKey) {
+          // allow the user to utilize a pre-existing encryption key, if available
+          if (encryptionKey) {
             return encryptText(encryptionKey);
           }
 
-          // OPTIONAL - if the user has a locator key to re-use but needs to fetch the encryption key
           return new FetchKey(sdk)
             .supplyAsync({ locatorKey })
             .then((fetchKeyResponse: ServerResponse) => {
@@ -156,7 +156,7 @@ export default class Encrypt extends XQModule {
             });
         }
 
-        // OPTIONAL - if the user has an encryption key to use
+        // allow the user to utilize a pre-existing encryption key, if available
         if (encryptionKey) {
           return encryptText(encryptionKey);
         }
