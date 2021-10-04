@@ -12,7 +12,7 @@ interface IEncryptParams {
   expires: number;
   dor?: boolean;
   locatorKey?: string;
-  encryptionKey: string;
+  encryptionKey?: string;
 }
 
 /**
@@ -52,8 +52,10 @@ export default class Encrypt extends XQModule {
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
    * @param {[String]} maybePayLoad.recipients  - the list of emails of users intended to have read access to the encrypted content
    * @param {String} maybePayLoad.text - the text that will be encrypted
-   * @param {Long} maybePayLoad.expires - the number of hours of life span until access to the encrypted text is expired
-   * @param {Boolean} [maybePayLoad.dor=false] - the boolean value which specifies if the content should be deleted after opening
+   * @param {Number} maybePayLoad.expires - the number of hours of life span until access to the encrypted text is expired
+   * @param {Boolean} [maybePayLoad.dor=false] - an optional boolean value which specifies if the content should be deleted after opening
+   * @param {String} maybePayLoad.locatorKey - an optional string value that may be used to utilize a pre-existing locator key
+   * @param {String} maybePayLoad.encryptionKey - an optional string value that may be used to utilize a pre-existing encryption key
    *
    * @returns {Promise<ServerResponse<{payload:{locatorKey:string, encryptedText:string}}>>}
    */
