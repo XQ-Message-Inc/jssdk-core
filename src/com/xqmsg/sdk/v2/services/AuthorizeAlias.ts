@@ -27,7 +27,7 @@ export default class AuthorizeAlias extends XQModule {
   /** The field name representing the last name of the user */
   static LAST_NAME: "lastName" = "lastName";
 
-  /** The field name representing the news letter service */
+  /** The field name representing the user's email or phone number */
   static USER: "user" = "user";
 
   /**
@@ -71,6 +71,8 @@ export default class AuthorizeAlias extends XQModule {
                 const accessToken = authorizeAliasResponse.payload;
                 try {
                   self.cache.putXQAccess(aliasUser, accessToken);
+                  self.cache.putActiveProfile(aliasUser);
+
                   return authorizeAliasResponse;
                 } catch (e) {
                   console.log(e.message);
