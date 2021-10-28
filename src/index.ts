@@ -15,6 +15,7 @@ import Encrypt from "./com/xqmsg/sdk/v2/services/Encrypt";
 import EncryptionAlgorithm from "./com/xqmsg/sdk/v2/algorithms/EncryptionAlgorithm";
 import ExchangeForAccessToken from "./com/xqmsg/sdk/v2/services/ExchangeForAccessToken";
 import FetchKey from "./com/xqmsg/sdk/v2/services/FetchKey";
+import FetchQuantumEntropy from "./com/xqmsg/sdk/v2/quantum/FetchQuantumEntropy";
 import FileDecrypt from "./com/xqmsg/sdk/v2/services/FileDecrypt";
 import FileEncrypt from "./com/xqmsg/sdk/v2/services/FileEncrypt";
 import GeneratePacket from "./com/xqmsg/sdk/v2/services/GeneratePacket";
@@ -62,6 +63,7 @@ export {
   EncryptionAlgorithm,
   ExchangeForAccessToken,
   FetchKey,
+  FetchQuantumEntropy,
   FileDecrypt,
   FileEncrypt,
   FindContacts,
