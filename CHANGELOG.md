@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.23] - 2020-10-28
+
+### Added
+
+- Expose `FetchQuantumEntropy` via SDK exported API
 
 ## [1.0.22] - 2020-10-27
 
