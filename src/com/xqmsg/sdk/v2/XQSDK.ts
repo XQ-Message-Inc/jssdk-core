@@ -179,7 +179,7 @@ class XQSDK {
     this.DASHBOARD_API_KEY = config.application.DASHBOARD_API_KEY;
 
     this.cache = new XQSimpleCache(localStorage);
-    this.OTPv2_ALGORITHM = "OTPV2";
+    this.OTPv2_ALGORITHM = "OTPv2";
     this.AES_ALGORITHM = "AES";
 
     this.SUBSCRIPTION_SERVER_URL = config.application.SUBSCRIPTION_SERVER_URL;
