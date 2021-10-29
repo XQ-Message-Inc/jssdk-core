@@ -1,6 +1,6 @@
 {
   "name": "@xqmsg/jssdk-core",
-  "version": "1.0.23",
+  "version": "1.0.25",
   "description": "A Javascript Implementation of XQ Message SDK, V.2",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -17,7 +17,8 @@
     "build": "concurrently \"webpack --config webpack.config.js\" \"tsc -p tsconfig-esm.json\" \"tsc -p tsconfig-cjs.json\"",
     "lint": "eslint src/**  --ext .ts",
     "clean": "rm -rf node_modules && rm -rf dist",
-    "test": "jest"
+    "test": "jest",
+    "publish": "yarn build && npm publish --access public"
   },
   "repository": {
     "type": "git",
