@@ -21,7 +21,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
   ) => Promise<unknown>;
 
   /**
-   * Takes an OTPV2 encrypted text string and attempts to decrypt with the provided key.
+   * Takes an OTPv2 encrypted text string and attempts to decrypt with the provided key.
    * @param  {String} text - the text to decrypt.
    * @param  {String} key - the encryption key.
    * @return {Promise<ServerResponse<{payload:{decryptedText:string}}>>} A Promise of the Response containing the decrypted text.
@@ -29,7 +29,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
   decryptText: (text: string, key: string) => Promise<ServerResponse>;
 
   /**
-   * Takes an OTPV2 encrypted Uint8Array and attempts to decrypt with the provided key.
+   * Takes an OTPv2 encrypted Uint8Array and attempts to decrypt with the provided key.
    * @param  {Uint8Array} encrypted - the Uint8Array to decrypt.
    * @param  {String} key - the encryption key.
    * @return {Uint8Array} the decrypted Uint8Array
@@ -109,12 +109,12 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
 
         return new Promise((resolve) => {
           if (key === "" || key == undefined) {
-            console.error("OTPV2 Source Key cannot be empty.");
+            console.error("OTPv2 Source Key cannot be empty.");
             resolve(
               new ServerResponse(
                 ServerResponse.ERROR,
                 500,
-                "OTPV2 Source Key cannot be empty."
+                "OTPv2 Source Key cannot be empty."
               )
             );
           }

@@ -84,7 +84,7 @@ describe("Testing `Encrypt` service", () => {
     expect(
       await testEncrypt(testToSucceedEncryptionPayload, AESAlgorithm)
     ).toEqual(true));
-  it(`should successfully encrypt the given text via OTPV2 algorithm`, async () =>
+  it(`should successfully encrypt the given text via OTPv2 algorithm`, async () =>
     expect(
       await testEncrypt(testToSucceedEncryptionPayload, OTPv2Algorithm)
     ).toEqual(true));
