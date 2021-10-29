@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.0.25] - 2020-10-29
 
+### Added
+
+- `publish` script to `package.json` -- runs `yarn build` then `npm publish --access public` to ensure we build out our latest updates before publishing to NPM
+
 ### Modified
 
 - naming of the `OPTV2` variable back to standardized `OTPv2`
