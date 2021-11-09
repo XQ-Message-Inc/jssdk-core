@@ -29,6 +29,11 @@ export default class EncryptionAlgorithm {
     locatorToken: string
   ) => Promise<ServerResponse>;
 
+  decryptFile: (
+    sourceFile: File,
+    locateFn: (aLocatorToken: string) => Promise<Record<string, string>>
+  ) => Promise<ServerResponse>;
+
   /**
    * Takes a string and encrypts it using the provided quantum key.
    *

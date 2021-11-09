@@ -1,14 +1,8 @@
+import EncryptionAlgorithm from "../algorithms/EncryptionAlgorithm";
 import FetchKey from "./FetchKey";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-
-type EncryptionAlgorithm = {
-  decryptFile: (
-    sourceFile: File,
-    locateFn: (aLocatorToken: string) => Promise<Record<string, string>>
-  ) => void;
-};
 
 /**
  * A service which is utilized to decrypt data stored in a file using the {@link EncryptionAlgorithm} provided.
