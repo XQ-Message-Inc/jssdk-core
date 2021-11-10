@@ -16,9 +16,9 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
    * @return {Promise<ServerResponse<{payload:{decryptedText:string}}>>} A Promise of the Response containing the decrypted text.
    */
   decryptFile: (
-    file: File,
-    retrieveKeyFunction: (locatorKey: string) => string
-  ) => Promise<unknown>;
+    sourceFile: File,
+    locateFn: (aLocatorToken: string) => Promise<string>
+  ) => Promise<ServerResponse>;
 
   /**
    * Takes an OTPv2 encrypted text string and attempts to decrypt with the provided key.
@@ -38,10 +38,10 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
 
   /**
    * @param {ParsedFile} parsed - the parsed file to be decrypted
-   * @return {String} keyString - the quantum key used to decrypt the file
+   * @return {String} locatorKey - the quantum key used to decrypt the file
    * @return {[File, String]} the decrypted file tuple
    */
-  doDecrypt: (parsed: ParsedFile, keyString: string) => [File, string];
+  doDecrypt: (parsed: ParsedFile, locatorKey: string) => [File, string];
 
   /**
    * @param {Uint8Array} data - data to be encrypted
@@ -319,8 +319,8 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
               parsedFile = pf;
               return retrieveKeyFunction(pf.locator);
             })
-            .then((key) => {
-              const result = self.doDecrypt(parsedFile, key);
+            .then((decryptedPayload) => {
+              const result = self.doDecrypt(parsedFile, decryptedPayload);
               const file = result[0];
               // const name = result[1];
               resolve(new ServerResponse(ServerResponse.OK, 200, file));
@@ -339,8 +339,8 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
       }
     };
 
-    this.doDecrypt = (parsed, keyString) => {
-      const key = new TextEncoder().encode(keyString);
+    this.doDecrypt = (parsed, locatorKey) => {
+      const key = new TextEncoder().encode(locatorKey);
       const fileName = this.decryptUint(parsed.nameEncrypted, key);
       const content = this.decryptUint(parsed.contentEncrypted, key);
 
@@ -359,44 +359,36 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
       return result;
     };
 
-    this.parseFileForDecrypt = (file) => {
-      return new Promise((resolve) => {
-        // Fetch the length of the token and the actual token. Wrapping in the "Response"
-        // class because Safari does not support Blob.arrayBuffer
-        resolve(
-          file.arrayBuffer().then((buffer: ArrayBuffer) => {
-            let pos = 0;
-            const locatorSize = new Uint32Array(buffer.slice(pos, pos + 4))[0];
-            if (locatorSize > 256) {
-              throw new Error(
-                "Unable to decrypt file, check that the file is valid and not damaged"
-              );
-            }
-            pos += 4;
-            const locator = new TextDecoder().decode(
-              new Uint8Array(buffer.slice(pos, locatorSize + pos))
-            );
-            pos += locatorSize;
-            const fileNameSize = new Uint32Array(buffer.slice(pos, pos + 4))[0];
-            if (fileNameSize < 2 || fileNameSize > 2000) {
-              throw new Error(
-                "Unable to decrypt file, check that the file is valid and not damaged"
-              );
-            }
-            pos += 4;
-            const nameEncrypted = new Uint8Array(
-              buffer.slice(pos, fileNameSize + pos)
-            );
-            pos += fileNameSize;
-
-            return {
-              locator: locator,
-              nameEncrypted: nameEncrypted,
-              contentEncrypted: new Uint8Array(buffer.slice(pos)),
-            };
-          })
+    this.parseFileForDecrypt = async (file) => {
+      const buffer = await new Response(file).arrayBuffer();
+      let pos = 0;
+      const locatorSize = new Uint32Array(buffer.slice(pos, pos + 4))[0];
+      if (locatorSize > 256) {
+        throw new Error(
+          "Unable to decrypt file, check that the file is valid and not damaged"
         );
-      });
+      }
+      pos += 4;
+      const locator = new TextDecoder().decode(
+        new Uint8Array(buffer.slice(pos, locatorSize + pos))
+      );
+      pos += locatorSize;
+      const fileNameSize = new Uint32Array(buffer.slice(pos, pos + 4))[0];
+      if (fileNameSize < 2 || fileNameSize > 2000) {
+        throw new Error(
+          "Unable to decrypt file, check that the file is valid and not damaged"
+        );
+      }
+      pos += 4;
+      const nameEncrypted = new Uint8Array(
+        buffer.slice(pos, fileNameSize + pos)
+      );
+      pos += fileNameSize;
+      return {
+        locator,
+        nameEncrypted,
+        contentEncrypted: new Uint8Array(buffer.slice(pos)),
+      };
     };
   }
 }

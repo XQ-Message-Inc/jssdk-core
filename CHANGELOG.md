@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.0.26] - 2021-11-09
 
 ### Modified
+- return type of `FileEncrypt.supplyAsync` from `void` --> `Promise<ServerResponse>`
+- return type of `locateFn`, the second parameter of `OTPv2Encryption.decryptFile`, a callback used to fetch the locator key of a given source file. From `string` --> `Promise<string>`
+- return type of `OTPv2Encryption.decryptFile` from `void` --> `Promise<unknown>`
+- refactor `OTPv2Encryption.parseFileForDecrypt` method, same results.
+- return type of `locateFn`, the second parameter of `EncryptionAlgorithm.decryptFile`, a callback used to fetch the locator key of a given source file. From `Record<string, string>` --> `Promise<string>`. The superclass' method should match the `OTPv2Encryption` variant method.
+
+## [1.0.26] - 2021-11-09
+
+### Modified
 
 - `FileDecrypt` - update the type of the algorithm parameter of the `FileDecrypt` constructor to the `EncryptionAlgorithm` super class, rather than an omitted/stripped down version of the type. Also update return type from `void` --> `Promise<ServerResponse>` which is the correct return type.
 
