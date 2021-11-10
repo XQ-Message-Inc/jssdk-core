@@ -31,7 +31,7 @@ export default class EncryptionAlgorithm {
 
   decryptFile: (
     sourceFile: File,
-    locateFn: (aLocatorToken: string) => Promise<Record<string, string>>
+    locateFn: (aLocatorToken: string) => Promise<string>
   ) => Promise<ServerResponse>;
 
   /**
