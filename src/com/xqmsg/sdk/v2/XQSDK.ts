@@ -10,6 +10,10 @@ import StatusException from "./exceptions/StatusException";
 import ValidationException from "./exceptions/ValidationException";
 import XQSimpleCache from "./caching/XQSimpleCache";
 
+import memoryCache from "memory-cache";
+
+var XMLHttpRequest = require("xhr2");
+
 const SUBSCRIPTION_SERVER_URL = "https://subscription.xqmsg.net/v2";
 const VALIDATION_SERVER_URL = "https://validation.xqmsg.net/v2";
 const KEY_SERVER_URL = "https://quantum.xqmsg.net/v2/";
@@ -178,7 +182,7 @@ class XQSDK {
     this.XQ_API_KEY = config.application.XQ_API_KEY;
     this.DASHBOARD_API_KEY = config.application.DASHBOARD_API_KEY;
 
-    this.cache = new XQSimpleCache(localStorage);
+    this.cache = new XQSimpleCache(memoryCache);
     this.OTPv2_ALGORITHM = "OTPv2";
     this.AES_ALGORITHM = "AES";
 
