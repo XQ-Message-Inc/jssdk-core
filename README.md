@@ -82,7 +82,7 @@ Optionally the user may utilize [AuthorizeAlias](#connect-to-an-alias-account) w
 The text to be encrypted should be submitted along with the email addresses of the intended recipients, as well as the amount of time that the message should be available.
 
 ```javascript
-import { Encrypt, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+import { Encrypt, EncryptionAlgorithm, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
 
 const sdk = new XQSDK({
   XQ_API_KEY: "YOUR_XQ_API_KEY"
@@ -120,7 +120,7 @@ new Encrypt(sdk, algorithm).supplyAsync(payload).then((response) => {
 To decrypt a message, the encrypted payload must be provided, along with the locator token received from XQ during encryption. The authenticated user must be one of the recipients that the message was originally sent to ( or the sender themselves).
 
 ```javascript
-import { Decrypt, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+import { EncryptionAlgorithm, Decrypt, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
 
 const sdk = new XQSDK({
   XQ_API_KEY: "YOUR_XQ_API_KEY"
@@ -156,7 +156,7 @@ new Decrypt(sdk, algorithm).supplyAsync(payload).then((response) => {
 Here, a `File` object containing the data for encryption must be provided. Like message encryption, a list of recipients who will be able to decrypt the file, as well as the amount of time before expiration must also be provided.
 
 ```javascript
-import { FileEncrypt, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+import { EncryptionAlgorithm, FileEncrypt, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
 
 const sdk = new XQSDK({
   XQ_API_KEY: "YOUR_XQ_API_KEY"
@@ -197,7 +197,7 @@ new FileEncrypt(sdk, algorithm)
 To decrypt a file, the URI to the XQ encrypted file must be provided. The user decrypting the file must be one of the recipients original specified ( or the sender ).
 
 ```javascript
-import { FileDecrypt, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+import { EncryptionAlgorithm, FileDecrypt, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
 
 const sdk = new XQSDK({
   XQ_API_KEY: "YOUR_XQ_API_KEY"

@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [1.1.0] - 2021-11-15
+
+## Added
+- Compatibility w/ server-side environments (node.js).
+
+We replaced purely web based APIs such as `Buffer`, `localStorage`, and `XMLHttpRequest` with nearly identical versions that are compatitble within server-side environments. The packages and their versions are listed here:
+```
+ "buffer": "^6.0.3",
+ "memory-cache": "^0.2.0",
+ "xhr2": "^0.2.1"
+```
+
+Utilizing `memory-cache` in lieu of `localStorage` required a few syntactic updates, mainly method names. `buffer` and `xhr2` were plug-and-play and replaced the web based variants just fine.
+
+## Tested
+- New compatibility updates via a web based playground application (react), a node/express server plaground as well as the `jssdk-examples` application.
+
+
 ## [1.0.26] - 2021-11-09
 
 ### Modified
