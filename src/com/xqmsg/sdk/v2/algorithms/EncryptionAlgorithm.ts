@@ -72,12 +72,6 @@ export default class EncryptionAlgorithm {
   /** The field name representing the encryption key */
   static KEY: "key" = "key";
 
-  /** The field name representing the OTPv2 algorithm key name */
-  static OTPv2: "OTPv2" = "OTPv2";
-
-  /** The field name representing the AES algorithm key name */
-  static AES: "AES" = "AES";
-
   constructor(sdk: XQSDK) {
     this.sdk = sdk;
 
