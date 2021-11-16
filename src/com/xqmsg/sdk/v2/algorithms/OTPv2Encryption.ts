@@ -8,6 +8,22 @@ type ParsedFile = {
   contentEncrypted: Uint8Array;
 };
 
+const universalBtoa = (str: string) => {
+  try {
+    return btoa(str);
+  } catch (err) {
+    return Buffer.from(str).toString("base64");
+  }
+};
+
+const universalAtob = (b64Encoded: string) => {
+  try {
+    return atob(b64Encoded);
+  } catch (err) {
+    return Buffer.from(b64Encoded, "base64").toString();
+  }
+};
+
 export default class OTPv2Encryption extends EncryptionAlgorithm {
   /**
    * Takes an encrypted file and attempts to decrypt with the provided key.
@@ -235,7 +251,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
 
         return new Promise((resolve) => {
           try {
-            const payload = atob(text);
+            const payload = universalAtob(text);
 
             const encoder = new TextEncoder();
 
@@ -299,7 +315,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
         const decoder = new TextDecoder();
         const dt = decoder.decode(new Uint8Array(j));
 
-        return btoa(dt);
+        return universalBtoa(dt);
       } catch (err) {
         console.info("ERROR: " + err.message);
         return err.message;

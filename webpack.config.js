@@ -19,6 +19,7 @@ module.exports = {
     // Support `path` in the browser
     fallback: {
       path: require.resolve("path-browserify"),
+      buffer: require.resolve("buffer/"),
     },
   },
   module: {
