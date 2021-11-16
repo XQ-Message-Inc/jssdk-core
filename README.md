@@ -94,7 +94,7 @@ const payload = {
   [Encrypt.EXPIRES_HOURS]: 24,
 };
 
-const algorithm = sdk.getAlgorithm(EncryptionAlgorithm.OTPv2); // Either "AES" or "OTPv2"
+const algorithm = sdk.getAlgorithm("OTPv2"); // Either "AES" or "OTPv2"
 
 new Encrypt(sdk, algorithm).supplyAsync(payload).then((response) => {
   switch (response.status) {
@@ -131,7 +131,7 @@ const payload = {
   [Decrypt.ENCRYPTED_TEXT]: "original_encrypted_content",
 };
 
-const algorithm = sdk.getAlgorithm(EncryptionAlgorithm.OTPv2); // Either "AES" or "OTPv2"
+const algorithm = sdk.getAlgorithm("OTPv2"); // Either "AES" or "OTPv2"
 
 new Decrypt(sdk, algorithm).supplyAsync(payload).then((response) => {
   switch (response.status) {
@@ -162,7 +162,7 @@ const sdk = new XQSDK({
   XQ_API_KEY: "YOUR_XQ_API_KEY"
 });
 
-const algorithm = sdk.getAlgorithm(EncryptionAlgorithm.OTPv2); // Either "AES" or "OTPv2"
+const algorithm = sdk.getAlgorithm("OTPv2"); // Either "AES" or "OTPv2"
 
 // A sample file object.
 const sourceFile = new File(["Hello"], "hello.txt", {
@@ -203,7 +203,7 @@ const sdk = new XQSDK({
   XQ_API_KEY: "YOUR_XQ_API_KEY"
 });
 
-const algorithm = sdk.getAlgorithm(EncryptionAlgorithm.OTPv2); // Either "AES" or "OTPv2"
+const algorithm = sdk.getAlgorithm("OTPv2"); // Either "AES" or "OTPv2"
 
 // A file object containing the encrypted text.
 const sourceFile = new File(["ENCRYPTED CONTENT"], "encrypted.txt", {
