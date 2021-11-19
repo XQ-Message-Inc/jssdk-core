@@ -8,14 +8,28 @@ type ParsedFile = {
   contentEncrypted: Uint8Array;
 };
 
-const universalBtoa = (str: string) => {
+/**
+ * The btoa() method creates a Base64-encoded ASCII string from a binary string
+ * (i.e., a String object in which each character in the string is treated as a byte of binary data).
+ *
+ * Since `btoa` is a Web API, we provide a fallback for all other environments utilizing `Buffer`
+ * @param binaryString - `string`
+ * @returns `string`;
+ */
+
+const universalBtoa = (binaryString: string) => {
   try {
-    return btoa(str);
+    return btoa(binaryString);
   } catch (err) {
-    return Buffer.from(str).toString("base64");
+    return Buffer.from(binaryString).toString("base64");
   }
 };
 
+/**
+ * The atob() function decodes a string of data which has been encoded using Base64 encoding
+ * @param b64Encoded - a `string` encoded using Base64 encoding
+ * @returns `string`;
+ */
 const universalAtob = (b64Encoded: string) => {
   try {
     return atob(b64Encoded);
