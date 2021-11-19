@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.1.1] - 2021-11-19
+
+## Added
+- Allow dynamic server URL configuration. Added new param to constructor of `XQSDK`, `serverConfig`, which allows the user to specific the `DASHBOARD_SERVER_URL`, `KEY_SERVER_URL`, `SUBSCRIPTION_SERVER_URL`, `VALIDATION_SERVER_URL` for their application.
+- Inline documentation for `universalBtoa` and `universalAtob` in `OTPv2Encryption.ts`
+
 ## [1.1.0] - 2021-11-15
 
 ## Added
@@ -24,7 +30,7 @@ Utilizing `memory-cache` in lieu of `localStorage` required a few syntactic upda
 - New compatibility updates via a web based playground application (react), a node/express server plaground as well as the `jssdk-examples` application.
 
 
-## [1.0.26] - 2021-11-09
+## [1.0.27] - 2021-11-09
 
 ### Modified
 - return type of `FileEncrypt.supplyAsync` from `void` --> `Promise<ServerResponse>`
