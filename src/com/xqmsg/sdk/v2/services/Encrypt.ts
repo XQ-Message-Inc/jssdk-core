@@ -92,9 +92,9 @@ export default class Encrypt extends XQModule {
          * @param expandedKey - the encryption key
          * @returns {locatorKey: string, encryptedText: string }
          */
-        const encryptText = (expandedKey: string) => {
+        const encryptText = (expandedKey: string, skipKeyExpansion = false) => {
           return algorithm
-            .encryptText(message, expandedKey)
+            .encryptText(message, expandedKey, skipKeyExpansion)
             .then((encryptResponse: ServerResponse) => {
               switch (encryptResponse.status) {
                 case ServerResponse.OK: {
@@ -145,20 +145,20 @@ export default class Encrypt extends XQModule {
         if (locatorKey) {
           // allow the user to utilize a pre-existing encryption key, if available
           if (encryptionKey) {
-            return encryptText(encryptionKey);
+            return encryptText(encryptionKey, true);
           }
 
           return new FetchKey(sdk)
             .supplyAsync({ locatorKey })
             .then((fetchKeyResponse: ServerResponse) => {
               const encryptionKey = fetchKeyResponse.payload;
-              return encryptText(encryptionKey);
+              return encryptText(encryptionKey, true);
             });
         }
 
         // allow the user to utilize a pre-existing encryption key, if available
         if (encryptionKey) {
-          return encryptText(encryptionKey);
+          return encryptText(encryptionKey, true);
         }
 
         return new FetchQuantumEntropy(sdk)

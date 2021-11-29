@@ -132,7 +132,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
     this.keyPos = 0;
     this.key;
 
-    this.encryptText = (text, key) => {
+    this.encryptText = (text, key, skipKeyExpansion = false) => {
       try {
         const self = this;
         self.sdk.validateAccessToken();
@@ -148,7 +148,9 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
               )
             );
           }
-          const expandedKey = self.expandKey(key, 2048);
+          const expandedKey = skipKeyExpansion
+            ? key
+            : self.expandKey(key, 2048);
           if (expandedKey == null) {
             console.error("Key could not be UTF8 encoded.");
             return resolve(

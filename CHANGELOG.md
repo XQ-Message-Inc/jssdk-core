@@ -5,9 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.2] - 2021-11-29
+## Modified
+- update `Encrypt` and `OTPv2Encryption` methods to allow users to bypass the key expansion method for user-generated keys.
 
 ## [1.1.1] - 2021-11-19
-
 ## Added
 - Allow dynamic server URL configuration. Added new param to constructor of `XQSDK`, `serverConfig`, which allows the user to specific the `DASHBOARD_SERVER_URL`, `KEY_SERVER_URL`, `SUBSCRIPTION_SERVER_URL`, `VALIDATION_SERVER_URL` for their application.
 - Inline documentation for `universalBtoa` and `universalAtob` in `OTPv2Encryption.ts`

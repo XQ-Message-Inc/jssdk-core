@@ -37,11 +37,16 @@ export default class EncryptionAlgorithm {
   /**
    * Takes a string and encrypts it using the provided quantum key.
    *
-   * @param  {String} text The text to encrypt.
-   * @param  {String} key The encryption key.
+   * @param  {String} text - The text to encrypt.
+   * @param  {String} key - The encryption key.
+   * @param  {Boolean} skipKeyExpansion - The boolean flag which determines whether or not to skip key expansion
    * @return {Promise<ServerResponse>} The encrypted text.
    */
-  encryptText: (text: string, key: string) => Promise<ServerResponse>;
+  encryptText: (
+    text: string,
+    key: string,
+    skipKeyExpansion?: boolean
+  ) => Promise<ServerResponse>;
 
   /**
    * Expand a key length to that of the text that needs encryption.
