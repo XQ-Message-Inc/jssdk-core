@@ -1,6 +1,6 @@
 {
   "name": "@xqmsg/jssdk-core",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "A Javascript Implementation of XQ Message SDK, V.2",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xqmsg/jssdk-core.git"
+    "url": "git+https://github.com/XQ-Message-Inc/jssdk-core.git"
   },
   "keywords": [
     "security",
@@ -40,9 +40,9 @@
   "author": "XQ Message",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/xqmsg/jssdk-core/issues"
+    "url": "https://github.com/XQ-Message-Inc/jssdk-core/issues"
   },
-  "homepage": "https://github.com/xqmsg/jssdk-core#readme",
+  "homepage": "https://github.com/XQ-Message-Inc/jssdk-core#readme",
   "devDependencies": {
     "@types/crypto-js": "^4.0.1",
     "@types/jest": "^26.0.23",
