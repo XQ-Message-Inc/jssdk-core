@@ -1,14 +1,8 @@
+import EncryptionAlgorithm from "../algorithms/EncryptionAlgorithm";
 import FetchKey from "./FetchKey";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-
-type EncryptionAlgorithm = {
-  decryptFile: (
-    sourceFile: File,
-    locateFn: (aLocatorToken: string) => Promise<Record<string, string>>
-  ) => void;
-};
 
 /**
  * A service which is utilized to decrypt data stored in a file using the {@link EncryptionAlgorithm} provided.
@@ -31,7 +25,7 @@ export default class FileDecrypt extends XQModule {
    *
    *  @returns {Promise<ServerResponse<{payload:File}>>}
    */
-  supplyAsync: (maybePayload: { sourceFile: File }) => void;
+  supplyAsync: (maybePayload: { sourceFile: File }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK, algorithm: EncryptionAlgorithm) {
     super(sdk);
@@ -60,17 +54,22 @@ export default class FileDecrypt extends XQModule {
       return algorithm.decryptFile(sourceFile, (aLocatorToken: string) => {
         return new FetchKey(sdk)
           .supplyAsync({ [FetchKey.LOCATOR_KEY]: aLocatorToken })
-          .then((retrieveKeyRespose: ServerResponse) => {
-            switch (retrieveKeyRespose.status) {
+          .then((retrieveKeyResponse: ServerResponse) => {
+            switch (retrieveKeyResponse.status) {
               case ServerResponse.OK: {
-                return retrieveKeyRespose.payload;
+                return retrieveKeyResponse.payload as string;
               }
               case ServerResponse.ERROR: {
                 console.error(
-                  `${algorithm.constructor.name}.decryptFile() failed, code: ${retrieveKeyRespose.statusCode}, reason: ${retrieveKeyRespose.payload}`
+                  `${algorithm.constructor.name}.decryptFile() failed, code: ${retrieveKeyResponse.statusCode}, reason: ${retrieveKeyResponse.payload}`
                 );
-                return retrieveKeyRespose;
+                return "";
               }
+              default:
+                console.error(
+                  `${algorithm.constructor.name}.decryptFile() failed, code: ${retrieveKeyResponse.statusCode}, reason: ${retrieveKeyResponse.payload}`
+                );
+                return "";
             }
           });
       });
