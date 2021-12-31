@@ -80,6 +80,7 @@ export default class Authorize extends XQModule {
 
         if (existingAccessToken) {
           self.cache.putActiveProfile(user);
+          self.cache.putXQAccess(user, existingAccessToken);
 
           return new Promise((resolve) => {
             resolve(
