@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+
+## [1.1.4] - 2021-12-30
+
+## Modified
+- update `Authorize` service to put access using an already existing, but valid, `accessToken`
+
 ## [1.1.3] - 2021-11-30
 
 ## Modified
