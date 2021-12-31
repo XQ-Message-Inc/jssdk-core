@@ -1,3 +1,4 @@
+import { CacheClass } from "memory-cache";
 import ServerResponse from "../ServerResponse";
 import StatusException from "../exceptions/StatusException";
 
@@ -81,12 +82,12 @@ export default class XQSimpleCache {
   removeXQPreAuthToken: (user: string) => void;
 
   /** The local storage object */
-  storage: Storage;
+  storage: CacheClass<string, string>;
 
   /**
-   * @param {Storage} storage
+   * @param {CacheClass} storage
    */
-  constructor(storage: Storage) {
+  constructor(storage: CacheClass<string, string>) {
     this.storage = storage;
     this.XQ_PREFIX = "xq";
     this.DASHBOARD_PREFIX = "dsb";
@@ -95,11 +96,11 @@ export default class XQSimpleCache {
     this.ACTIVE_PROFILE_KEY = "active-profile";
 
     this.putXQPreAuthToken = (user, preAuthToken) => {
-      this.storage.setItem(this.makeExchangeKey(user), preAuthToken);
+      this.storage.put(this.makeExchangeKey(user), preAuthToken);
     };
 
     this.getXQPreAuthToken = (user) => {
-      const preAuthToken = this.storage.getItem(this.makeExchangeKey(user));
+      const preAuthToken = this.storage.get(this.makeExchangeKey(user));
       if (!preAuthToken) {
         return null;
       }
@@ -109,16 +110,16 @@ export default class XQSimpleCache {
     this.removeXQPreAuthToken = (user) => {
       const xqPreAuthToken = this.getXQPreAuthToken(user);
       if (xqPreAuthToken != null) {
-        this.storage.removeItem(this.makeExchangeKey(user));
+        this.storage.del(this.makeExchangeKey(user));
       }
     };
 
     this.putXQAccess = (user, accessToken) => {
-      this.storage.setItem(this.makeXQAccessKey(user), accessToken);
+      this.storage.put(this.makeXQAccessKey(user), accessToken);
     };
 
     this.getXQAccess = (user, required) => {
-      const accessToken = this.storage.getItem(this.makeXQAccessKey(user));
+      const accessToken = this.storage.get(this.makeXQAccessKey(user));
       if (required && !accessToken) {
         throw new StatusException(401, "401 Unauthorized");
       } else {
@@ -129,7 +130,7 @@ export default class XQSimpleCache {
     this.removeXQAccess = (user) => {
       const accessToken = this.getXQAccess(user);
       if (accessToken) {
-        this.storage.removeItem(this.makeXQAccessKey(user));
+        this.storage.del(this.makeXQAccessKey(user));
 
         return new ServerResponse(
           ServerResponse.ERROR,
@@ -140,11 +141,11 @@ export default class XQSimpleCache {
     };
 
     this.putDashboardAccess = (user, accessToken) => {
-      this.storage.setItem(this.makeDashboardAccessKey(user), accessToken);
+      this.storage.put(this.makeDashboardAccessKey(user), accessToken);
     };
 
     this.getDashboardAccess = (user, required = false) => {
-      const dashboardAccessToken = this.storage.getItem(
+      const dashboardAccessToken = this.storage.get(
         this.makeDashboardAccessKey(user)
       );
       if (required && !dashboardAccessToken) {
@@ -157,7 +158,7 @@ export default class XQSimpleCache {
     this.removeDashboardAccess = (user) => {
       const dashboardAccessToken = this.getDashboardAccess(user);
       if (dashboardAccessToken) {
-        this.storage.removeItem(this.makeDashboardAccessKey(user));
+        this.storage.del(this.makeDashboardAccessKey(user));
 
         return new ServerResponse(
           ServerResponse.ERROR,
@@ -177,34 +178,34 @@ export default class XQSimpleCache {
       const self = this;
       const availableProfiles = this.listProfiles();
       if (availableProfiles.length == 0) {
-        self.storage.setItem(this.PROFILE_LIST_KEY, JSON.stringify([user]));
+        self.storage.put(this.PROFILE_LIST_KEY, JSON.stringify([user]));
       } else {
         if (!availableProfiles.includes(user)) {
           availableProfiles.push(user);
           const merged = availableProfiles.join(",");
-          self.storage.setItem(this.PROFILE_LIST_KEY, merged);
+          self.storage.put(this.PROFILE_LIST_KEY, merged);
         }
       }
-      this.storage.setItem(this.ACTIVE_PROFILE_KEY, user);
+      this.storage.put(this.ACTIVE_PROFILE_KEY, user);
     };
 
     this.putProfile = (user) => {
       const availableProfiles = this.listProfiles();
       if (availableProfiles.length == 0) {
-        this.storage.setItem(this.PROFILE_LIST_KEY, user);
+        this.storage.put(this.PROFILE_LIST_KEY, user);
       } else {
         availableProfiles.push(user);
         const merged = availableProfiles.join(",");
-        this.storage.setItem(this.PROFILE_LIST_KEY, merged);
+        this.storage.put(this.PROFILE_LIST_KEY, merged);
       }
 
       if (this.getActiveProfile(false) == null) {
-        this.storage.setItem(this.ACTIVE_PROFILE_KEY, user);
+        this.storage.put(this.ACTIVE_PROFILE_KEY, user);
       }
     };
 
     this.getActiveProfile = (required) => {
-      const activeProfile = this.storage.getItem(this.ACTIVE_PROFILE_KEY);
+      const activeProfile = this.storage.get(this.ACTIVE_PROFILE_KEY);
 
       if (required && activeProfile == null) {
         throw new StatusException(401, "401 Unauthorized");
@@ -221,10 +222,7 @@ export default class XQSimpleCache {
       const profilesSansUser = availableProfiles.filter(
         (profile) => profile != user
       );
-      this.storage.setItem(
-        this.PROFILE_LIST_KEY,
-        JSON.stringify(profilesSansUser)
-      );
+      this.storage.put(this.PROFILE_LIST_KEY, JSON.stringify(profilesSansUser));
       this.removeXQPreAuthToken(user);
       this.removeXQAccess(user);
       this.removeDashboardAccess(user);
@@ -244,12 +242,12 @@ export default class XQSimpleCache {
 
         break;
       }
-      this.storage.removeItem(this.ACTIVE_PROFILE_KEY);
-      this.storage.removeItem(this.PROFILE_LIST_KEY);
+      this.storage.del(this.ACTIVE_PROFILE_KEY);
+      this.storage.del(this.PROFILE_LIST_KEY);
     };
 
     this.listProfiles = () => {
-      const profiles = this.storage.getItem(this.PROFILE_LIST_KEY);
+      const profiles = this.storage.get(this.PROFILE_LIST_KEY);
       if (profiles != null) {
         return profiles.split(",");
       } else {

@@ -24,6 +24,9 @@ export default class Authorize extends XQModule {
   /** Specified name of the service */
   serviceName: string;
 
+  /** The field name representing an existing access token */
+  static ACCESS_TOKEN: "accessToken" = "accessToken";
+
   /** if 'pin' is sent the validation email will only have the code and no confirmation button */
   static CODE_TYPE: "codetype" = "codetype";
 
@@ -49,6 +52,7 @@ export default class Authorize extends XQModule {
    * @param {String} [maybePayLoad.lastName] - Last name of the user.
    * @param {Boolean} [maybePayLoad.newsLetter=false] - Should the user receive a newsletter.
    * @param {NotificationEnum} [maybePayLoad.notifications=0] Enum Value to specify Notification Settings
+   * @param {String} maybePayLoad.accessToken - an already generated access token, if valid allows use to bypass authorization.
    *
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
@@ -58,6 +62,7 @@ export default class Authorize extends XQModule {
     lastName?: string;
     newsLetter?: boolean;
     notifications?: number;
+    accessToken?: string;
   }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
@@ -71,6 +76,21 @@ export default class Authorize extends XQModule {
         const self = this;
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
         const user = maybePayLoad[Authorize.USER];
+        const existingAccessToken = maybePayLoad[Authorize.ACCESS_TOKEN];
+
+        if (existingAccessToken) {
+          self.cache.putActiveProfile(user);
+          self.cache.putXQAccess(user, existingAccessToken);
+
+          return new Promise((resolve) => {
+            resolve(
+              new ServerResponse(ServerResponse.OK, 200, {
+                accessToken: existingAccessToken,
+                user,
+              })
+            );
+          });
+        }
 
         return this.sdk
           .call(
