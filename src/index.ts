@@ -29,6 +29,7 @@ import RolesEnum from "./com/xqmsg/sdk/v2/RolesEnum";
 import ServerResponse from "./com/xqmsg/sdk/v2/ServerResponse";
 import UpdateSettings from "./com/xqmsg/sdk/v2/services/UpdateSettings";
 import XQSDK from "./com/xqmsg/sdk/v2/XQSDK";
+import { CommunicationsEnum } from "./com/xqmsg/sdk/v2/CommunicationsEnum";
 
 /**
  * Dashboard services
@@ -83,4 +84,5 @@ export {
   UpdateSettings,
   UpdateUserGroup,
   XQSDK,
+  CommunicationsEnum,
 };
