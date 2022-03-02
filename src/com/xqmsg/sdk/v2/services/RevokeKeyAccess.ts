@@ -49,7 +49,7 @@ export default class RevokeKeyAccess extends XQModule {
         return this.sdk.call(
           this.sdk.VALIDATION_SERVER_URL,
           this.serviceName + "/" + encodeURIComponent(locatorKey),
-          CallMethod.OPTIONS,
+          CallMethod.DELETE,
           additionalHeaderProperties,
           null,
           true

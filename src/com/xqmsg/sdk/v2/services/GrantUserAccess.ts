@@ -65,7 +65,7 @@ export default class GrantUserAccess extends XQModule {
           this.serviceName +
             "/" +
             encodeURIComponent(maybePayLoad[GrantUserAccess.LOCATOR_TOKEN]),
-          CallMethod.OPTIONS,
+          CallMethod.POST,
           additionalHeaderProperties,
           payload,
           true
