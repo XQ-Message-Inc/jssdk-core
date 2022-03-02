@@ -49,7 +49,7 @@ export default class UpdateSettings extends XQModule {
         return this.sdk.call(
           this.sdk.SUBSCRIPTION_SERVER_URL,
           this.serviceName,
-          CallMethod.OPTIONS,
+          CallMethod.PATCH,
           additionalHeaderProperties,
           maybePayLoad,
           true
