@@ -5,7 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.2.0] - 2021-02-03
+
+## [1.2.4] 2022-03-02
+
+## Modified
+- Modify services to use correct `CallMethod` (instead of `CallMethod.OPTIONS`):
+* `GrantUserAccess` => POST
+* `RevokeKeyAccess` => DELETE
+* `RevokeUserAccess` => PATCH
+* `UpdateSettings` => PATCH
+
+
+## [1.2.1] - 2022-02-13
+
+## Modified
+- update `RevokeKeyAccess` service `CallMethod` to utilize `DELETE` instead of `OPTIONS`
+
+## [1.2.0] - 2022-02-03
 
 ## Modified
 - update `Encrypt`, `FileEncrypt`, and `GeneratePacket` to accept `type` and `meta` field values in payload
