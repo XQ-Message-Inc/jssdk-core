@@ -65,7 +65,7 @@ export default class RevokeUserAccess extends XQModule {
         return this.sdk.call(
           this.sdk.VALIDATION_SERVER_URL,
           this.serviceName + "/" + encodeURIComponent(locatorKey),
-          CallMethod.OPTIONS,
+          CallMethod.PATCH,
           additionalHeaderProperties,
           payload,
           true

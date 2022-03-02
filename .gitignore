@@ -124,3 +124,6 @@ xq-javascript-sdk.iml
 dist
 
 .vscode
+
+.yalc
+yalc.lock
