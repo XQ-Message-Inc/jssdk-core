@@ -44,6 +44,7 @@ import GetApplications from "./com/xqmsg/sdk/v2/services/dashboard/GetApplicatio
 import RemoveContact from "./com/xqmsg/sdk/v2/services/dashboard/RemoveContact";
 import RemoveUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/RemoveUserGroup";
 import UpdateUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/UpdateUserGroup";
+import VerifyAccount from "./com/xqmsg/sdk/v2/services/dashboard/VerifyAccount";
 
 export {
   AddContact,
@@ -83,6 +84,7 @@ export {
   ServerResponse,
   UpdateSettings,
   UpdateUserGroup,
+  VerifyAccount,
   XQSDK,
   CommunicationsEnum,
 };
