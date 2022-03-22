@@ -6,6 +6,11 @@ import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
 
+enum DashboardAccessToken {
+  preAuth = "preauth-dashboard",
+  auth = "dashboard",
+}
+
 /**
  * A service utilized to verify a user via their `accessToken` and allow access to Dashboard services.
  * @class [DashboardLogin]
@@ -38,11 +43,32 @@ export default class VerifyAccount extends XQModule {
       try {
         const self = this;
 
-        const preAccessToken = maybePayLoad[VerifyAccount.ACCESS_TOKEN];
+        const accessToken = maybePayLoad[VerifyAccount.ACCESS_TOKEN];
 
         const additionalHeaderProperties = {
-          Authorization: `Bearer ${preAccessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         };
+
+        const decodedIncomingAccessToken: JwtPayload = jwtDecode(accessToken);
+
+        // if user has an already existing dashboard token
+        // skip pre-auth dashboard token exchange process
+        if (decodedIncomingAccessToken.iss === DashboardAccessToken.auth) {
+          const profile = decodedIncomingAccessToken.sub;
+
+          self.cache.putActiveProfile(profile);
+
+          self.cache.putDashboardAccess(profile, accessToken);
+
+          return new Promise((resolve) => {
+            resolve(
+              new ServerResponse(ServerResponse.OK, 200, {
+                user: profile,
+                dashboardAccessToken: accessToken,
+              })
+            );
+          });
+        }
 
         return this.sdk
           .call(
@@ -72,7 +98,11 @@ export default class VerifyAccount extends XQModule {
                   activeProfile,
                   dashboardAccessToken
                 );
-                return exchangeResponse;
+
+                return new ServerResponse(ServerResponse.OK, 200, {
+                  user: profile,
+                  dashboardAccessToken,
+                });
               }
               case ServerResponse.ERROR: {
                 console.error(

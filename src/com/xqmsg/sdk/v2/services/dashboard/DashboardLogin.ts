@@ -61,26 +61,24 @@ export default class DashboardLogin extends XQModule {
             switch (exchangeResponse.status) {
               case ServerResponse.OK: {
                 const dashboardAccessToken = exchangeResponse.payload;
-                try {
-                  const decodedJWTPayload: JwtPayload = jwtDecode(
-                    exchangeResponse.payload
-                  );
+                const decodedJWTPayload: JwtPayload = jwtDecode(
+                  exchangeResponse.payload
+                );
 
-                  const profile = decodedJWTPayload.sub;
+                const profile = decodedJWTPayload.sub;
 
-                  await self.cache.putActiveProfile(profile);
+                await self.cache.putActiveProfile(profile);
 
-                  const activeProfile = self.cache.getActiveProfile(true);
+                const activeProfile = self.cache.getActiveProfile(true);
 
-                  self.cache.putDashboardAccess(
-                    activeProfile,
-                    dashboardAccessToken
-                  );
-                  return exchangeResponse;
-                } catch (e) {
-                  console.log(e);
-                  return null;
-                }
+                self.cache.putDashboardAccess(
+                  activeProfile,
+                  dashboardAccessToken
+                );
+                return new ServerResponse(ServerResponse.OK, 200, {
+                  user: profile,
+                  dashboardAccessToken,
+                });
               }
               case ServerResponse.ERROR: {
                 console.error(
