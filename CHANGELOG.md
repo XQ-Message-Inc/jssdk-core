@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.4.0] 2022-03-22
+## Addition
+- Add `GetBusinesses` service to return a payload containing an array of businesses related to a user's dashboard
+
 
 ## [1.3.2] 2022-03-22
 ## Modified
