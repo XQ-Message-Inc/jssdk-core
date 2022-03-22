@@ -40,6 +40,7 @@ import DashboardLogin from "./com/xqmsg/sdk/v2/services/dashboard/DashboardLogin
 import DisableContact from "./com/xqmsg/sdk/v2/services/dashboard/DisableContact";
 import FindUserGroups from "./com/xqmsg/sdk/v2/services/dashboard/FindUserGroups";
 import GetApplications from "./com/xqmsg/sdk/v2/services/dashboard/GetApplications";
+import GetBusinesses from "./com/xqmsg/sdk/v2/services/dashboard/GetBusinesses";
 import GetContacts from "./com/xqmsg/sdk/v2/services/dashboard/GetContacts";
 import GetCurrentUser from "./com/xqmsg/sdk/v2/services/dashboard/GetCurrentUser";
 import RemoveContact from "./com/xqmsg/sdk/v2/services/dashboard/RemoveContact";
@@ -73,6 +74,7 @@ export {
   FindUserGroups,
   GeneratePacket,
   GetApplications,
+  GetBusinesses,
   GetContacts,
   GetCurrentUser,
   GetSettings,
