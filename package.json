@@ -1,6 +1,6 @@
 {
   "name": "@xqmsg/jssdk-core",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "A Javascript Implementation of XQ Message SDK, V.2",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
