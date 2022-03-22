@@ -7,54 +7,56 @@ import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
 
 /**
- * A service utilized to log-in a user and allow access to Dashboard services.
+ * A service utilized to verify a user via their `accessToken` and allow access to Dashboard services.
  * @class [DashboardLogin]
  */
-export default class DashboardLogin extends XQModule {
+export default class VerifyAccount extends XQModule {
   /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
 
   /** Specified name of the service */
   serviceName: string;
 
-  /** The field name representing the authenticated credential */
-  static CREDENTIAL: "credential" = "credential";
+  /** The field name representing an access token */
+  static ACCESS_TOKEN: "accessToken" = "accessToken";
 
   /**
    * @param {Map} maybePayLoad - the container for the request parameters supplied to this method.
-   * @param {String} maybePayLoad.credential - the provided OAuth token
+   * @param {String} maybePayLoad.accesstoken - the provided access token
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
-  supplyAsync: (maybePayLoad: {
-    [DashboardLogin.CREDENTIAL]: string;
+  supplyAsync: (maybePayload: {
+    [VerifyAccount.ACCESS_TOKEN]: string;
   }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "login";
-    this.requiredFields = [DashboardLogin.CREDENTIAL];
+    this.serviceName = "login/verify";
+    this.requiredFields = [VerifyAccount.ACCESS_TOKEN];
 
     this.supplyAsync = (maybePayLoad) => {
       try {
         const self = this;
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
-        const loginRequest = {
-          method: 1, // TODO(worstestes - 3.21.22): an obselete field which will be removed at a later date
-          [DashboardLogin.CREDENTIAL]: maybePayLoad.credential,
+        const preAccessToken = maybePayLoad[VerifyAccount.ACCESS_TOKEN];
+        console.log({ maybePayLoad });
+
+        const additionalHeaderProperties = {
+          Authorization: `Bearer ${preAccessToken}`,
         };
 
         return this.sdk
           .call(
             this.sdk.DASHBOARD_SERVER_URL,
             this.serviceName,
-            CallMethod.POST,
+            CallMethod.GET,
+            additionalHeaderProperties,
             null,
-            loginRequest,
             true,
             Destination.DASHBOARD
           )
           .then(async (exchangeResponse: ServerResponse) => {
+            console.log({ exchangeResponse });
             switch (exchangeResponse.status) {
               case ServerResponse.OK: {
                 const dashboardAccessToken = exchangeResponse.payload;

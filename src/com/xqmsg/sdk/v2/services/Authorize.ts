@@ -4,7 +4,7 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * A service which is utilized request an access token when given an email address.
+ * A service which is used to authorize a user to utilize XQ services.
  * If successful, the service itself will return a pre-authorization token that can be exchanged
  * for a full access token after validation is complete.
  *
@@ -14,6 +14,8 @@ import XQSDK from "../XQSDK";
  *
  * The user can then choose to either click the link to complete the process or use the PIN.
  * The pin servers as the input parameter of the `CodeValidator` service
+ *
+ * Optionally, a user may pass an existing `accessToken` which will allow them to skip the `CodeValidator` step.
  *  @class [Authorize]
  */
 
