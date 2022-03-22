@@ -20,7 +20,7 @@ import FileDecrypt from "./com/xqmsg/sdk/v2/services/FileDecrypt";
 import FileEncrypt from "./com/xqmsg/sdk/v2/services/FileEncrypt";
 import GeneratePacket from "./com/xqmsg/sdk/v2/services/GeneratePacket";
 import GetSettings from "./com/xqmsg/sdk/v2/services/GetSettings";
-import GetUserInfo from "./com/xqmsg/sdk/v2/services/GetUserInfo";
+import GetSubscriberInfo from "./com/xqmsg/sdk/v2/services/GetSubscriberInfo";
 import GrantUserAccess from "./com/xqmsg/sdk/v2/services/GrantUserAccess";
 import NotificationEnum from "./com/xqmsg/sdk/v2/NotificationEnum";
 import RevokeKeyAccess from "./com/xqmsg/sdk/v2/services/RevokeKeyAccess";
@@ -38,9 +38,10 @@ import AddContact from "./com/xqmsg/sdk/v2/services/dashboard/AddContact";
 import AddUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/AddUserGroup";
 import DashboardLogin from "./com/xqmsg/sdk/v2/services/dashboard/DashboardLogin";
 import DisableContact from "./com/xqmsg/sdk/v2/services/dashboard/DisableContact";
-import FindContacts from "./com/xqmsg/sdk/v2/services/dashboard/FindContacts";
 import FindUserGroups from "./com/xqmsg/sdk/v2/services/dashboard/FindUserGroups";
 import GetApplications from "./com/xqmsg/sdk/v2/services/dashboard/GetApplications";
+import GetContacts from "./com/xqmsg/sdk/v2/services/dashboard/GetContacts";
+import GetCurrentUser from "./com/xqmsg/sdk/v2/services/dashboard/GetCurrentUser";
 import RemoveContact from "./com/xqmsg/sdk/v2/services/dashboard/RemoveContact";
 import RemoveUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/RemoveUserGroup";
 import UpdateUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/UpdateUserGroup";
@@ -56,6 +57,7 @@ export {
   CheckKeyExpiration,
   CodeValidator,
   CombineAuthorizations,
+  CommunicationsEnum,
   DashboardLogin,
   Decrypt,
   DeleteAuthorization,
@@ -68,12 +70,13 @@ export {
   FetchQuantumEntropy,
   FileDecrypt,
   FileEncrypt,
-  FindContacts,
   FindUserGroups,
   GeneratePacket,
   GetApplications,
+  GetContacts,
+  GetCurrentUser,
   GetSettings,
-  GetUserInfo,
+  GetSubscriberInfo,
   GrantUserAccess,
   NotificationEnum,
   RemoveContact,
@@ -86,5 +89,4 @@ export {
   UpdateUserGroup,
   VerifyAccount,
   XQSDK,
-  CommunicationsEnum,
 };

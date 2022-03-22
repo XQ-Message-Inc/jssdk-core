@@ -17,22 +17,25 @@ export default class DashboardLogin extends XQModule {
   /** Specified name of the service */
   serviceName: string;
 
-  /** The field name representing the authenticated credential */
-  static CREDENTIAL: "credential" = "credential";
+  /** The field name representing the service name */
+  static LOGIN: "login" = "login";
+
+  /** The field name representing the authenticated pwd */
+  static PWD: "pwd" = "pwd";
 
   /**
    * @param {Map} maybePayLoad - the container for the request parameters supplied to this method.
-   * @param {String} maybePayLoad.credential - the provided OAuth token
+   * @param {String} maybePayLoad.pwd - the provided OAuth token
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
   supplyAsync: (maybePayLoad: {
-    [DashboardLogin.CREDENTIAL]: string;
+    [DashboardLogin.PWD]: string;
   }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "login";
-    this.requiredFields = [DashboardLogin.CREDENTIAL];
+    this.serviceName = DashboardLogin.LOGIN;
+    this.requiredFields = [DashboardLogin.PWD];
 
     this.supplyAsync = (maybePayLoad) => {
       try {
@@ -41,7 +44,7 @@ export default class DashboardLogin extends XQModule {
 
         const loginRequest = {
           method: 1, // TODO(worstestes - 3.21.22): an obselete field which will be removed at a later date
-          [DashboardLogin.CREDENTIAL]: maybePayLoad.credential,
+          [DashboardLogin.PWD]: maybePayLoad.pwd,
         };
 
         return this.sdk
@@ -87,10 +90,14 @@ export default class DashboardLogin extends XQModule {
               }
             }
           });
-      } catch (exc) {
+      } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            new ServerResponse(ServerResponse.ERROR, exc.code, exc.reason)
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
           );
         });
       }

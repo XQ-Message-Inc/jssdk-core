@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.3.0] 2022-03-02
+
+## Added
+- Add `VerifyAccount`, `GetCurrentUser`, `GetContacts`, and `GetSubscriberInfo` services
+
+## Modified
+- Modify `DashboardLogin` service
+## Removed
+- Remove `FindContacts` service
+
 ## [1.2.4] 2022-03-02
 
 ## Modified

@@ -58,26 +58,21 @@ export default class VerifyAccount extends XQModule {
             switch (exchangeResponse.status) {
               case ServerResponse.OK: {
                 const dashboardAccessToken = exchangeResponse.payload;
-                try {
-                  const decodedJWTPayload: JwtPayload = jwtDecode(
-                    exchangeResponse.payload
-                  );
+                const decodedJWTPayload: JwtPayload = jwtDecode(
+                  exchangeResponse.payload
+                );
 
-                  const profile = decodedJWTPayload.sub;
+                const profile = decodedJWTPayload.sub;
 
-                  await self.cache.putActiveProfile(profile);
+                await self.cache.putActiveProfile(profile);
 
-                  const activeProfile = self.cache.getActiveProfile(true);
+                const activeProfile = self.cache.getActiveProfile(true);
 
-                  self.cache.putDashboardAccess(
-                    activeProfile,
-                    dashboardAccessToken
-                  );
-                  return exchangeResponse;
-                } catch (e) {
-                  console.log(e);
-                  return null;
-                }
+                self.cache.putDashboardAccess(
+                  activeProfile,
+                  dashboardAccessToken
+                );
+                return exchangeResponse;
               }
               case ServerResponse.ERROR: {
                 console.error(
@@ -87,10 +82,14 @@ export default class VerifyAccount extends XQModule {
               }
             }
           });
-      } catch (exc) {
+      } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            new ServerResponse(ServerResponse.ERROR, exc.code, exc.reason)
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
           );
         });
       }

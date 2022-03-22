@@ -4,11 +4,11 @@ import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
 
 /**
- * A service which is utilized to retrieve a users information.
+ * A service which is utilized to retrieve the current subscriber's information.
  *
- * @class [GetUserInfo]
+ * @class [GetSubscriberInfo]
  */
-export default class GetUserInfo extends XQModule {
+export default class GetSubscriberInfo extends XQModule {
   /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
 
