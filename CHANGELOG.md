@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
-## [1.3.0] 2022-03-22
+## [1.3.2] 2022-03-22
 ## Modified
 - Modify `VerifyAccount` and `DashboardLogin` services to return a payload that includes a `dashboardAccessToken` and `user` (email/ID)
 - Modify `VerifyAccount` to take optional full dashboard access token, rather than just a pre-auth dashboard access token
