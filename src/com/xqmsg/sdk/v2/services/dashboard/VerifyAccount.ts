@@ -39,7 +39,6 @@ export default class VerifyAccount extends XQModule {
         const self = this;
 
         const preAccessToken = maybePayLoad[VerifyAccount.ACCESS_TOKEN];
-        console.log({ maybePayLoad });
 
         const additionalHeaderProperties = {
           Authorization: `Bearer ${preAccessToken}`,
@@ -56,7 +55,6 @@ export default class VerifyAccount extends XQModule {
             Destination.DASHBOARD
           )
           .then(async (exchangeResponse: ServerResponse) => {
-            console.log({ exchangeResponse });
             switch (exchangeResponse.status) {
               case ServerResponse.OK: {
                 const dashboardAccessToken = exchangeResponse.payload;
