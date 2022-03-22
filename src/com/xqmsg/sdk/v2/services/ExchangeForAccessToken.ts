@@ -60,10 +60,14 @@ export default class ExchangeForAccessToken extends XQModule {
               }
             }
           });
-      } catch (exc) {
+      } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            new ServerResponse(ServerResponse.ERROR, exc.code, exc.reason)
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
           );
         });
       }
