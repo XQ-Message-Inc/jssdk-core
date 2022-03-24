@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [1.5.0] 2022-03-24
+## Addition
+- Add `GetEventLogs`, `GetCommunications`, `GetEventTypes` services to return a payloads containing event logs, communications, and event types - respectively.
+
 ## [1.4.0] 2022-03-22
 ## Addition
 - Add `GetBusinesses` service to return a payload containing an array of businesses related to a user's dashboard
