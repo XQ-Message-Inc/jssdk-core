@@ -41,8 +41,11 @@ import DisableContact from "./com/xqmsg/sdk/v2/services/dashboard/DisableContact
 import FindUserGroups from "./com/xqmsg/sdk/v2/services/dashboard/FindUserGroups";
 import GetApplications from "./com/xqmsg/sdk/v2/services/dashboard/GetApplications";
 import GetBusinesses from "./com/xqmsg/sdk/v2/services/dashboard/GetBusinesses";
+import GetCommunications from "./com/xqmsg/sdk/v2/services/dashboard/GetCommunications";
 import GetContacts from "./com/xqmsg/sdk/v2/services/dashboard/GetContacts";
 import GetCurrentUser from "./com/xqmsg/sdk/v2/services/dashboard/GetCurrentUser";
+import GetEventLogs from "./com/xqmsg/sdk/v2/services/dashboard/GetEventLogs";
+import GetEventTypes from "./com/xqmsg/sdk/v2/services/dashboard/GetEventTypes";
 import RemoveContact from "./com/xqmsg/sdk/v2/services/dashboard/RemoveContact";
 import RemoveUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/RemoveUserGroup";
 import UpdateUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/UpdateUserGroup";
@@ -75,8 +78,11 @@ export {
   GeneratePacket,
   GetApplications,
   GetBusinesses,
+  GetCommunications,
   GetContacts,
   GetCurrentUser,
+  GetEventLogs,
+  GetEventTypes,
   GetSettings,
   GetSubscriberInfo,
   GrantUserAccess,

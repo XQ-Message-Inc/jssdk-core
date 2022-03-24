@@ -32,3 +32,9 @@ export type ContactSummary = {
   status: UserStatus;
   bid: number;
 };
+
+export type EventType = {
+  action: string;
+  title: string;
+  id: string;
+};
