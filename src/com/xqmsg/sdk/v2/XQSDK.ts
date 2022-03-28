@@ -382,7 +382,9 @@ class XQSDK {
         };
         if (
           maybePayload &&
-          [CallMethod.POST, CallMethod.PATCH].includes(method)
+          [CallMethod.POST, CallMethod.PATCH, CallMethod.DELETE].includes(
+            method
+          )
         ) {
           if (
             maybeHeaderProperties != null &&

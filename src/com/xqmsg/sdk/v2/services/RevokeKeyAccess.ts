@@ -17,7 +17,7 @@ export default class RevokeKeyAccess extends XQModule {
   serviceName: string;
 
   /** The field name representing the locator key */
-  static LOCATOR_KEY: "locatorKey" = "locatorKey";
+  static LOCATOR_KEYS: "locatorKeys" = "locatorKeys";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
@@ -27,7 +27,7 @@ export default class RevokeKeyAccess extends XQModule {
    * @returns {Promise<ServerResponse<{}>>}
    */
   supplyAsync: (maybePayload: {
-    locatorKey: string;
+    locatorKeys: string[];
   }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
@@ -40,7 +40,7 @@ export default class RevokeKeyAccess extends XQModule {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
         const accessToken = this.sdk.validateAccessToken();
-        const locatorKey = maybePayLoad[RevokeKeyAccess.LOCATOR_KEY];
+        const locatorKeys = maybePayLoad[RevokeKeyAccess.LOCATOR_KEYS];
 
         const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
@@ -48,10 +48,10 @@ export default class RevokeKeyAccess extends XQModule {
 
         return this.sdk.call(
           this.sdk.VALIDATION_SERVER_URL,
-          this.serviceName + "/" + encodeURIComponent(locatorKey),
+          this.serviceName,
           CallMethod.DELETE,
           additionalHeaderProperties,
-          null,
+          { tokens: locatorKeys },
           true
         );
       } catch (exception) {
