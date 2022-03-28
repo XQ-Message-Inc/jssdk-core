@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.5.1] - 2022-03-28
+### Modified
+
+- Update `RevokeKeyAccess` expected params of `locatorKey` --> `locatorKeys`, a `string` --> `string[]`
+- Update `call` method of XQSDK to include check from DELETE http method when factoring in `maybePayload` presence
 
 ## [1.5.0] 2022-03-24
 ## Addition
