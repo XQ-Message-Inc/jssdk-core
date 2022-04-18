@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.5.3] - 2022-04-18
+### Modified
+
+- Update `Authorize` params to include `text` and `target`. `text` is an interpolated text field when a mobile number is specified. Use $pin to interpolate the pin or $link to interpolate the maybePayLoad.target. `target` is A link that can be interpolated in the maybePayload.text. Used for inviting users by text
 ## [1.5.1] - 2022-03-28
 ### Modified
 
