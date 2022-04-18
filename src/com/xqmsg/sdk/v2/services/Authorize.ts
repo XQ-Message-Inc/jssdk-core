@@ -47,6 +47,12 @@ export default class Authorize extends XQModule {
   /** The field name representing the email of the user */
   static USER: "user" = "user";
 
+  /** The field name representing the text sent to the user's phone */
+  static TEXT: "text" = "text";
+
+  /** The field name representing the target that can be interpolated in the text sent to a user's phone */
+  static TARGET: "target" = "target";
+
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
    * @param {String} maybePayLoad.user - Email of the user to be validated.
@@ -55,6 +61,8 @@ export default class Authorize extends XQModule {
    * @param {Boolean} [maybePayLoad.newsLetter=false] - Should the user receive a newsletter.
    * @param {NotificationEnum} [maybePayLoad.notifications=0] Enum Value to specify Notification Settings
    * @param {String} maybePayLoad.accessToken - an already generated access token, if valid allows use to bypass authorization.
+   * @param {String} maybePayLoad.text - An interpolated text field when a mobile number is specified. Use $pin to interpolate the pin or $link to interpolate the maybePayLoad.target
+   * @param {String} maybePayLoad.target - A link that can be interpolated in the maybePayload.text. Used for inviting users by text
    *
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
@@ -65,6 +73,8 @@ export default class Authorize extends XQModule {
     newsLetter?: boolean;
     notifications?: number;
     accessToken?: string;
+    text?: string;
+    target?: string;
   }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
