@@ -63,6 +63,7 @@ export default class Authorize extends XQModule {
    * @param {String} maybePayLoad.accessToken - an already generated access token, if valid allows use to bypass authorization.
    * @param {String} maybePayLoad.text - An interpolated text field when a mobile number is specified. Use $pin to interpolate the pin or $link to interpolate the maybePayLoad.target
    * @param {String} maybePayLoad.target - A link that can be interpolated in the maybePayload.text. Used for inviting users by text
+   * @param {String} maybePayLoad.codetype - Codetype. Use 'sms' for inviting users by text.
    *
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
@@ -75,6 +76,7 @@ export default class Authorize extends XQModule {
     accessToken?: string;
     text?: string;
     target?: string;
+    codetype?: string;
   }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
