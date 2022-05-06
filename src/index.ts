@@ -34,6 +34,7 @@ import { CommunicationsEnum } from "./com/xqmsg/sdk/v2/CommunicationsEnum";
 /**
  * Dashboard services
  */
+import AddBusiness from "./com/xqmsg/sdk/v2/services/dashboard/AddBusiness";
 import AddContact from "./com/xqmsg/sdk/v2/services/dashboard/AddContact";
 import AddUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/AddUserGroup";
 import DashboardLogin from "./com/xqmsg/sdk/v2/services/dashboard/DashboardLogin";
@@ -43,15 +44,18 @@ import GetApplications from "./com/xqmsg/sdk/v2/services/dashboard/GetApplicatio
 import GetBusinesses from "./com/xqmsg/sdk/v2/services/dashboard/GetBusinesses";
 import GetCommunications from "./com/xqmsg/sdk/v2/services/dashboard/GetCommunications";
 import GetContacts from "./com/xqmsg/sdk/v2/services/dashboard/GetContacts";
+import GetCurrentBusiness from "./com/xqmsg/sdk/v2/services/dashboard/GetCurrentBusiness";
 import GetCurrentUser from "./com/xqmsg/sdk/v2/services/dashboard/GetCurrentUser";
 import GetEventLogs from "./com/xqmsg/sdk/v2/services/dashboard/GetEventLogs";
 import GetEventTypes from "./com/xqmsg/sdk/v2/services/dashboard/GetEventTypes";
 import RemoveContact from "./com/xqmsg/sdk/v2/services/dashboard/RemoveContact";
 import RemoveUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/RemoveUserGroup";
+import UpdateBusiness from "./com/xqmsg/sdk/v2/services/dashboard/UpdateBusiness";
 import UpdateUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/UpdateUserGroup";
 import VerifyAccount from "./com/xqmsg/sdk/v2/services/dashboard/VerifyAccount";
 
 export {
+  AddBusiness,
   AddContact,
   AddUserGroup,
   Authorize,
@@ -80,6 +84,7 @@ export {
   GetBusinesses,
   GetCommunications,
   GetContacts,
+  GetCurrentBusiness,
   GetCurrentUser,
   GetEventLogs,
   GetEventTypes,
@@ -93,6 +98,7 @@ export {
   RevokeUserAccess,
   RolesEnum,
   ServerResponse,
+  UpdateBusiness,
   UpdateSettings,
   UpdateUserGroup,
   VerifyAccount,
