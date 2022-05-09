@@ -5,33 +5,27 @@ import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
 
 /**
- * A service which is utilized to remove an existing Contact
+ * A service which is utilized to fetch the current business of the logged in user
  *
- * @class [RemoveContact]
+ * @class [GetCurrentBusiness]
  */
-export default class RemoveContact extends XQModule {
+export default class GetCurrentBusiness extends XQModule {
   /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
 
   /** Specified name of the service */
   serviceName: string;
 
-  /** The field name representing the id */
-  static ID: "id" = "id";
-
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {String} id - the user id of the Contact that will be removed
    * @returns {Promise<ServerResponse<{payload:{}}>>}
    */
-  supplyAsync: (maybePayload: {
-    [RemoveContact.ID]: string;
-  }) => Promise<ServerResponse>;
+  supplyAsync: (maybePayLoad: null) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "contact";
-    this.requiredFields = [RemoveContact.ID];
+    this.serviceName = "business";
+    this.requiredFields = [];
 
     this.supplyAsync = (maybePayLoad) => {
       try {
@@ -47,10 +41,10 @@ export default class RemoveContact extends XQModule {
 
         return this.sdk.call(
           this.sdk.DASHBOARD_SERVER_URL,
-          `${this.serviceName}/${maybePayLoad[RemoveContact.ID]}?delete=true`,
-          CallMethod.DELETE,
+          this.serviceName,
+          CallMethod.GET,
           additionalHeaderProperties,
-          null,
+          maybePayLoad,
           true,
           Destination.DASHBOARD
         );
