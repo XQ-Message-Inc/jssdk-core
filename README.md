@@ -651,14 +651,20 @@ new VerifyAccount(sdk)
 ### Managing a business
 Users may create a business - inviting others via email. Creators of a business are added with the role of `SuperUser`, and are allowed to give and restrict permissions of members of the business. Depending on the role of certain members, they may be able to perform such actions like user and application management.
 
-You also have the ability to lookup all available communications and applications of a business or a workspace. This also applies to personal communications/applications.
+The SDK provides a variety of CRUD services for businesses, such as `AddBusiness`, `GetBusinesses`, `GetCurrentBusiness`, and `UpdateBusiness`. You also have the ability to lookup all available communications of a business or a workspace. This also applies to personal communications/applications.
 
 ```javascript
 import { 
+  AddApplication,
+  AddBusiness, 
   GetApplications,
   GetBusinesses,
   GetCommunications,
+  GetCurrentBusiness,
+  RemoveApplication,
   ServerResponse, 
+  UpdateApplication, 
+  UpdateBusiness,
   XQSDK 
 } from "@xqmsg/jssdk-core";
 
@@ -676,6 +682,90 @@ new GetBusinesses(sdk)
         const data = response.payload;
         const businesses = data[GetBusinesses.BUSINESSES];
         // The format of businesses is {canAccessBusiness: boolean, domain: string, id: int, isPersonal: boolean, name: string}[]
+        break;
+      }
+      case ServerResponse.ERROR: {
+        // Something went wrong...
+        break;
+      }
+    }
+
+    return response;
+  });
+
+// Add a new business
+new AddBusiness(sdk)
+  .supplyAsync({
+    [AddBusiness.EMAIL]: "jack@email.com",
+    [AddBusiness.WORKSPACE]: "my_workspace",
+    [AddBusiness.NAME]: "My Workspace",
+    [AddBusiness.ADMIN_EMAIL]: "jack@email.com",
+    [AddBusiness.ADMIN_FIRST]: "Jack",
+    [AddBusiness.ADMIN_LAST]: "Smith",
+    [AddBusiness.STREET]: "123 Business Avenue",
+    [AddBusiness.CITY]: "New York",
+    [AddBusiness.STATE]: "New York",
+    [AddBusiness.COUNTRY]: "USA",
+    [AddBusiness.TELEPHONE]: "123-456-7890",
+    [AddBusiness.POSTAL]: "12345",
+    [AddBusiness.TAG]: "Our new business!",
+    [AddBusiness.CONVERT_FROM_EXISTING]: false,
+  })
+  .then((response) => {
+    switch (response.status) {
+      case ServerResponse.OK: {
+        // Success. The access token for the newly created business is returned.
+        const accessToken = response.payload;
+        break;
+      }
+      case ServerResponse.ERROR: {
+        // Something went wrong...
+        break;
+      }
+    }
+
+    return response;
+  });
+
+// Update an existing business
+new UpdateBusiness(sdk)
+  .supplyAsync({
+    [UpdateBusiness.EMAIL]: "jane@email.com",
+    [UpdateBusiness.WORKSPACE]: "my_workspace",
+    [UpdateBusiness.NAME]: "My Workspace",
+    [UpdateBusiness.STREET]: "123 Business Avenue",
+    [UpdateBusiness.CITY]: "New York",
+    [UpdateBusiness.STATE]: "New York",
+    [UpdateBusiness.COUNTRY]: "USA",
+    [UpdateBusiness.TELEPHONE]: "123-456-7890",
+    [UpdateBusiness.POSTAL]: "12345",
+    [UpdateBusiness.TAG]: "Our updated business!",
+    [UpdateBusiness.LOCKED]: false,
+  })
+  .then((response) => {
+    switch (response.status) {
+      case ServerResponse.OK: {
+        // Success. The business was updated.
+        break;
+      }
+      case ServerResponse.ERROR: {
+        // Something went wrong...
+        break;
+      }
+    }
+
+    return response;
+  });
+
+// Get current business of authenticated user
+new GetCurrentBusiness(sdk)
+  .supplyAsync(null)
+  .then((response) => {
+    switch (response.status) {
+      case ServerResponse.OK: {
+        // Success. The current business is returned.
+        // The type of currentBusiness is CurrentBusinessSummary.
+        const currentBusiness = response.payload
         break;
       }
       case ServerResponse.ERROR: {
@@ -734,6 +824,72 @@ new GetApplications(sdk)
         const data = response.payload;
         const apps = data[GetApplications.APPS];
         // The format of apps is {id:int, name:string, desc:string}[]
+        break;
+      }
+      case ServerResponse.ERROR: {
+        // Something went wrong...
+        break;
+      }
+    }
+
+    return response;
+  });
+
+// Add a new application to the current business/workspace
+new AddApplication(sdk)
+  .supplyAsync({
+    [AddApplication.NAME]: "My App Name",
+    [AddApplication.DESC]: "My app description",
+  })
+  .then((response) => {
+    switch (response.status) {
+      case ServerResponse.OK: {
+        // Success. The new application was created.
+        const data = response.payload;
+        // The id of the new application.
+        const id = data.id
+        break;
+      }
+      case ServerResponse.ERROR: {
+        // Something went wrong...
+        break;
+      }
+    }
+
+    return response;
+  });
+
+// Update an existing application
+new UpdateApplication(sdk)
+  .supplyAsync({
+    [UpdateApplication.ID]: 123,
+    [UpdateApplication.NAME]: "My App Name",
+    [UpdateApplication.DESC]: "My app description",
+  })
+  .then((response) => {
+    switch (response.status) {
+      case ServerResponse.OK: {
+        // Success. The application was updated.
+        break;
+      }
+      case ServerResponse.ERROR: {
+        // Something went wrong...
+        break;
+      }
+    }
+
+    return response;
+  });
+
+// Remove an existing application
+new UpdateApplication(sdk)
+  .supplyAsync({
+    [UpdateApplication.ID]: 123,
+  })
+  .then((response) => {
+    switch (response.status) {
+      case ServerResponse.OK: {
+        // Success. The application was removed.
         break;
       }
       case ServerResponse.ERROR: {

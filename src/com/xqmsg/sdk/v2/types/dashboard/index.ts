@@ -38,3 +38,30 @@ export type EventType = {
   title: string;
   id: string;
 };
+
+export type CurrentBusinessSummary = {
+  id: number;
+  name: string;
+  workspace: string;
+  email: string;
+  phone: string;
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  postal: string;
+  tag: string;
+  locked: true;
+  isPersonal: true;
+  subscription: {
+    graceExpires: number;
+    overflow: number;
+    overflowTime: number;
+    plan: number;
+    seats: number;
+    status: number;
+    reason: string;
+    renewalDate: number;
+  };
+  icon: string;
+};

@@ -100,7 +100,7 @@ export default class AddBusiness extends XQModule {
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "business";
+    this.serviceName = AddBusiness.BUSINESS;
     this.requiredFields = [
       AddBusiness.EMAIL,
       AddBusiness.NAME,
