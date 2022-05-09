@@ -18,7 +18,7 @@ export default class GetCurrentBusiness extends XQModule {
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @returns {Promise<ServerResponse<{payload:{}}>>}
+   * @returns {Promise<ServerResponse<{payload: CurrentBusinessSummary}>>}
    */
   supplyAsync: (maybePayLoad: null) => Promise<ServerResponse>;
 

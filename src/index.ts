@@ -34,8 +34,8 @@ import { CommunicationsEnum } from "./com/xqmsg/sdk/v2/CommunicationsEnum";
 /**
  * Dashboard services
  */
-import AddBusiness from "./com/xqmsg/sdk/v2/services/dashboard/AddBusiness";
 import AddApplication from "./com/xqmsg/sdk/v2/services/dashboard/AddApplication";
+import AddBusiness from "./com/xqmsg/sdk/v2/services/dashboard/AddBusiness";
 import AddContact from "./com/xqmsg/sdk/v2/services/dashboard/AddContact";
 import AddUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/AddUserGroup";
 import DashboardLogin from "./com/xqmsg/sdk/v2/services/dashboard/DashboardLogin";
@@ -52,14 +52,14 @@ import GetEventTypes from "./com/xqmsg/sdk/v2/services/dashboard/GetEventTypes";
 import RemoveApplication from "./com/xqmsg/sdk/v2/services/dashboard/RemoveApplication";
 import RemoveContact from "./com/xqmsg/sdk/v2/services/dashboard/RemoveContact";
 import RemoveUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/RemoveUserGroup";
-import UpdateBusiness from "./com/xqmsg/sdk/v2/services/dashboard/UpdateBusiness";
 import UpdateApplication from "./com/xqmsg/sdk/v2/services/dashboard/UpdateApplication";
+import UpdateBusiness from "./com/xqmsg/sdk/v2/services/dashboard/UpdateBusiness";
 import UpdateUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/UpdateUserGroup";
 import VerifyAccount from "./com/xqmsg/sdk/v2/services/dashboard/VerifyAccount";
 
 export {
-  AddBusiness,
   AddApplication,
+  AddBusiness,
   AddContact,
   AddUserGroup,
   Authorize,
@@ -103,8 +103,8 @@ export {
   RevokeUserAccess,
   RolesEnum,
   ServerResponse,
-  UpdateBusiness,
   UpdateApplication,
+  UpdateBusiness,
   UpdateSettings,
   UpdateUserGroup,
   VerifyAccount,
