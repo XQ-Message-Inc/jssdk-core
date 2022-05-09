@@ -564,6 +564,7 @@ a user must be signed into XQ with an authorized email account associated with t
 
 - [Authorization](#connecting-to-the-dashboard)
 - [Businesses](#managing-a-business)
+- [Applications](#managing-an-application)
 - [User Groups](#managing-a-user-group)
 - [Contacts](#using-an-external-id-based-contact-for-tracking)
 - [Event Logs](#using-event-logs)
@@ -655,15 +656,11 @@ The SDK provides a variety of CRUD services for businesses, such as `AddBusiness
 
 ```javascript
 import { 
-  AddApplication,
   AddBusiness, 
-  GetApplications,
   GetBusinesses,
   GetCommunications,
   GetCurrentBusiness,
-  RemoveApplication,
   ServerResponse, 
-  UpdateApplication, 
   UpdateBusiness,
   XQSDK 
 } from "@xqmsg/jssdk-core";
@@ -813,6 +810,26 @@ new GetCommunications(sdk)
 
     return response;
   });
+```
+
+### Managing an application
+Once you have a business created, you may create applications under your current business. The number of applications a single business can have are limited - If the limit is reached, older keys may be removed in order to add new ones.
+
+The SDK provides a variety of CRUD services for applications, such as `AddApplication`, `GetApplications`, `RemoveApplication`, and `UpdateApplication`.
+
+``` javascript
+import { 
+  AddApplication,
+  GetApplications,
+  RemoveApplication,
+  ServerResponse, 
+  UpdateApplication, 
+  XQSDK 
+} from "@xqmsg/jssdk-core";
+
+const sdk = new XQSDK({
+  DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY"
+});
 
 // Get all applications of a business/workspace
 new GetApplications(sdk)
@@ -882,9 +899,9 @@ new UpdateApplication(sdk)
   });
 
 // Remove an existing application
-new UpdateApplication(sdk)
+new RemoveApplication(sdk)
   .supplyAsync({
-    [UpdateApplication.ID]: 123,
+    [RemoveApplication.ID]: 123,
   })
   .then((response) => {
     switch (response.status) {
