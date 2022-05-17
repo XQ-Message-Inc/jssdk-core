@@ -5,38 +5,46 @@ import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
 
 /**
- * A service which is utilized to remove an existing Contact
+ * A service which is utilized to update an existing developer application.
  *
- * @class [RemoveContact]
+ * @class [UpdateApplication]
  */
-export default class RemoveContact extends XQModule {
+export default class UpdateApplication extends XQModule {
   /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
 
   /** Specified name of the service */
   serviceName: string;
 
-  /** The field name representing the id */
+  /** The field name representing the ID of the application */
   static ID: "id" = "id";
+
+  /** The field name representing the name of the application to be updated */
+  static NAME: "name" = "name";
+
+  /** The field name representing the description of the application to be updated*/
+  static DESC: "desc" = "desc";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {String} id - the user id of the Contact that will be removed
+   * @param {Number} id - the id of the application
+   * @param {String} name - the name of the application
+   * @param {String} desc - the description of the application
    * @returns {Promise<ServerResponse<{payload:{}}>>}
    */
   supplyAsync: (maybePayload: {
-    [RemoveContact.ID]: string;
+    [UpdateApplication.ID]: number;
+    [UpdateApplication.NAME]?: string;
+    [UpdateApplication.DESC]?: string;
   }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "contact";
-    this.requiredFields = [RemoveContact.ID];
+    this.serviceName = "devapp";
+    this.requiredFields = [UpdateApplication.ID];
 
     this.supplyAsync = (maybePayLoad) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
-
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );
@@ -47,10 +55,10 @@ export default class RemoveContact extends XQModule {
 
         return this.sdk.call(
           this.sdk.DASHBOARD_SERVER_URL,
-          `${this.serviceName}/${maybePayLoad[RemoveContact.ID]}?delete=true`,
-          CallMethod.DELETE,
+          this.serviceName + "/" + maybePayLoad[UpdateApplication.ID],
+          CallMethod.PATCH,
           additionalHeaderProperties,
-          null,
+          maybePayLoad,
           true,
           Destination.DASHBOARD
         );
