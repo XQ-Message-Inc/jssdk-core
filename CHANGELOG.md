@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.6.0] - 2022-04-18
+## [1.6.0] - 2022-05-16
 
 ### Addition
 - Add CRUD operations for businesses, including `AddBusiness`, `GetCurrentBusiness`, and `UpdateBusiness`.
