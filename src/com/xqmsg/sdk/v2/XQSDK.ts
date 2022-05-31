@@ -10,6 +10,8 @@ import StatusException from "./exceptions/StatusException";
 import ValidationException from "./exceptions/ValidationException";
 import XQSimpleCache from "./caching/XQSimpleCache";
 
+import handleException from "./exceptions/handleException";
+
 import memoryCache from "memory-cache";
 
 var XMLHttpRequest = require("xhr2");
@@ -343,12 +345,8 @@ class XQSDK {
                     try {
                       dataMap = JSON.parse(responseString.replace(/\n/g, ""));
                     } catch (e) {
-                      return resolve(
-                        new ServerResponse(
-                          ServerResponse.ERROR,
-                          this.status,
-                          e.errorText
-                        )
+                      return new Promise((resolve) =>
+                        resolve(handleException(e))
                       );
                     }
                     return resolve(

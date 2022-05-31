@@ -3,6 +3,9 @@ import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
+import { XQServices } from "../../XQServicesEnum";
+
+import handleException from "../../exceptions/handleException";
 
 /**
  * A service which is utilized to update an existing business
@@ -92,25 +95,30 @@ export default class UpdateBusiness extends XQModule {
           Authorization: "Bearer " + dashboardAccessToken,
         };
 
-        return this.sdk.call(
-          this.sdk.DASHBOARD_SERVER_URL,
-          this.serviceName,
-          CallMethod.PATCH,
-          additionalHeaderProperties,
-          maybePayLoad,
-          true,
-          Destination.DASHBOARD
-        );
+        return this.sdk
+          .call(
+            this.sdk.DASHBOARD_SERVER_URL,
+            this.serviceName,
+            CallMethod.PATCH,
+            additionalHeaderProperties,
+            maybePayLoad,
+            true,
+            Destination.DASHBOARD
+          )
+          .then(async (response: ServerResponse) => {
+            switch (response.status) {
+              case ServerResponse.OK: {
+                return response;
+              }
+              case ServerResponse.ERROR: {
+                return handleException(response, XQServices.UpdateBusiness);
+              }
+            }
+          });
       } catch (exception) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
-          );
-        });
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.UpdateBusiness))
+        );
       }
     };
   }

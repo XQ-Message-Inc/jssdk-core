@@ -2,6 +2,9 @@ import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
+import { XQServices } from "../XQServicesEnum";
+
+import handleException from "../exceptions/handleException";
 
 /**
  * A service which is used to fetch an encryption key using a valid locator key.
@@ -60,35 +63,22 @@ export default class FetchKey extends XQModule {
             null,
             true
           )
-          .then((serverResponse: ServerResponse) => {
-            return new Promise((resolve) => {
-              switch (serverResponse.status) {
-                case ServerResponse.OK: {
-                  let key = serverResponse.payload;
-                  if (key.startsWith(".")) key = key.substr(2);
-                  resolve(new ServerResponse(ServerResponse.OK, 200, key));
-                  break;
-                }
-                case ServerResponse.ERROR: {
-                  console.error(
-                    `RetrieveKey failed, code: ${serverResponse.statusCode}, reason: ${serverResponse.payload}`
-                  );
-                  resolve(serverResponse);
-                  break;
-                }
+          .then((response: ServerResponse) => {
+            switch (response.status) {
+              case ServerResponse.OK: {
+                let key = response.payload;
+                if (key.startsWith(".")) key = key.substr(2);
+                return new ServerResponse(ServerResponse.OK, 200, key);
               }
-            });
+              case ServerResponse.ERROR: {
+                return handleException(response, XQServices.FetchKey);
+              }
+            }
           });
-      } catch (validationException) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              validationException.code,
-              validationException.reason
-            )
-          );
-        });
+      } catch (exception) {
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.FetchKey))
+        );
       }
     };
   }

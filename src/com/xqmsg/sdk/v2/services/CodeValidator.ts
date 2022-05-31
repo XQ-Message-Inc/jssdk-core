@@ -3,6 +3,9 @@ import ExchangeForAccessToken from "./ExchangeForAccessToken";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
+import { XQServices } from "../XQServicesEnum";
+
+import handleException from "../exceptions/handleException";
 
 /**
  * A service which is utilized to authenticate the two-factor PIN which resulted from the preceding {@link Authorize} service call.
@@ -53,27 +56,20 @@ export default class CodeValidator extends XQModule {
             maybePayLoad,
             true
           )
-          .then((validationResponse: ServerResponse) => {
-            switch (validationResponse.status) {
+          .then((response: ServerResponse) => {
+            switch (response.status) {
               case ServerResponse.OK: {
                 return new ExchangeForAccessToken(self.sdk).supplyAsync(null);
               }
               case ServerResponse.ERROR: {
-                console.info(validationResponse);
-                return validationResponse;
+                return handleException(response, XQServices.CodeValidator);
               }
             }
           });
       } catch (exception) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
-          );
-        });
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.CodeValidator))
+        );
       }
     };
   }

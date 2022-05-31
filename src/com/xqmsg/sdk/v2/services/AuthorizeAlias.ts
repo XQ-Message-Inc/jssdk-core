@@ -2,6 +2,9 @@ import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
+import { XQServices } from "../XQServicesEnum";
+
+import handleException from "../exceptions/handleException";
 
 interface IAuthorizeAliasParams {
   user: string;
@@ -65,35 +68,23 @@ export default class AuthorizeAlias extends XQModule {
             maybePayLoad,
             true
           )
-          .then((authorizeAliasResponse: ServerResponse) => {
-            switch (authorizeAliasResponse.status) {
+          .then((response: ServerResponse) => {
+            switch (response.status) {
               case ServerResponse.OK: {
-                const accessToken = authorizeAliasResponse.payload;
-                try {
-                  self.cache.putXQAccess(aliasUser, accessToken);
-                  self.cache.putActiveProfile(aliasUser);
+                const accessToken = response.payload;
 
-                  return authorizeAliasResponse;
-                } catch (e) {
-                  console.log(e.message);
-                  return null;
-                }
+                self.cache.putXQAccess(aliasUser, accessToken);
+                self.cache.putActiveProfile(aliasUser);
+
+                return response;
               }
-              default: {
-                return console.error("Error retrieving alias authorization");
+              case ServerResponse.ERROR: {
+                return handleException(response, XQServices.AuthorizeAlias);
               }
             }
           });
-      } catch (validationException) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              validationException.code,
-              validationException.reason
-            )
-          );
-        });
+      } catch (exception) {
+        return handleException(exception, XQServices.AuthorizeAlias);
       }
     };
   }
