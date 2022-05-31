@@ -2,8 +2,8 @@ import { Encrypt, XQSDK } from "../../src";
 
 // XQ API Keys
 const credentials = {
-  XQ_API_KEY: "",
-  DASHBOARD_API_KEY: "",
+  XQ_API_KEY: "YOUR_XQ_API_KEY",
+  DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY",
 };
 
 /**
