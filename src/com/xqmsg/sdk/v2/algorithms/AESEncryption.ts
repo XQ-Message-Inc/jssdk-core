@@ -1,8 +1,11 @@
 import AES from "crypto-js/aes";
 import EncryptionAlgorithm from "./EncryptionAlgorithm";
 import ServerResponse from "../ServerResponse";
+import { XQEncryptionAlgorithms } from "../XQServicesEnum";
 import XQSDK from "../XQSDK";
+
 import encodeUTF8 from "crypto-js/enc-utf8";
+import handleException from "../exceptions/handleException";
 
 /**
  * A class for the [Advanced Encryption Standard (AES)](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard#Definitive_standards).
@@ -61,22 +64,18 @@ export default class AESEncryption extends EncryptionAlgorithm {
                 [EncryptionAlgorithm.KEY]: key,
               })
             );
-          } catch (error) {
-            console.error(error.message);
-
-            resolve(
-              new ServerResponse(ServerResponse.ERROR, 500, error.message)
-            );
+          } catch (exception) {
+            return new Promise((resolve) => {
+              resolve(
+                handleException(exception, XQEncryptionAlgorithms.AESEncryption)
+              );
+            });
           }
         });
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
+            handleException(exception, XQEncryptionAlgorithms.AESEncryption)
           );
         });
       }
@@ -107,21 +106,18 @@ export default class AESEncryption extends EncryptionAlgorithm {
                 [EncryptionAlgorithm.DECRYPTED_TEXT]: decryptedText,
               })
             );
-          } catch (error) {
-            console.error(error.message);
-            resolve(
-              new ServerResponse(ServerResponse.ERROR, 500, error.message)
-            );
+          } catch (exception) {
+            return new Promise((resolve) => {
+              resolve(
+                handleException(exception, XQEncryptionAlgorithms.AESEncryption)
+              );
+            });
           }
         });
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
+            handleException(exception, XQEncryptionAlgorithms.AESEncryption)
           );
         });
       }

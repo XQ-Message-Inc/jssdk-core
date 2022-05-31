@@ -3,6 +3,9 @@ import FetchKey from "./FetchKey";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
+import { XQServices } from "../XQServicesEnum";
+
+import handleException from "../exceptions/handleException";
 
 /**
  * A service which is utilized to decrypt encrypted textual data using the {@link EncryptionAlgorithm} provided.
@@ -73,21 +76,17 @@ export default class Decrypt extends XQModule {
                   });
               }
               case ServerResponse.ERROR: {
-                console.info(keyRetrievalResponse);
-                return keyRetrievalResponse;
+                return handleException(
+                  keyRetrievalResponse,
+                  XQServices.Decrypt
+                );
               }
             }
           });
-      } catch (validationException) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              validationException.code,
-              validationException.reason
-            )
-          );
-        });
+      } catch (exception) {
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.Decrypt))
+        );
       }
     };
   }

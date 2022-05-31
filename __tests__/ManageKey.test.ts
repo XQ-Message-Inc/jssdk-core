@@ -1,11 +1,12 @@
 import {
   AuthorizeAlias,
+  CommunicationsEnum,
   FetchKey,
   GeneratePacket,
   ServerResponse,
 } from "../src";
-
 import { ensureCredentialsPresent, sdk, testEmail } from "./utils/setupFiles";
+import { IGeneratePacketParams } from "../src/com/xqmsg/sdk/v2/services/GeneratePacket";
 
 describe("Testing manual key management", () => {
   const authorizeUser = (user: string) =>
@@ -24,11 +25,13 @@ describe("Testing manual key management", () => {
         }
       });
 
-  const payload = {
+  const payload: IGeneratePacketParams = {
     [GeneratePacket.KEY]: "TEST KEY",
     [GeneratePacket.EXPIRES_HOURS]: 1,
     [GeneratePacket.RECIPIENTS]: ["recipient@xqmsg.com"],
     [GeneratePacket.DELETE_ON_RECEIPT]: false,
+    [GeneratePacket.TYPE]: CommunicationsEnum.EMAIL,
+    [GeneratePacket.META]: null,
   };
 
   const generatePacket = () =>

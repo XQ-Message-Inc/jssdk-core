@@ -2,6 +2,9 @@ import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
+import { XQServices } from "../XQServicesEnum";
+
+import handleException from "../exceptions/handleException";
 
 /**
  *  A service which is utilized to exchange a temporary access token with a real access token used in all secured XQ Message interactions
@@ -41,35 +44,27 @@ export default class ExchangeForAccessToken extends XQModule {
             maybePayLoad,
             true
           )
-          .then((exchangeResponse: ServerResponse) => {
-            switch (exchangeResponse.status) {
+          .then((response: ServerResponse) => {
+            switch (response.status) {
               case ServerResponse.OK: {
-                const accessToken = exchangeResponse.payload;
-                try {
-                  const activeProfile = self.cache.getActiveProfile(true);
-                  self.cache.putXQAccess(activeProfile, accessToken);
-                  self.cache.removeXQPreAuthToken(activeProfile);
-                  return exchangeResponse;
-                } catch (e) {
-                  console.log(e.message);
-                  return null;
-                }
+                const accessToken = response.payload;
+                const activeProfile = self.cache.getActiveProfile(true);
+                self.cache.putXQAccess(activeProfile, accessToken);
+                self.cache.removeXQPreAuthToken(activeProfile);
+                return response;
               }
-              default: {
-                return exchangeResponse;
+              case ServerResponse.ERROR: {
+                return handleException(
+                  response,
+                  XQServices.ExchangeForAccessToken
+                );
               }
             }
           });
       } catch (exception) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
-          );
-        });
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.ExchangeForAccessToken))
+        );
       }
     };
   }

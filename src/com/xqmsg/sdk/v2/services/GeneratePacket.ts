@@ -1,10 +1,12 @@
 import CallMethod from "../CallMethod";
+import { CommunicationsEnum } from "../CommunicationsEnum";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-import { CommunicationsEnum } from "../CommunicationsEnum";
+import { XQServices } from "../XQServicesEnum";
+import handleException from "../exceptions/handleException";
 
-interface IGeneratePacketParams {
+export interface IGeneratePacketParams {
   key: string;
   expires: number;
   recipients: string[];
@@ -109,26 +111,14 @@ export default class GeneratePacket extends XQModule {
                 );
               }
               case ServerResponse.ERROR: {
-                console.error(
-                  `GeneratePacket failed, code: ${response.statusCode}, reason: ${response.payload}`
-                );
-                return response;
-              }
-              default: {
-                return response;
+                return handleException(response, XQServices.GeneratePacket);
               }
             }
           });
-      } catch (validationException) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              validationException.code,
-              validationException.reason
-            )
-          );
-        });
+      } catch (exception) {
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.GeneratePacket))
+        );
       }
     };
   }

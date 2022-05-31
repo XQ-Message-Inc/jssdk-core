@@ -5,6 +5,9 @@ import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
+import { XQServices } from "../../XQServicesEnum";
+
+import handleException from "../../exceptions/handleException";
 
 /**
  * A service utilized to log-in a user and allow access to Dashboard services.
@@ -57,12 +60,12 @@ export default class DashboardLogin extends XQModule {
             true,
             Destination.DASHBOARD
           )
-          .then(async (exchangeResponse: ServerResponse) => {
-            switch (exchangeResponse.status) {
+          .then(async (response: ServerResponse) => {
+            switch (response.status) {
               case ServerResponse.OK: {
-                const dashboardAccessToken = exchangeResponse.payload;
+                const dashboardAccessToken = response.payload;
                 const decodedJWTPayload: JwtPayload = jwtDecode(
-                  exchangeResponse.payload
+                  response.payload
                 );
 
                 const profile = decodedJWTPayload.sub;
@@ -81,23 +84,14 @@ export default class DashboardLogin extends XQModule {
                 });
               }
               case ServerResponse.ERROR: {
-                console.error(
-                  `VerifyAccount failed, code: ${exchangeResponse.statusCode}, reason: ${exchangeResponse.payload}`
-                );
-                return exchangeResponse;
+                return handleException(response, XQServices.DashboardLogin);
               }
             }
           });
       } catch (exception) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
-          );
-        });
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.DashboardLogin))
+        );
       }
     };
   }

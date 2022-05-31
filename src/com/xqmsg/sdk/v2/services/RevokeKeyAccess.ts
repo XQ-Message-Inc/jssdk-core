@@ -2,6 +2,9 @@ import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
+import { XQServices } from "../XQServicesEnum";
+
+import handleException from "../exceptions/handleException";
 
 /**
  * A service which is utilized to revoke a key using a locator token.
@@ -34,7 +37,7 @@ export default class RevokeKeyAccess extends XQModule {
     super(sdk);
 
     this.serviceName = "key";
-    this.requiredFields = [RevokeKeyAccess.LOCATOR_KEY];
+    this.requiredFields = [RevokeKeyAccess.LOCATOR_KEYS];
 
     this.supplyAsync = (maybePayLoad) => {
       try {
@@ -46,24 +49,29 @@ export default class RevokeKeyAccess extends XQModule {
           Authorization: "Bearer " + accessToken,
         };
 
-        return this.sdk.call(
-          this.sdk.VALIDATION_SERVER_URL,
-          this.serviceName,
-          CallMethod.DELETE,
-          additionalHeaderProperties,
-          { tokens: locatorKeys },
-          true
-        );
+        return this.sdk
+          .call(
+            this.sdk.VALIDATION_SERVER_URL,
+            this.serviceName,
+            CallMethod.DELETE,
+            additionalHeaderProperties,
+            { tokens: locatorKeys },
+            true
+          )
+          .then((response: ServerResponse) => {
+            switch (response.status) {
+              case ServerResponse.OK: {
+                return response;
+              }
+              case ServerResponse.ERROR: {
+                return handleException(response, XQServices.RevokeKeyAccess);
+              }
+            }
+          });
       } catch (exception) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
-          );
-        });
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.RevokeKeyAccess))
+        );
       }
     };
   }
