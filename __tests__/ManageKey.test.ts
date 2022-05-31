@@ -20,7 +20,7 @@ describe("Testing manual key management", () => {
             return response;
           }
           case ServerResponse.ERROR: {
-            return false;
+            return response;
           }
         }
       });
@@ -53,9 +53,6 @@ describe("Testing manual key management", () => {
     new FetchKey(sdk)
       .supplyAsync({ [FetchKey.LOCATOR_KEY]: token })
       .then((response) => {
-        if (!response) {
-          return false;
-        }
         switch (response.status) {
           case ServerResponse.OK: {
             return response.payload;
@@ -71,9 +68,6 @@ describe("Testing manual key management", () => {
   it(`should successfully generate and fetch key packet`, async () =>
     expect(
       await authorizeUser(testEmail).then((userResponse) => {
-        if (!userResponse) {
-          return false;
-        }
         switch (userResponse.status) {
           case ServerResponse.OK: {
             return generatePacket().then((keyResponse) => {
