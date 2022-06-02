@@ -46,6 +46,7 @@ export enum XQServices {
   UpdateApplication = "UpdateApplication",
   UpdateBusiness = "UpdateBusiness",
   UpdateUserGroup = "UpdateUserGroup",
+  ValidateSession = "ValidateSession",
   VerifyAccount = "VerifyAccount",
 }
 

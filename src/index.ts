@@ -55,6 +55,7 @@ import RemoveUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/RemoveUserGro
 import UpdateApplication from "./com/xqmsg/sdk/v2/services/dashboard/UpdateApplication";
 import UpdateBusiness from "./com/xqmsg/sdk/v2/services/dashboard/UpdateBusiness";
 import UpdateUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/UpdateUserGroup";
+import ValidateSession from "./com/xqmsg/sdk/v2/services/dashboard/ValidateSession";
 import VerifyAccount from "./com/xqmsg/sdk/v2/services/dashboard/VerifyAccount";
 
 export {
@@ -107,6 +108,7 @@ export {
   UpdateBusiness,
   UpdateSettings,
   UpdateUserGroup,
+  ValidateSession,
   VerifyAccount,
   XQSDK,
 };
