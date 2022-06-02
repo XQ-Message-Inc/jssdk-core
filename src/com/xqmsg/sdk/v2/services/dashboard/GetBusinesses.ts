@@ -3,6 +3,9 @@ import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
+import { XQServices } from "../../XQServicesEnum";
+
+import handleException from "../../exceptions/handleException";
 
 /**
  * A service which is utilized to find a given dashboard's Businesses
@@ -54,29 +57,17 @@ export default class GetBusinesses extends XQModule {
           .then(async (response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
-                const businesses = response.payload.businesses;
-                return new ServerResponse(ServerResponse.OK, 200, {
-                  businesses,
-                });
+                return response;
               }
               case ServerResponse.ERROR: {
-                console.error(
-                  `GetBusinesses failed, code: ${response.statusCode}, reason: ${response.payload}`
-                );
-                return response;
+                return handleException(response, XQServices.GetBusinesses);
               }
             }
           });
       } catch (exception) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
-          );
-        });
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.GetBusinesses))
+        );
       }
     };
   }

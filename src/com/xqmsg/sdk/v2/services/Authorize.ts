@@ -2,6 +2,9 @@ import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
+import { XQServices } from "../XQServicesEnum";
+
+import handleException from "../exceptions/handleException";
 
 /**
  * A service which is used to authorize a user to utilize XQ services.
@@ -123,21 +126,15 @@ export default class Authorize extends XQModule {
                 self.cache.putActiveProfile(user);
                 return response;
               }
-              default: {
-                return response;
+              case ServerResponse.ERROR: {
+                return handleException(response, XQServices.Authorize);
               }
             }
           });
       } catch (exception) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
-          );
-        });
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.Authorize))
+        );
       }
     };
   }

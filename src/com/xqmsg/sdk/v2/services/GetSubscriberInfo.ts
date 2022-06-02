@@ -2,6 +2,9 @@ import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
+import { XQServices } from "../XQServicesEnum";
+
+import handleException from "../exceptions/handleException";
 
 /**
  * A service which is utilized to retrieve the current subscriber's information.
@@ -56,24 +59,29 @@ export default class GetSubscriberInfo extends XQModule {
           Authorization: "Bearer " + accessToken,
         };
 
-        return this.sdk.call(
-          this.sdk.SUBSCRIPTION_SERVER_URL,
-          this.serviceName,
-          CallMethod.GET,
-          additionalHeaderProperties,
-          maybePayLoad,
-          true
-        );
+        return this.sdk
+          .call(
+            this.sdk.SUBSCRIPTION_SERVER_URL,
+            this.serviceName,
+            CallMethod.GET,
+            additionalHeaderProperties,
+            maybePayLoad,
+            true
+          )
+          .then((response: ServerResponse) => {
+            switch (response.status) {
+              case ServerResponse.OK: {
+                return response;
+              }
+              case ServerResponse.ERROR: {
+                return handleException(response, XQServices.GetSubscriberInfo);
+              }
+            }
+          });
       } catch (exception) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
-          );
-        });
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.GetSubscriberInfo))
+        );
       }
     };
   }

@@ -3,6 +3,9 @@ import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
+import { XQServices } from "../../XQServicesEnum";
+
+import handleException from "../../exceptions/handleException";
 
 /**
  * A service which is utilized to return all event types
@@ -100,29 +103,17 @@ export default class GetCommunications extends XQModule {
           .then(async (response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
-                const communications = response.payload.communications;
-                return new ServerResponse(ServerResponse.OK, 200, {
-                  communications,
-                });
+                return response;
               }
               case ServerResponse.ERROR: {
-                console.error(
-                  `GetCommunications failed, code: ${response.statusCode}, reason: ${response.payload}`
-                );
-                return response;
+                return handleException(response, XQServices.GetCommunications);
               }
             }
           });
       } catch (exception) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
-          );
-        });
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.GetCommunications))
+        );
       }
     };
   }

@@ -1,3 +1,5 @@
+import { CommunicationsEnum } from "../CommunicationsEnum";
+
 import EncryptionAlgorithm from "../algorithms/EncryptionAlgorithm";
 import FetchKey from "./FetchKey";
 import FetchQuantumEntropy from "../quantum/FetchQuantumEntropy";
@@ -5,7 +7,9 @@ import GeneratePacket from "./GeneratePacket";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-import { CommunicationsEnum } from "../CommunicationsEnum";
+import { XQServices } from "../XQServicesEnum";
+
+import handleException from "../exceptions/handleException";
 
 interface IEncryptParams {
   recipients: string[];
@@ -110,10 +114,10 @@ export default class Encrypt extends XQModule {
         const encryptText = (expandedKey: string, skipKeyExpansion = false) => {
           return algorithm
             .encryptText(message, expandedKey, skipKeyExpansion)
-            .then((encryptResponse: ServerResponse) => {
-              switch (encryptResponse.status) {
+            .then((response: ServerResponse) => {
+              switch (response.status) {
                 case ServerResponse.OK: {
-                  const encryptResult = encryptResponse.payload;
+                  const encryptResult = response.payload;
                   const encryptedText =
                     encryptResult[EncryptionAlgorithm.ENCRYPTED_TEXT];
                   const expandedKey = encryptResult[EncryptionAlgorithm.KEY];
@@ -129,10 +133,10 @@ export default class Encrypt extends XQModule {
                       [GeneratePacket.TYPE]: type,
                       [GeneratePacket.META]: meta,
                     })
-                    .then((uploadResponse: ServerResponse) => {
-                      switch (uploadResponse.status) {
+                    .then((response: ServerResponse) => {
+                      switch (response.status) {
                         case ServerResponse.OK: {
-                          const locator = uploadResponse.payload;
+                          const locator = response.payload;
                           return new ServerResponse(ServerResponse.OK, 200, {
                             [Encrypt.LOCATOR_KEY]: locator,
                             [Encrypt.ENCRYPTED_TEXT]: encryptedText,
@@ -140,19 +144,13 @@ export default class Encrypt extends XQModule {
                         }
 
                         case ServerResponse.ERROR: {
-                          console.error(
-                            `PacketValidation failed, code: ${uploadResponse.statusCode}, reason: ${uploadResponse.payload}`
-                          );
-                          return uploadResponse;
+                          return handleException(response, XQServices.Encrypt);
                         }
                       }
                     });
                 }
                 case ServerResponse.ERROR: {
-                  console.error(
-                    `${algorithm.constructor.name}.encryptText(...) failed,  code: ${encryptResponse.statusCode}, reason: ${encryptResponse.payload}`
-                  );
-                  return encryptResponse;
+                  return handleException(response, XQServices.Encrypt);
                 }
               }
             });
@@ -180,10 +178,10 @@ export default class Encrypt extends XQModule {
 
         return new FetchQuantumEntropy(sdk)
           .supplyAsync({ [FetchQuantumEntropy.KS]: FetchQuantumEntropy._256 })
-          .then((keyResponse: ServerResponse) => {
-            switch (keyResponse.status) {
+          .then((response: ServerResponse) => {
+            switch (response.status) {
               case ServerResponse.OK: {
-                const initialKey = keyResponse.payload;
+                const initialKey = response.payload;
 
                 const expandedKey = algorithm.expandKey(
                   initialKey,
@@ -193,22 +191,13 @@ export default class Encrypt extends XQModule {
                 return encryptText(expandedKey);
               }
               case ServerResponse.ERROR: {
-                console.error(
-                  `FetchQuantumEntropy failed, code: ${keyResponse.statusCode}, reason: ${keyResponse.payload}`
-                );
-                return keyResponse;
+                return handleException(response, XQServices.Encrypt);
               }
             }
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
-          )
+          resolve(handleException(exception, XQServices.Encrypt))
         );
       }
     };

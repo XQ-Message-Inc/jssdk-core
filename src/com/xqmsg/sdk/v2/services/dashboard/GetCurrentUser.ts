@@ -3,6 +3,9 @@ import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
+import { XQServices } from "../../XQServicesEnum";
+
+import handleException from "../../exceptions/handleException";
 
 /**
  * A service which is utilized to return the currently logged in user's data
@@ -63,30 +66,23 @@ export default class GetCurrentUser extends XQModule {
                   // We couldn't wind a user with this email address. This should never happen but
                   // we need to account for the possibility. Throwing here will trigger the same error handling as
                   // if the request failed.
-                  throw new Error(
+                  throw new ServerResponse(
+                    ServerResponse.ERROR,
+                    404,
                     `Could not find a user with that email address: ${activeProfile}`
                   );
                 }
                 return new ServerResponse(ServerResponse.OK, 200, { contact });
               }
               case ServerResponse.ERROR: {
-                console.error(
-                  `GetCurrentUser failed, code: ${response.statusCode}, reason: ${response.payload}`
-                );
-                return response;
+                return handleException(response, XQServices.GetCurrentUser);
               }
             }
           });
       } catch (exception) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
-          );
-        });
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.GetCurrentUser))
+        );
       }
     };
   }

@@ -3,6 +3,9 @@ import FetchKey from "./FetchKey";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
+import { XQServices } from "../XQServicesEnum";
+
+import handleException from "../exceptions/handleException";
 
 /**
  * A service which is utilized to decrypt data stored in a file using the {@link EncryptionAlgorithm} provided.
@@ -36,43 +39,37 @@ export default class FileDecrypt extends XQModule {
     this.supplyAsync = (maybePayLoad) => {
       try {
         this.sdk.validateInput(maybePayLoad, this.requiredFields);
-      } catch (validationException) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              validationException.code,
-              validationException.reason
-            )
-          );
-        });
+      } catch (exception) {
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.FileDecrypt))
+        );
       }
       const algorithm = this.algorithm;
       const sdk = this.sdk;
       const sourceFile = maybePayLoad[FileDecrypt.SOURCE_FILE];
 
-      return algorithm.decryptFile(sourceFile, (aLocatorToken: string) => {
-        return new FetchKey(sdk)
-          .supplyAsync({ [FetchKey.LOCATOR_KEY]: aLocatorToken })
-          .then((retrieveKeyResponse: ServerResponse) => {
-            switch (retrieveKeyResponse.status) {
+      try {
+        return algorithm.decryptFile(
+          sourceFile,
+          async (aLocatorToken: string) => {
+            const response = await new FetchKey(sdk).supplyAsync({
+              [FetchKey.LOCATOR_KEY]: aLocatorToken,
+            });
+            switch (response.status) {
               case ServerResponse.OK: {
-                return retrieveKeyResponse.payload as string;
+                return response.payload as string;
               }
-              case ServerResponse.ERROR: {
-                console.error(
-                  `${algorithm.constructor.name}.decryptFile() failed, code: ${retrieveKeyResponse.statusCode}, reason: ${retrieveKeyResponse.payload}`
-                );
-                return "";
+              default: {
+                throw response;
               }
-              default:
-                console.error(
-                  `${algorithm.constructor.name}.decryptFile() failed, code: ${retrieveKeyResponse.statusCode}, reason: ${retrieveKeyResponse.payload}`
-                );
-                return "";
             }
-          });
-      });
+          }
+        );
+      } catch (exception) {
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.FileDecrypt))
+        );
+      }
     };
   }
 }
