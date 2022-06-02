@@ -8,11 +8,10 @@ import { XQServices } from "../../XQServicesEnum";
 import handleException from "../../exceptions/handleException";
 
 /**
- * A service which is utilized to fetch the current business of the logged in user
- *
- * @class [GetCurrentBusiness]
+ * A service which is utilized to validate the current dashboard session
+ * @class [ValidateSession]
  */
-export default class GetCurrentBusiness extends XQModule {
+export default class ValidateSession extends XQModule {
   /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
 
@@ -21,19 +20,17 @@ export default class GetCurrentBusiness extends XQModule {
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @returns {Promise<ServerResponse<{payload: CurrentBusinessSummary}>>}
+   * @returns {Promise<ServerResponse<{payload: string; status: ServerResponse.OK | ServerResponse.ERROR; statusCode: number; }>>}
    */
-  supplyAsync: (maybePayLoad: null) => Promise<ServerResponse>;
+  supplyAsync: () => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "business";
+    this.serviceName = "session";
     this.requiredFields = [];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = () => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
-
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );
@@ -48,7 +45,7 @@ export default class GetCurrentBusiness extends XQModule {
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
-            maybePayLoad,
+            null,
             true,
             Destination.DASHBOARD
           )
@@ -58,13 +55,13 @@ export default class GetCurrentBusiness extends XQModule {
                 return response;
               }
               case ServerResponse.ERROR: {
-                return handleException(response, XQServices.GetCurrentBusiness);
+                return handleException(response, XQServices.ValidateSession);
               }
             }
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GetCurrentBusiness))
+          resolve(handleException(exception, XQServices.ValidateSession))
         );
       }
     };

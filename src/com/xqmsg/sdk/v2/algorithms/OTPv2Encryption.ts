@@ -1,6 +1,9 @@
 import EncryptionAlgorithm from "./EncryptionAlgorithm";
 import ServerResponse from "../ServerResponse";
+import { XQEncryptionAlgorithms } from "../XQServicesEnum";
 import XQSDK from "../XQSDK";
+
+import handleException from "../exceptions/handleException";
 
 type ParsedFile = {
   locator: string;
@@ -172,11 +175,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
+            handleException(exception, XQEncryptionAlgorithms.OTPv2Encryption)
           );
         });
       }
@@ -241,11 +240,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
+            handleException(exception, XQEncryptionAlgorithms.OTPv2Encryption)
           );
         });
       }
@@ -291,51 +286,52 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
                 })
               );
             } catch (exception) {
-              resolve(
-                new ServerResponse(ServerResponse.ERROR, 500, exception.message)
-              );
+              return new Promise((resolve) => {
+                resolve(
+                  handleException(
+                    exception,
+                    XQEncryptionAlgorithms.OTPv2Encryption
+                  )
+                );
+              });
             }
           } catch (exception) {
-            resolve(
-              new ServerResponse(ServerResponse.ERROR, 500, exception.message)
-            );
+            return new Promise((resolve) => {
+              resolve(
+                handleException(
+                  exception,
+                  XQEncryptionAlgorithms.OTPv2Encryption
+                )
+              );
+            });
           }
         });
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
+            handleException(exception, XQEncryptionAlgorithms.OTPv2Encryption)
           );
         });
       }
     };
 
     this.exclusiveDisjunction = (text: string, expandedKey: string): string => {
-      try {
-        const encoder = new TextEncoder();
+      const encoder = new TextEncoder();
 
-        const keyBytes = encoder.encode(expandedKey);
-        const payloadBytes = encoder.encode(encodeURIComponent(text));
+      const keyBytes = encoder.encode(expandedKey);
+      const payloadBytes = encoder.encode(encodeURIComponent(text));
 
-        const j = [];
+      const j = [];
 
-        for (let idx = 0; idx < payloadBytes.length; ++idx) {
-          const mi = idx % keyBytes.length;
-          j.push(payloadBytes[idx] ^ keyBytes[mi]);
-        }
-
-        const decoder = new TextDecoder();
-        const dt = decoder.decode(new Uint8Array(j));
-
-        return universalBtoa(dt);
-      } catch (err) {
-        console.info("ERROR: " + err.message);
-        return err.message;
+      for (let idx = 0; idx < payloadBytes.length; ++idx) {
+        const mi = idx % keyBytes.length;
+        j.push(payloadBytes[idx] ^ keyBytes[mi]);
       }
+
+      const decoder = new TextDecoder();
+      const dt = decoder.decode(new Uint8Array(j));
+
+      return universalBtoa(dt);
     };
 
     this.decryptFile = (file, retrieveKeyFunction) => {
@@ -361,11 +357,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
+            handleException(exception, XQEncryptionAlgorithms.OTPv2Encryption)
           );
         });
       }

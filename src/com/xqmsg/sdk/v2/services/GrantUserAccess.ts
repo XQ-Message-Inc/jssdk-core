@@ -2,6 +2,9 @@ import CallMethod from "./../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
+import { XQServices } from "../XQServicesEnum";
+
+import handleException from "../exceptions/handleException";
 
 /**
  * A service which is utilized to grant access for a particular user to a specified key. The
@@ -60,26 +63,31 @@ export default class GrantUserAccess extends XQModule {
           Authorization: "Bearer " + accessToken,
         };
 
-        return this.sdk.call(
-          this.sdk.VALIDATION_SERVER_URL,
-          this.serviceName +
-            "/" +
-            encodeURIComponent(maybePayLoad[GrantUserAccess.LOCATOR_TOKEN]),
-          CallMethod.POST,
-          additionalHeaderProperties,
-          payload,
-          true
-        );
+        return this.sdk
+          .call(
+            this.sdk.VALIDATION_SERVER_URL,
+            this.serviceName +
+              "/" +
+              encodeURIComponent(maybePayLoad[GrantUserAccess.LOCATOR_TOKEN]),
+            CallMethod.POST,
+            additionalHeaderProperties,
+            payload,
+            true
+          )
+          .then((response: ServerResponse) => {
+            switch (response.status) {
+              case ServerResponse.OK: {
+                return response;
+              }
+              case ServerResponse.ERROR: {
+                return handleException(response, XQServices.GrantUserAccess);
+              }
+            }
+          });
       } catch (exception) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
-          );
-        });
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.GrantUserAccess))
+        );
       }
     };
   }

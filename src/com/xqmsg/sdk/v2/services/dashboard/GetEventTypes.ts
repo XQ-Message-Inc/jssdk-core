@@ -3,6 +3,9 @@ import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
+import { XQServices } from "../../XQServicesEnum";
+
+import handleException from "../../exceptions/handleException";
 
 /**
  * A service which is utilized to return all event types
@@ -53,29 +56,17 @@ export default class GetEventTypes extends XQModule {
           .then(async (response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
-                const eventTypes = response.payload.data;
-                return new ServerResponse(ServerResponse.OK, 200, {
-                  eventTypes,
-                });
+                return response;
               }
               case ServerResponse.ERROR: {
-                console.error(
-                  `GetEventTypes failed, code: ${response.statusCode}, reason: ${response.payload}`
-                );
-                return response;
+                return handleException(response, XQServices.GetEventTypes);
               }
             }
           });
       } catch (exception) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
-          );
-        });
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.GetEventTypes))
+        );
       }
     };
   }

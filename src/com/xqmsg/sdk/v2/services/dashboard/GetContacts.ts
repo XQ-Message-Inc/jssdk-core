@@ -4,6 +4,9 @@ import ServerResponse from "../../ServerResponse";
 import { UserRole } from "../../types/dashboard";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
+import { XQServices } from "../../XQServicesEnum";
+
+import handleException from "../../exceptions/handleException";
 
 /**
  * A service which is utilized to return all contacts of the current user
@@ -78,27 +81,17 @@ export default class GetContacts extends XQModule {
           .then(async (response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
-                const contacts = response.payload.contacts;
-                return new ServerResponse(ServerResponse.OK, 200, { contacts });
+                return response;
               }
               case ServerResponse.ERROR: {
-                console.error(
-                  `GetContacts failed, code: ${response.statusCode}, reason: ${response.payload}`
-                );
-                return response;
+                return handleException(response, XQServices.GetContacts);
               }
             }
           });
       } catch (exception) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
-          );
-        });
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.GetContacts))
+        );
       }
     };
   }
