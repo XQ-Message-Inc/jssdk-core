@@ -8,38 +8,34 @@ import { XQServices } from "../../XQServicesEnum";
 import handleException from "../../exceptions/handleException";
 
 /**
- * A service which is utilized to remove an existing Contact
+ * A service which is utilized to find a given dashboard's Businesses
  *
- * @class [RemoveContact]
+ * @class [GetBusinesses]
  */
-export default class RemoveContact extends XQModule {
+export default class GetBusinesses extends XQModule {
   /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
 
   /** Specified name of the service */
   serviceName: string;
 
-  /** The field name representing the id */
-  static ID: "id" = "id";
+  static BUSINESSES: "businesses" = "businesses";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {String} id - the user id of the Contact that will be removed
-   * @returns {Promise<ServerResponse<{payload:{}}>>}
+   *
+   * @returns {Promise<ServerResponse<{payload:{businesses:[{canAccessBusiness: boolean, domain: string, id: int, isPersonal: boolean, name: string}]}}>>}
    */
-  supplyAsync: (maybePayload: {
-    [RemoveContact.ID]: string;
-  }) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "contact";
-    this.requiredFields = [RemoveContact.ID];
+    this.serviceName = GetBusinesses.BUSINESSES;
+    this.requiredFields = [];
 
-    this.supplyAsync = (maybePayLoad) => {
+    // TODO(joshuaskatz - 3.22.22): add filter capabilities
+    this.supplyAsync = () => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
-
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );
@@ -51,8 +47,8 @@ export default class RemoveContact extends XQModule {
         return this.sdk
           .call(
             this.sdk.DASHBOARD_SERVER_URL,
-            `${this.serviceName}/${maybePayLoad[RemoveContact.ID]}?delete=true`,
-            CallMethod.DELETE,
+            this.serviceName,
+            CallMethod.GET,
             additionalHeaderProperties,
             null,
             true,
@@ -64,13 +60,13 @@ export default class RemoveContact extends XQModule {
                 return response;
               }
               case ServerResponse.ERROR: {
-                return handleException(response, XQServices.RemoveContact);
+                return handleException(response, XQServices.GetBusinesses);
               }
             }
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.RemoveContact))
+          resolve(handleException(exception, XQServices.GetBusinesses))
         );
       }
     };

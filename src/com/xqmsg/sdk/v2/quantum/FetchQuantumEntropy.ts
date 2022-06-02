@@ -2,6 +2,9 @@ import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "../services/XQModule";
 import XQSDK from "../XQSDK";
+import { XQServices } from "../XQServicesEnum";
+
+import handleException from "../exceptions/handleException";
 
 /**
  * Fetches quantum entropy from the server. When the user makes the request,
@@ -38,24 +41,30 @@ export default class FetchQuantumEntropy extends XQModule {
           [XQSDK.CONTENT_TYPE]: XQSDK.TEXT_PLAIN_UTF_8,
         };
 
-        return this.sdk.call(
-          this.sdk.KEY_SERVER_URL,
-          null,
-          CallMethod.GET,
-          additionalHeaderProperties,
-          maybePayLoad,
-          false
-        );
+        return this.sdk
+          .call(
+            this.sdk.KEY_SERVER_URL,
+            null,
+            CallMethod.GET,
+            additionalHeaderProperties,
+            maybePayLoad,
+            false
+          )
+          .then((response: ServerResponse) => {
+            switch (response.status) {
+              case ServerResponse.OK: {
+                return response;
+              }
+              case ServerResponse.ERROR: {
+                return handleException(
+                  response,
+                  XQServices.FetchQuantumEntropy
+                );
+              }
+            }
+          });
       } catch (exception) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
-          );
-        });
+        return handleException(exception, XQServices.FetchQuantumEntropy);
       }
     };
   }

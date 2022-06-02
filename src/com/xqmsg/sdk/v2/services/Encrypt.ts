@@ -1,3 +1,5 @@
+import { CommunicationsEnum } from "../CommunicationsEnum";
+
 import EncryptionAlgorithm from "../algorithms/EncryptionAlgorithm";
 import FetchKey from "./FetchKey";
 import FetchQuantumEntropy from "../quantum/FetchQuantumEntropy";
@@ -5,6 +7,9 @@ import GeneratePacket from "./GeneratePacket";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
+import { XQServices } from "../XQServicesEnum";
+
+import handleException from "../exceptions/handleException";
 
 interface IEncryptParams {
   recipients: string[];
@@ -13,6 +18,8 @@ interface IEncryptParams {
   dor?: boolean;
   locatorKey?: string;
   encryptionKey?: string;
+  type?: CommunicationsEnum;
+  meta?: Record<string, unknown>;
 }
 
 /**
@@ -48,6 +55,12 @@ export default class Encrypt extends XQModule {
   /** The field name representing the text that will be encrypted */
   static TEXT: "text" = "text";
 
+  /** The field name representing the type of communication that the user is encrypting (ex. File, Email, Chat, etc.) */
+  static TYPE: "type" = "type";
+
+  /** The field name representing the arbitrary metadata the user would like to attach to the log of the encrypted payload */
+  static META: "meta" = "meta";
+
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
    * @param {[String]} maybePayLoad.recipients  - the list of emails of users intended to have read access to the encrypted content
@@ -56,6 +69,8 @@ export default class Encrypt extends XQModule {
    * @param {Boolean} [maybePayLoad.dor=false] - an optional boolean value which specifies if the content should be deleted after opening
    * @param {String} maybePayLoad.locatorKey - an optional string value that may be used to utilize a pre-existing locator key
    * @param {String} maybePayLoad.encryptionKey - an optional string value that may be used to utilize a pre-existing encryption key
+   * @param {String} maybePayLoad.type - an optional string value which specifies the type of communication the user is encrypting. Defaults to `unknown`
+   * @param {Map} maybePayLoad.meta - an optional map value which can contain any arbitrary metadata the user wants
    *
    * @returns {Promise<ServerResponse<{payload:{locatorKey:string, encryptedText:string}}>>}
    */
@@ -82,10 +97,14 @@ export default class Encrypt extends XQModule {
         const message = maybePayLoad[Encrypt.TEXT];
         const recipients = maybePayLoad[Encrypt.RECIPIENTS];
         const expiresHours = maybePayLoad[Encrypt.EXPIRES_HOURS];
-        const deleteOnReceipt = maybePayLoad[Encrypt.DELETE_ON_RECEIPT];
+        const deleteOnReceipt =
+          maybePayLoad[Encrypt.DELETE_ON_RECEIPT] ?? false;
 
         const locatorKey = maybePayLoad[Encrypt.LOCATOR_KEY];
         const encryptionKey = maybePayLoad[Encrypt.ENCRYPTION_KEY];
+
+        const type = maybePayLoad[Encrypt.TYPE] ?? CommunicationsEnum.UNKNOWN;
+        const meta = maybePayLoad[Encrypt.META] ?? null;
 
         /**
          * A function utilized to take an encryption key and encrypt textual data.
@@ -95,10 +114,10 @@ export default class Encrypt extends XQModule {
         const encryptText = (expandedKey: string, skipKeyExpansion = false) => {
           return algorithm
             .encryptText(message, expandedKey, skipKeyExpansion)
-            .then((encryptResponse: ServerResponse) => {
-              switch (encryptResponse.status) {
+            .then((response: ServerResponse) => {
+              switch (response.status) {
                 case ServerResponse.OK: {
-                  const encryptResult = encryptResponse.payload;
+                  const encryptResult = response.payload;
                   const encryptedText =
                     encryptResult[EncryptionAlgorithm.ENCRYPTED_TEXT];
                   const expandedKey = encryptResult[EncryptionAlgorithm.KEY];
@@ -111,11 +130,13 @@ export default class Encrypt extends XQModule {
                       [GeneratePacket.DELETE_ON_RECEIPT]: deleteOnReceipt
                         ? deleteOnReceipt
                         : false,
+                      [GeneratePacket.TYPE]: type,
+                      [GeneratePacket.META]: meta,
                     })
-                    .then((uploadResponse: ServerResponse) => {
-                      switch (uploadResponse.status) {
+                    .then((response: ServerResponse) => {
+                      switch (response.status) {
                         case ServerResponse.OK: {
-                          const locator = uploadResponse.payload;
+                          const locator = response.payload;
                           return new ServerResponse(ServerResponse.OK, 200, {
                             [Encrypt.LOCATOR_KEY]: locator,
                             [Encrypt.ENCRYPTED_TEXT]: encryptedText,
@@ -123,19 +144,13 @@ export default class Encrypt extends XQModule {
                         }
 
                         case ServerResponse.ERROR: {
-                          console.error(
-                            `PacketValidation failed, code: ${uploadResponse.statusCode}, reason: ${uploadResponse.payload}`
-                          );
-                          return uploadResponse;
+                          return handleException(response, XQServices.Encrypt);
                         }
                       }
                     });
                 }
                 case ServerResponse.ERROR: {
-                  console.error(
-                    `${algorithm.constructor.name}.encryptText(...) failed,  code: ${encryptResponse.statusCode}, reason: ${encryptResponse.payload}`
-                  );
-                  return encryptResponse;
+                  return handleException(response, XQServices.Encrypt);
                 }
               }
             });
@@ -163,10 +178,10 @@ export default class Encrypt extends XQModule {
 
         return new FetchQuantumEntropy(sdk)
           .supplyAsync({ [FetchQuantumEntropy.KS]: FetchQuantumEntropy._256 })
-          .then((keyResponse: ServerResponse) => {
-            switch (keyResponse.status) {
+          .then((response: ServerResponse) => {
+            switch (response.status) {
               case ServerResponse.OK: {
-                const initialKey = keyResponse.payload;
+                const initialKey = response.payload;
 
                 const expandedKey = algorithm.expandKey(
                   initialKey,
@@ -176,22 +191,13 @@ export default class Encrypt extends XQModule {
                 return encryptText(expandedKey);
               }
               case ServerResponse.ERROR: {
-                console.error(
-                  `FetchQuantumEntropy failed, code: ${keyResponse.statusCode}, reason: ${keyResponse.payload}`
-                );
-                return keyResponse;
+                return handleException(response, XQServices.Encrypt);
               }
             }
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              exception.code,
-              exception.reason
-            )
-          )
+          resolve(handleException(exception, XQServices.Encrypt))
         );
       }
     };

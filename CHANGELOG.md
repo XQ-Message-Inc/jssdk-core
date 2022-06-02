@@ -5,6 +5,75 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.7.0] - 2022-06-01
+
+### Addition
+- Add `ValidateSession` service which consumes the `/session` endpoint. This is used to determine the validity of the XQ Dashboard session
+### Modified
+- Error handling updates: Modified `catch` block of `trycatch` utilized in each service. Added `handleException` function used to return the `ServerResponse` or create one.
+
+## [1.6.0] - 2022-05-16
+
+### Addition
+- Add CRUD operations for businesses, including `AddBusiness`, `GetCurrentBusiness`, and `UpdateBusiness`.
+- Add CRUD operations for applications, including `AddApplication`, `RemoveApplication`, and `UpdateApplication`.
+- 
+### Modified
+- Update the `README.md` documentation file to reflect recent changes to the sdk.
+
+## [1.5.3] - 2022-04-18
+### Modified
+
+- Update `Authorize` params to include `text` and `target`. `text` is an interpolated text field when a mobile number is specified. Use $pin to interpolate the pin or $link to interpolate the maybePayLoad.target. `target` is A link that can be interpolated in the maybePayload.text. Used for inviting users by text
+## [1.5.1] - 2022-03-28
+### Modified
+
+- Update `RevokeKeyAccess` expected params of `locatorKey` --> `locatorKeys`, a `string` --> `string[]`
+- Update `call` method of XQSDK to include check from DELETE http method when factoring in `maybePayload` presence
+
+## [1.5.0] 2022-03-24
+## Addition
+- Add `GetEventLogs`, `GetCommunications`, `GetEventTypes` services to return a payloads containing event logs, communications, and event types - respectively.
+
+## [1.4.0] 2022-03-22
+## Addition
+- Add `GetBusinesses` service to return a payload containing an array of businesses related to a user's dashboard
+
+
+## [1.3.2] 2022-03-22
+## Modified
+- Modify `VerifyAccount` and `DashboardLogin` services to return a payload that includes a `dashboardAccessToken` and `user` (email/ID)
+- Modify `VerifyAccount` to take optional full dashboard access token, rather than just a pre-auth dashboard access token
+## [1.3.0] 2022-03-21
+
+## Added
+- Add `VerifyAccount`, `GetCurrentUser`, `GetContacts`, and `GetSubscriberInfo` services
+
+## Modified
+- Modify `DashboardLogin` service
+## Removed
+- Remove `FindContacts` service
+
+## [1.2.4] 2022-03-02
+
+## Modified
+- Modify services to use correct `CallMethod` (instead of `CallMethod.OPTIONS`):
+* `GrantUserAccess` => POST
+* `RevokeKeyAccess` => DELETE
+* `RevokeUserAccess` => PATCH
+* `UpdateSettings` => PATCH
+
+
+## [1.2.1] - 2022-02-13
+
+## Modified
+- update `RevokeKeyAccess` service `CallMethod` to utilize `DELETE` instead of `OPTIONS`
+
+## [1.2.0] - 2022-02-03
+
+## Modified
+- update `Encrypt`, `FileEncrypt`, and `GeneratePacket` to accept `type` and `meta` field values in payload
+
 ## [1.1.4] - 2021-12-30
 
 ## Modified

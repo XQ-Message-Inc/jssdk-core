@@ -20,7 +20,7 @@ import FileDecrypt from "./com/xqmsg/sdk/v2/services/FileDecrypt";
 import FileEncrypt from "./com/xqmsg/sdk/v2/services/FileEncrypt";
 import GeneratePacket from "./com/xqmsg/sdk/v2/services/GeneratePacket";
 import GetSettings from "./com/xqmsg/sdk/v2/services/GetSettings";
-import GetUserInfo from "./com/xqmsg/sdk/v2/services/GetUserInfo";
+import GetSubscriberInfo from "./com/xqmsg/sdk/v2/services/GetSubscriberInfo";
 import GrantUserAccess from "./com/xqmsg/sdk/v2/services/GrantUserAccess";
 import NotificationEnum from "./com/xqmsg/sdk/v2/NotificationEnum";
 import RevokeKeyAccess from "./com/xqmsg/sdk/v2/services/RevokeKeyAccess";
@@ -29,22 +29,38 @@ import RolesEnum from "./com/xqmsg/sdk/v2/RolesEnum";
 import ServerResponse from "./com/xqmsg/sdk/v2/ServerResponse";
 import UpdateSettings from "./com/xqmsg/sdk/v2/services/UpdateSettings";
 import XQSDK from "./com/xqmsg/sdk/v2/XQSDK";
+import { CommunicationsEnum } from "./com/xqmsg/sdk/v2/CommunicationsEnum";
 
 /**
  * Dashboard services
  */
+import AddApplication from "./com/xqmsg/sdk/v2/services/dashboard/AddApplication";
+import AddBusiness from "./com/xqmsg/sdk/v2/services/dashboard/AddBusiness";
 import AddContact from "./com/xqmsg/sdk/v2/services/dashboard/AddContact";
 import AddUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/AddUserGroup";
 import DashboardLogin from "./com/xqmsg/sdk/v2/services/dashboard/DashboardLogin";
 import DisableContact from "./com/xqmsg/sdk/v2/services/dashboard/DisableContact";
-import FindContacts from "./com/xqmsg/sdk/v2/services/dashboard/FindContacts";
 import FindUserGroups from "./com/xqmsg/sdk/v2/services/dashboard/FindUserGroups";
 import GetApplications from "./com/xqmsg/sdk/v2/services/dashboard/GetApplications";
+import GetBusinesses from "./com/xqmsg/sdk/v2/services/dashboard/GetBusinesses";
+import GetCommunications from "./com/xqmsg/sdk/v2/services/dashboard/GetCommunications";
+import GetContacts from "./com/xqmsg/sdk/v2/services/dashboard/GetContacts";
+import GetCurrentBusiness from "./com/xqmsg/sdk/v2/services/dashboard/GetCurrentBusiness";
+import GetCurrentUser from "./com/xqmsg/sdk/v2/services/dashboard/GetCurrentUser";
+import GetEventLogs from "./com/xqmsg/sdk/v2/services/dashboard/GetEventLogs";
+import GetEventTypes from "./com/xqmsg/sdk/v2/services/dashboard/GetEventTypes";
+import RemoveApplication from "./com/xqmsg/sdk/v2/services/dashboard/RemoveApplication";
 import RemoveContact from "./com/xqmsg/sdk/v2/services/dashboard/RemoveContact";
 import RemoveUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/RemoveUserGroup";
+import UpdateApplication from "./com/xqmsg/sdk/v2/services/dashboard/UpdateApplication";
+import UpdateBusiness from "./com/xqmsg/sdk/v2/services/dashboard/UpdateBusiness";
 import UpdateUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/UpdateUserGroup";
+import ValidateSession from "./com/xqmsg/sdk/v2/services/dashboard/ValidateSession";
+import VerifyAccount from "./com/xqmsg/sdk/v2/services/dashboard/VerifyAccount";
 
 export {
+  AddApplication,
+  AddBusiness,
   AddContact,
   AddUserGroup,
   Authorize,
@@ -54,6 +70,7 @@ export {
   CheckKeyExpiration,
   CodeValidator,
   CombineAuthorizations,
+  CommunicationsEnum,
   DashboardLogin,
   Decrypt,
   DeleteAuthorization,
@@ -66,21 +83,32 @@ export {
   FetchQuantumEntropy,
   FileDecrypt,
   FileEncrypt,
-  FindContacts,
   FindUserGroups,
   GeneratePacket,
   GetApplications,
+  GetBusinesses,
+  GetCommunications,
+  GetContacts,
+  GetCurrentBusiness,
+  GetCurrentUser,
+  GetEventLogs,
+  GetEventTypes,
   GetSettings,
-  GetUserInfo,
+  GetSubscriberInfo,
   GrantUserAccess,
   NotificationEnum,
+  RemoveApplication,
   RemoveContact,
   RemoveUserGroup,
   RevokeKeyAccess,
   RevokeUserAccess,
   RolesEnum,
   ServerResponse,
+  UpdateApplication,
+  UpdateBusiness,
   UpdateSettings,
   UpdateUserGroup,
+  ValidateSession,
+  VerifyAccount,
   XQSDK,
 };
