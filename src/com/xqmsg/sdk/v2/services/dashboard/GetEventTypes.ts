@@ -8,38 +8,33 @@ import { XQServices } from "../../XQServicesEnum";
 import handleException from "../../exceptions/handleException";
 
 /**
- * A service which is utilized to remove an existing Contact
+ * A service which is utilized to return all event types
  *
- * @class [RemoveContact]
+ * @class [GetEventTypes]
  */
-export default class RemoveContact extends XQModule {
+export default class GetEventTypes extends XQModule {
   /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
 
   /** Specified name of the service */
   serviceName: string;
 
-  /** The field name representing the id */
-  static ID: "id" = "id";
+  /** The service name */
+  static EVENT_TYPES: "eventtypes" = "eventtypes";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {String} id - the user id of the Contact that will be removed
-   * @returns {Promise<ServerResponse<{payload:{}}>>}
+   * @returns {Promise<ServerResponse<{payload: EventType[] }>>}
    */
-  supplyAsync: (maybePayload: {
-    [RemoveContact.ID]: string;
-  }) => Promise<ServerResponse>;
+  supplyAsync: () => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "contact";
-    this.requiredFields = [RemoveContact.ID];
+    this.serviceName = GetEventTypes.EVENT_TYPES;
+    this.requiredFields = [];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = () => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
-
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );
@@ -51,8 +46,8 @@ export default class RemoveContact extends XQModule {
         return this.sdk
           .call(
             this.sdk.DASHBOARD_SERVER_URL,
-            `${this.serviceName}/${maybePayLoad[RemoveContact.ID]}?delete=true`,
-            CallMethod.DELETE,
+            this.serviceName,
+            CallMethod.GET,
             additionalHeaderProperties,
             null,
             true,
@@ -64,13 +59,13 @@ export default class RemoveContact extends XQModule {
                 return response;
               }
               case ServerResponse.ERROR: {
-                return handleException(response, XQServices.RemoveContact);
+                return handleException(response, XQServices.GetEventTypes);
               }
             }
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.RemoveContact))
+          resolve(handleException(exception, XQServices.GetEventTypes))
         );
       }
     };

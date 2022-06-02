@@ -1,6 +1,7 @@
 import CallMethod from "../../CallMethod";
 import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
+import { UserRole } from "../../types/dashboard";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
 import { XQServices } from "../../XQServicesEnum";
@@ -8,38 +9,57 @@ import { XQServices } from "../../XQServicesEnum";
 import handleException from "../../exceptions/handleException";
 
 /**
- * A service which is utilized to remove an existing Contact
+ * A service which is utilized to return all contacts of the current user
  *
- * @class [RemoveContact]
+ * @class [GetContacts]
  */
-export default class RemoveContact extends XQModule {
+export default class GetContacts extends XQModule {
   /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
 
   /** Specified name of the service */
   serviceName: string;
 
+  /** The service name */
+  static CONTACT: "contact" = "contact";
+
+  /** The field name representing the filter for the list of Contacts */
+  static FILTER: "filter" = "filter";
+
   /** The field name representing the id */
   static ID: "id" = "id";
 
+  /** The field name representing the limit of the list of Contacts */
+  static LIMIT: "limit" = "limit";
+
+  /** The field name representing the page of the list of Contacts */
+  static PAGE: "page" = "page";
+
+  /** The field name representing the role */
+  static ROLE: "role" = "role";
+
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {String} id - the user id of the Contact that will be removed
-   * @returns {Promise<ServerResponse<{payload:{}}>>}
+   * @returns {Promise<ServerResponse<{payload: ContactSummary }>>}
    */
-  supplyAsync: (maybePayload: {
-    [RemoveContact.ID]: string;
-  }) => Promise<ServerResponse>;
+  supplyAsync: (
+    maybePayload: {
+      [GetContacts.FILTER]?: string;
+      [GetContacts.ID]?: string;
+      [GetContacts.LIMIT]?: number;
+      [GetContacts.PAGE]?: number;
+      [GetContacts.ROLE]?: UserRole;
+    } | null
+  ) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "contact";
-    this.requiredFields = [RemoveContact.ID];
+    this.serviceName = GetContacts.CONTACT;
+    this.requiredFields = [];
 
-    this.supplyAsync = (maybePayLoad) => {
+    // TODO(worstestes - 3.21.22): add filter capabilities
+    this.supplyAsync = () => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
-
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );
@@ -51,8 +71,8 @@ export default class RemoveContact extends XQModule {
         return this.sdk
           .call(
             this.sdk.DASHBOARD_SERVER_URL,
-            `${this.serviceName}/${maybePayLoad[RemoveContact.ID]}?delete=true`,
-            CallMethod.DELETE,
+            this.serviceName + "/all",
+            CallMethod.GET,
             additionalHeaderProperties,
             null,
             true,
@@ -64,13 +84,13 @@ export default class RemoveContact extends XQModule {
                 return response;
               }
               case ServerResponse.ERROR: {
-                return handleException(response, XQServices.RemoveContact);
+                return handleException(response, XQServices.GetContacts);
               }
             }
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.RemoveContact))
+          resolve(handleException(exception, XQServices.GetContacts))
         );
       }
     };

@@ -1,7 +1,19 @@
 import CallMethod from "../CallMethod";
+import { CommunicationsEnum } from "../CommunicationsEnum";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
+import { XQServices } from "../XQServicesEnum";
+import handleException from "../exceptions/handleException";
+
+export interface IGeneratePacketParams {
+  key: string;
+  expires: number;
+  recipients: string[];
+  dor: boolean;
+  type: CommunicationsEnum;
+  meta: Record<string, unknown> | null;
+}
 
 /**
  * A service which is utilized to generate an encrypted packet containing the encryption key that you want to
@@ -28,8 +40,11 @@ export default class GeneratePacket extends XQModule {
   /** The field name representing the list of emails of users intended to have read access to the encrypted content */
   static RECIPIENTS: "recipients" = "recipients";
 
-  /** The field name representing the type */
+  /** The field name representing the type of communication that the user is encrypting (ex. File, Email, Chat, etc.) */
   static TYPE: "type" = "type";
+
+  /** The field name representing the arbitrary metadata the user would like to attach to the log of the encrypted payload */
+  static META: "meta" = "meta";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
@@ -37,15 +52,12 @@ export default class GeneratePacket extends XQModule {
    * @param {Long} maybePayLoad.expires - The number of hours that this key will remain valid for. After this time, it will no longer be accessible.
    * @param {[String]} maybePayLoad.recipients  -  list of emails of those recipients who are allowed to access the key.
    * @param {Boolean} [maybePayLoad.dor=false] - Should the content be deleted after opening.
+   * @param {String} maybePayLoad.type - an optional string value which specifies the type of communication the user is encrypting. Defaults to `unknown`
+   * @param {Map} maybePayLoad.meta - an optional map value which can contain any arbitrary metadata the user wants
    *
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
-  supplyAsync: (maybePayload: {
-    key: string;
-    expires: number;
-    recipients: string[];
-    dor: boolean;
-  }) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: IGeneratePacketParams) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -99,26 +111,14 @@ export default class GeneratePacket extends XQModule {
                 );
               }
               case ServerResponse.ERROR: {
-                console.error(
-                  `GeneratePacket failed, code: ${response.statusCode}, reason: ${response.payload}`
-                );
-                return response;
-              }
-              default: {
-                return response;
+                return handleException(response, XQServices.GeneratePacket);
               }
             }
           });
-      } catch (validationException) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              validationException.code,
-              validationException.reason
-            )
-          );
-        });
+      } catch (exception) {
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.GeneratePacket))
+        );
       }
     };
   }

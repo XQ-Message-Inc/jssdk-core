@@ -1,9 +1,23 @@
+import { CommunicationsEnum } from "../CommunicationsEnum";
+
 import EncryptionAlgorithm from "../algorithms/EncryptionAlgorithm";
 import FetchQuantumEntropy from "../quantum/FetchQuantumEntropy";
 import GeneratePacket from "./GeneratePacket";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
+import { XQServices } from "../XQServicesEnum";
+
+import handleException from "../exceptions/handleException";
+
+interface IFileEncryptParams {
+  sourceFile: File;
+  recipients: string[];
+  expires: number;
+  dor: boolean;
+  type?: CommunicationsEnum;
+  meta?: Record<string, unknown>;
+}
 
 /**
  * A service which is utilized to encrypt data stored in a file using the {@link EncryptionAlgorithm} provided.
@@ -41,21 +55,24 @@ export default class FileEncrypt extends XQModule {
   /** The field name representing the text that will be encrypted */
   static TEXT: "text" = "text";
 
+  /** The field name representing the type of communication that the user is encrypting (ex. File, Email, Chat, etc.) */
+  static TYPE: "type" = "type";
+
+  /** The field name representing the arbitrary metadata the user would like to attach to the log of the encrypted payload */
+  static META: "meta" = "meta";
+
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
    * @param {File} maybePayLoad.sourceFile - The file to be encrypted.
    * @param {[String]} maybePayLoad.recipients  - List of emails of users intended to have read access to the encrypted content.
    * @param {Long} maybePayLoad.expires - Life span of the encrypted content, measured in hours.
    * @param {Boolean} [maybePayLoad.dor=false] - Should the content be deleted after opening.
+   * @param {String} maybePayLoad.type - an optional string value which specifies the type of communication the user is encrypting. Defaults to `unknown`
+   * @param {Map} maybePayLoad.meta - an optional map value which can contain any arbitrary metadata the user wants
    *
    * @returns {Promise<ServerResponse<{payload:File}>>}
    */
-  supplyAsync: (maybePayLoad: {
-    sourceFile: File;
-    recipients: string[];
-    expires: number;
-    dor: boolean;
-  }) => Promise<ServerResponse>;
+  supplyAsync: (maybePayLoad: IFileEncryptParams) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK, algorithm: EncryptionAlgorithm) {
     super(sdk);
@@ -78,12 +95,16 @@ export default class FileEncrypt extends XQModule {
         const recipients = maybePayLoad[FileEncrypt.RECIPIENTS];
         const sourceFile = maybePayLoad[FileEncrypt.SOURCE_FILE];
 
+        const type =
+          maybePayLoad[FileEncrypt.TYPE] ?? CommunicationsEnum.UNKNOWN;
+        const meta = maybePayLoad[FileEncrypt.META] ?? null;
+
         return new FetchQuantumEntropy(sdk)
           .supplyAsync({ [FetchQuantumEntropy.KS]: FetchQuantumEntropy._256 })
-          .then((keyResponse) => {
-            switch (keyResponse.status) {
+          .then((response) => {
+            switch (response.status) {
               case ServerResponse.OK: {
-                const initialKey = keyResponse.payload;
+                const initialKey = response.payload;
                 const expandedKey = algorithm.expandKey(
                   initialKey,
                   sourceFile.size > 4096
@@ -99,74 +120,45 @@ export default class FileEncrypt extends XQModule {
                     [FileEncrypt.DELETE_ON_RECEIPT]: deleteOnReceipt
                       ? deleteOnReceipt
                       : false,
+                    [GeneratePacket.TYPE]: type,
+                    [GeneratePacket.META]: meta,
                   })
-                  .then((uploadResponse) => {
-                    switch (uploadResponse.status) {
+                  .then((response) => {
+                    switch (response.status) {
                       case ServerResponse.OK: {
-                        const locatorToken = uploadResponse.payload;
+                        const locatorToken = response.payload;
                         return algorithm
                           .encryptFile(sourceFile, expandedKey, locatorToken)
-                          .then((fileEncryptResponse: ServerResponse) => {
-                            switch (fileEncryptResponse.status) {
+                          .then((response: ServerResponse) => {
+                            switch (response.status) {
                               case ServerResponse.OK: {
-                                return fileEncryptResponse;
+                                return response;
                               }
-                              case ServerResponse.ERROR: {
-                                console.error(
-                                  `${algorithm.constructor.name}.encryptFile() failed, code: ${fileEncryptResponse.statusCode}, reason: ${fileEncryptResponse.payload}`
-                                );
-                                return fileEncryptResponse;
-                              }
+
                               default: {
-                                console.error(
-                                  `${algorithm.constructor.name}.encryptFile() failed, code: ${fileEncryptResponse.statusCode}, reason: ${fileEncryptResponse.payload}`
-                                );
-                                return fileEncryptResponse;
+                                throw response;
                               }
                             }
                           });
                       }
-
-                      case ServerResponse.ERROR: {
-                        console.error(
-                          `GeneratePacket failed, code: ${uploadResponse.statusCode}, reason: ${uploadResponse.payload}`
-                        );
-                        return uploadResponse;
-                      }
-
                       default: {
-                        console.error(
-                          `GeneratePacket failed, code: ${uploadResponse.statusCode}, reason: ${uploadResponse.payload}`
-                        );
-                        return uploadResponse;
+                        throw response;
                       }
                     }
                   });
               }
               case ServerResponse.ERROR: {
-                console.error(
-                  `FetchQuantumEntropy failed, code: ${keyResponse.statusCode}, reason: ${keyResponse.payload}`
-                );
-                return keyResponse;
+                return handleException(response, XQServices.FileEncrypt);
               }
               default: {
-                console.error(
-                  `FetchQuantumEntropy failed, code: ${keyResponse.statusCode}, reason: ${keyResponse.payload}`
-                );
-                return keyResponse;
+                return handleException(response, XQServices.FileEncrypt);
               }
             }
           });
-      } catch (validationException) {
-        return new Promise((resolve) => {
-          resolve(
-            new ServerResponse(
-              ServerResponse.ERROR,
-              validationException.code,
-              validationException.reason
-            )
-          );
-        });
+      } catch (exception) {
+        return new Promise((resolve) =>
+          resolve(handleException(exception, XQServices.FileEncrypt))
+        );
       }
     };
   }

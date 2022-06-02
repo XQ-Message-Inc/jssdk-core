@@ -8,38 +8,41 @@ import { XQServices } from "../../XQServicesEnum";
 import handleException from "../../exceptions/handleException";
 
 /**
- * A service which is utilized to remove an existing Contact
+ * A service which is utilized to create a new developer application.
  *
- * @class [RemoveContact]
+ * @class [AddApplication]
  */
-export default class RemoveContact extends XQModule {
+export default class AddApplication extends XQModule {
   /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
 
   /** Specified name of the service */
   serviceName: string;
 
-  /** The field name representing the id */
-  static ID: "id" = "id";
+  /** The field name representing the name of the application */
+  static NAME: "name" = "name";
+
+  /** The field name representing the description of the application */
+  static DESC: "desc" = "desc";
 
   /**
    * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {String} id - the user id of the Contact that will be removed
-   * @returns {Promise<ServerResponse<{payload:{}}>>}
+   * @param {String} name - the name of the application
+   * @param {String} desc - the description of the application
+   * @returns {Promise<ServerResponse<{payload:{id: int}}>>}
    */
   supplyAsync: (maybePayload: {
-    [RemoveContact.ID]: string;
+    [AddApplication.NAME]: string;
+    [AddApplication.DESC]?: string;
   }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "contact";
-    this.requiredFields = [RemoveContact.ID];
+    this.serviceName = "devapp";
+    this.requiredFields = [AddApplication.NAME];
 
     this.supplyAsync = (maybePayLoad) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
-
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );
@@ -51,26 +54,26 @@ export default class RemoveContact extends XQModule {
         return this.sdk
           .call(
             this.sdk.DASHBOARD_SERVER_URL,
-            `${this.serviceName}/${maybePayLoad[RemoveContact.ID]}?delete=true`,
-            CallMethod.DELETE,
+            this.serviceName,
+            CallMethod.POST,
             additionalHeaderProperties,
-            null,
+            maybePayLoad,
             true,
             Destination.DASHBOARD
           )
-          .then(async (response: ServerResponse) => {
+          .then((response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
                 return response;
               }
               case ServerResponse.ERROR: {
-                return handleException(response, XQServices.RemoveContact);
+                return handleException(response, XQServices.AddApplication);
               }
             }
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.RemoveContact))
+          resolve(handleException(exception, XQServices.AddApplication))
         );
       }
     };
