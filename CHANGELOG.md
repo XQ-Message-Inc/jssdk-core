@@ -5,23 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-
 ## [1.7.0] - 2022-06-01
 
 ### Addition
 - Add `ValidateSession` service which consumes the `/session` endpoint. This is used to determine the validity of the XQ Dashboard session
 ### Modified
-
 - Error handling updates: Modified `catch` block of `trycatch` utilized in each service. Added `handleException` function used to return the `ServerResponse` or create one.
 
-## [1.6.0] - 2022-04-18
+## [1.6.0] - 2022-05-16
 
 ### Addition
 - Add CRUD operations for businesses, including `AddBusiness`, `GetCurrentBusiness`, and `UpdateBusiness`.
-
 - Add CRUD operations for applications, including `AddApplication`, `RemoveApplication`, and `UpdateApplication`.
+- 
 ### Modified
-
 - Update the `README.md` documentation file to reflect recent changes to the sdk.
 
 ## [1.5.3] - 2022-04-18
