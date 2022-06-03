@@ -13,22 +13,28 @@ import handleException from "../exceptions/handleException";
  * @class [DeleteSubscriber]
  */
 export default class DeleteSubscriber extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
+  requiredFields: string[];
+
   /** Specified name of the service */
   serviceName: string;
 
   /**
    *
-   * @param {{}} [maybePayLoad=null]
+   * @param {{}} [maybePayload=null]
    * @returns {Promise<ServerResponse<{}>>}
    */
-  supplyAsync: (maybePayLoad: null) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
   constructor(sdk: XQSDK) {
     super(sdk);
 
     this.serviceName = "subscriber";
+    this.requiredFields = [];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
@@ -40,7 +46,7 @@ export default class DeleteSubscriber extends XQModule {
             this.serviceName,
             CallMethod.DELETE,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true
           )
           .then((response: ServerResponse) => {

@@ -24,8 +24,8 @@ export default class CodeValidator extends XQModule {
   static PIN: "pin" = "pin";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {String} maybePayLoad.pin - the two-factor pin used to validate the `Authorize` service request
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {String} maybePayload.pin - the two-factor pin used to validate the `Authorize` service request
    *
    * @returns {Promise<ServerResponse<{payload:String}>>} a `ServerResponse` containing the access token
    */
@@ -37,10 +37,10 @@ export default class CodeValidator extends XQModule {
     this.serviceName = "codevalidation";
     this.requiredFields = [CodeValidator.PIN];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
         const self = this;
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
         const preAuthToken = this.sdk.validatePreAuthToken();
 
         const additionalHeaderProperties = {
@@ -53,7 +53,7 @@ export default class CodeValidator extends XQModule {
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true
           )
           .then((response: ServerResponse) => {

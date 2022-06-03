@@ -29,7 +29,7 @@ export default class UpdateUserGroup extends XQModule {
   static NAME: "name" = "name";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
    * @param {String} id - the id of the user group to be updated
    * @param {String} name - the updated name of the user group
    * @param {String} members - the updated members of the user group
@@ -46,9 +46,9 @@ export default class UpdateUserGroup extends XQModule {
     this.serviceName = "usergroup";
     this.requiredFields = [UpdateUserGroup.ID];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
 
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
@@ -59,14 +59,14 @@ export default class UpdateUserGroup extends XQModule {
         };
 
         const payload = {
-          [UpdateUserGroup.NAME]: maybePayLoad[UpdateUserGroup.NAME],
-          [UpdateUserGroup.MEMBERS]: maybePayLoad[UpdateUserGroup.MEMBERS],
+          [UpdateUserGroup.NAME]: maybePayload[UpdateUserGroup.NAME],
+          [UpdateUserGroup.MEMBERS]: maybePayload[UpdateUserGroup.MEMBERS],
         };
 
         return this.sdk
           .call(
             this.sdk.DASHBOARD_SERVER_URL,
-            this.serviceName + "/" + maybePayLoad[UpdateUserGroup.ID],
+            this.serviceName + "/" + maybePayload[UpdateUserGroup.ID],
             CallMethod.PATCH,
             additionalHeaderProperties,
             payload,

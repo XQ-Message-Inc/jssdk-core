@@ -22,7 +22,7 @@ export default class GetBusinesses extends XQModule {
   static BUSINESSES: "businesses" = "businesses";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
    *
    * @returns {Promise<ServerResponse<{payload:{businesses:[{canAccessBusiness: boolean, domain: string, id: int, isPersonal: boolean, name: string}]}}>>}
    */
@@ -34,8 +34,10 @@ export default class GetBusinesses extends XQModule {
     this.requiredFields = [];
 
     // TODO(joshuaskatz - 3.22.22): add filter capabilities
-    this.supplyAsync = () => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );

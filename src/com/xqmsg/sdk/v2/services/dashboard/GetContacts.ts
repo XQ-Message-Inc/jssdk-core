@@ -39,7 +39,7 @@ export default class GetContacts extends XQModule {
   static ROLE: "role" = "role";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
    * @returns {Promise<ServerResponse<{payload: ContactSummary }>>}
    */
   supplyAsync: (
@@ -58,8 +58,10 @@ export default class GetContacts extends XQModule {
     this.requiredFields = [];
 
     // TODO(worstestes - 3.21.22): add filter capabilities
-    this.supplyAsync = () => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );

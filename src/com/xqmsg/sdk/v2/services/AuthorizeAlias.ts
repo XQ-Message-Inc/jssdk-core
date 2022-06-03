@@ -34,10 +34,10 @@ export default class AuthorizeAlias extends XQModule {
   static USER: "user" = "user";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {String} maybePayLoad.user - Email of the user to be validated.
-   * @param {String} [maybePayLoad.firstName] - First name of the user. (Optional)
-   * @param {String} [maybePayLoad.lastName] - Last name of the user. (Optional)
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {String} maybePayload.user - Email of the user to be validated.
+   * @param {String} [maybePayload.firstName] - First name of the user. (Optional)
+   * @param {String} [maybePayload.lastName] - Last name of the user. (Optional)
    *
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
@@ -49,14 +49,14 @@ export default class AuthorizeAlias extends XQModule {
     this.serviceName = "authorizealias";
     this.requiredFields = [AuthorizeAlias.USER];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const self = this;
 
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
-
         const aliasUser =
-          maybePayLoad[AuthorizeAlias.USER as keyof IAuthorizeAliasParams] ??
+          maybePayload[AuthorizeAlias.USER as keyof IAuthorizeAliasParams] ??
           "";
 
         return this.sdk
@@ -65,7 +65,7 @@ export default class AuthorizeAlias extends XQModule {
             this.serviceName,
             CallMethod.POST,
             null,
-            maybePayLoad,
+            maybePayload,
             true
           )
           .then((response: ServerResponse) => {

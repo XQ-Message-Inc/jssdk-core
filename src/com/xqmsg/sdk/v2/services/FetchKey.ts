@@ -29,11 +29,11 @@ export default class FetchKey extends XQModule {
   static LOCATOR_KEY: "locatorKey" = "locatorKey";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {String} maybePayLoad.locatorKey - the key used to fetch the encryption key from the server
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {String} maybePayload.locatorKey - the key used to fetch the encryption key from the server
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
-  supplyAsync: (maybePayLoad: {
+  supplyAsync: (maybePayload: {
     locatorKey: string;
   }) => Promise<ServerResponse>;
 
@@ -44,12 +44,12 @@ export default class FetchKey extends XQModule {
     this.serviceName = "key";
     this.requiredFields = [FetchKey.LOCATOR_KEY];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
         const accessToken = this.sdk.validateAccessToken();
 
-        const locatorKey = maybePayLoad[FetchKey.LOCATOR_KEY];
+        const locatorKey = maybePayload[FetchKey.LOCATOR_KEY];
         const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };

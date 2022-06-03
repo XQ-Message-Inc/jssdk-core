@@ -47,13 +47,13 @@ export default class GeneratePacket extends XQModule {
   static META: "meta" = "meta";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {String} maybePayLoad.key - The secret key that the user wants to protect.
-   * @param {Long} maybePayLoad.expires - The number of hours that this key will remain valid for. After this time, it will no longer be accessible.
-   * @param {[String]} maybePayLoad.recipients  -  list of emails of those recipients who are allowed to access the key.
-   * @param {Boolean} [maybePayLoad.dor=false] - Should the content be deleted after opening.
-   * @param {String} maybePayLoad.type - an optional string value which specifies the type of communication the user is encrypting. Defaults to `unknown`
-   * @param {Map} maybePayLoad.meta - an optional map value which can contain any arbitrary metadata the user wants
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {String} maybePayload.key - The secret key that the user wants to protect.
+   * @param {Long} maybePayload.expires - The number of hours that this key will remain valid for. After this time, it will no longer be accessible.
+   * @param {[String]} maybePayload.recipients  -  list of emails of those recipients who are allowed to access the key.
+   * @param {Boolean} [maybePayload.dor=false] - Should the content be deleted after opening.
+   * @param {String} maybePayload.type - an optional string value which specifies the type of communication the user is encrypting. Defaults to `unknown`
+   * @param {Map} maybePayload.meta - an optional map value which can contain any arbitrary metadata the user wants
    *
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
@@ -69,9 +69,9 @@ export default class GeneratePacket extends XQModule {
       GeneratePacket.EXPIRES_HOURS,
     ];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
         const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
@@ -79,10 +79,10 @@ export default class GeneratePacket extends XQModule {
         };
 
         const flattenedRecipientList =
-          maybePayLoad[GeneratePacket.RECIPIENTS].join(",");
+          maybePayload[GeneratePacket.RECIPIENTS].join(",");
 
         const payload = {
-          ...maybePayLoad,
+          ...maybePayload,
           [GeneratePacket.RECIPIENTS]: flattenedRecipientList,
         };
 
