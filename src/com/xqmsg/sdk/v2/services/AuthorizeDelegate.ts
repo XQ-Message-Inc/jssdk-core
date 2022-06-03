@@ -21,7 +21,7 @@ export default class AuthorizeDelegate extends XQModule {
 
   /**
    *
-   * @param {{}} [maybePayLoad=null]
+   * @param {{}} [maybePayload=null]
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
   supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
@@ -32,8 +32,10 @@ export default class AuthorizeDelegate extends XQModule {
     this.serviceName = "delegate";
     this.requiredFields = [];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
@@ -46,7 +48,7 @@ export default class AuthorizeDelegate extends XQModule {
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true
           )
           .then((response: ServerResponse) => {

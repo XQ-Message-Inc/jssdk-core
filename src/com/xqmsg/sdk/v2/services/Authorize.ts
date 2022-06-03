@@ -57,16 +57,16 @@ export default class Authorize extends XQModule {
   static TARGET: "target" = "target";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {String} maybePayLoad.user - Email of the user to be validated.
-   * @param {String} [maybePayLoad.firstName]  - First name of the user.
-   * @param {String} [maybePayLoad.lastName] - Last name of the user.
-   * @param {Boolean} [maybePayLoad.newsLetter=false] - Should the user receive a newsletter.
-   * @param {NotificationEnum} [maybePayLoad.notifications=0] Enum Value to specify Notification Settings
-   * @param {String} maybePayLoad.accessToken - an already generated access token, if valid allows use to bypass authorization.
-   * @param {String} maybePayLoad.text - An interpolated text field when a mobile number is specified. Use $pin to interpolate the pin or $link to interpolate the maybePayLoad.target
-   * @param {String} maybePayLoad.target - A link that can be interpolated in the maybePayload.text. Used for inviting users by text
-   * @param {String} maybePayLoad.codetype - Codetype. Use 'sms' for inviting users by text.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {String} maybePayload.user - Email of the user to be validated.
+   * @param {String} [maybePayload.firstName]  - First name of the user.
+   * @param {String} [maybePayload.lastName] - Last name of the user.
+   * @param {Boolean} [maybePayload.newsLetter=false] - Should the user receive a newsletter.
+   * @param {NotificationEnum} [maybePayload.notifications=0] Enum Value to specify Notification Settings
+   * @param {String} maybePayload.accessToken - an already generated access token, if valid allows use to bypass authorization.
+   * @param {String} maybePayload.text - An interpolated text field when a mobile number is specified. Use $pin to interpolate the pin or $link to interpolate the maybePayload.target
+   * @param {String} maybePayload.target - A link that can be interpolated in the maybePayload.text. Used for inviting users by text
+   * @param {String} maybePayload.codetype - Codetype. Use 'sms' for inviting users by text.
    *
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
@@ -88,12 +88,12 @@ export default class Authorize extends XQModule {
     this.serviceName = "authorize";
     this.requiredFields = [Authorize.USER];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
         const self = this;
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
-        const user = maybePayLoad[Authorize.USER];
-        const existingAccessToken = maybePayLoad[Authorize.ACCESS_TOKEN];
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+        const user = maybePayload[Authorize.USER];
+        const existingAccessToken = maybePayload[Authorize.ACCESS_TOKEN];
 
         if (existingAccessToken) {
           self.cache.putActiveProfile(user);
@@ -115,7 +115,7 @@ export default class Authorize extends XQModule {
             this.serviceName,
             CallMethod.POST,
             null,
-            maybePayLoad,
+            maybePayload,
             true
           )
           .then((response: ServerResponse) => {

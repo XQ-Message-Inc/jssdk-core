@@ -25,8 +25,8 @@ export default class CheckKeyExpiration extends XQModule {
   static LOCATOR_KEY: "locatorKey" = "locatorKey";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {String} maybePayLoad.locatorKey- A URL encoded version of the key locator token to fetch the key from the server.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {String} maybePayload.locatorKey- A URL encoded version of the key locator token to fetch the key from the server.
    * @see #encodeURIComponent function encodeURIComponent (built-in since ES-5)
    * @returns {Promise<ServerResponse<{payload:{expiresOn:long}}>>}
    **/
@@ -40,12 +40,12 @@ export default class CheckKeyExpiration extends XQModule {
     this.serviceName = "expiration";
     this.requiredFields = [CheckKeyExpiration.LOCATOR_KEY];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
         const accessToken = this.sdk.validateAccessToken();
 
-        const locatorKey = maybePayLoad[CheckKeyExpiration.LOCATOR_KEY];
+        const locatorKey = maybePayload[CheckKeyExpiration.LOCATOR_KEY];
         const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };

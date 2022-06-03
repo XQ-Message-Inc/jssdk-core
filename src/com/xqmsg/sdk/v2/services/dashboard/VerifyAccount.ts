@@ -3,11 +3,13 @@ import jwtDecode, { JwtPayload } from "jwt-decode";
 import CallMethod from "../../CallMethod";
 import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
+import ValidateSession from "./ValidateSession";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
 import { XQServices } from "../../XQServicesEnum";
 
 import handleException from "../../exceptions/handleException";
+import verifyJWTExpiration from "../../utils/verifyJWTExpiration";
 
 enum DashboardAccessToken {
   preAuth = "preauth-dashboard",
@@ -15,7 +17,7 @@ enum DashboardAccessToken {
 }
 
 /**
- * A service utilized to verify a user via their `accessToken` and allow access to Dashboard services.
+ * A service utilized to verify a user via their `accessToken` saved in-memory and allow access to Dashboard services.
  * @class [DashboardLogin]
  */
 export default class VerifyAccount extends XQModule {
@@ -29,8 +31,8 @@ export default class VerifyAccount extends XQModule {
   static ACCESS_TOKEN: "accessToken" = "accessToken";
 
   /**
-   * @param {Map} maybePayLoad - the container for the request parameters supplied to this method.
-   * @param {String} maybePayLoad.accesstoken - the provided access token
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {String} maybePayload.accesstoken - the provided access token
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
   supplyAsync: (maybePayload: {
@@ -42,11 +44,50 @@ export default class VerifyAccount extends XQModule {
     this.serviceName = "login/verify";
     this.requiredFields = [VerifyAccount.ACCESS_TOKEN];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const self = this;
 
-        const accessToken = maybePayLoad[VerifyAccount.ACCESS_TOKEN];
+        const accessToken = maybePayload[VerifyAccount.ACCESS_TOKEN];
+
+        const isAccessTokenExpired: boolean = verifyJWTExpiration(accessToken);
+
+        if (isAccessTokenExpired) {
+          return new Promise((resolve) => {
+            resolve(
+              new ServerResponse(ServerResponse.ERROR, 401, {
+                payload: "access token expired",
+              })
+            );
+          });
+        }
+
+        const validateSession = async (
+          profile: string,
+          dashboardAccessToken: string
+        ) => {
+          // Verify that the session is valid before proceeding
+          const response = await new ValidateSession(this.sdk).supplyAsync({
+            accessToken: dashboardAccessToken,
+          });
+
+          switch (response.status) {
+            case ServerResponse.OK: {
+              return new ServerResponse(ServerResponse.OK, 200, {
+                user: profile,
+                dashboardAccessToken,
+              });
+            }
+            case ServerResponse.ERROR: {
+              self.cache.removeDashboardAccess(profile);
+              self.cache.removeProfile(profile);
+
+              return handleException(response, XQServices.VerifyAccount);
+            }
+          }
+        };
 
         const additionalHeaderProperties = {
           Authorization: `Bearer ${accessToken}`,
@@ -57,20 +98,12 @@ export default class VerifyAccount extends XQModule {
         // if user has an already existing dashboard token
         // skip pre-auth dashboard token exchange process
         if (decodedIncomingAccessToken.iss === DashboardAccessToken.auth) {
-          const profile = decodedIncomingAccessToken.sub;
+          const profile = decodedIncomingAccessToken.sub || "";
 
           self.cache.putActiveProfile(profile);
-
           self.cache.putDashboardAccess(profile, accessToken);
 
-          return new Promise((resolve) => {
-            resolve(
-              new ServerResponse(ServerResponse.OK, 200, {
-                user: profile,
-                dashboardAccessToken: accessToken,
-              })
-            );
-          });
+          return validateSession(profile, accessToken);
         }
 
         return this.sdk
@@ -91,21 +124,12 @@ export default class VerifyAccount extends XQModule {
                   response.payload
                 );
 
-                const profile = decodedJWTPayload.sub;
+                const profile = decodedJWTPayload.sub || "";
 
-                await self.cache.putActiveProfile(profile);
+                self.cache.putActiveProfile(profile);
+                self.cache.putDashboardAccess(profile, dashboardAccessToken);
 
-                const activeProfile = self.cache.getActiveProfile(true);
-
-                self.cache.putDashboardAccess(
-                  activeProfile,
-                  dashboardAccessToken
-                );
-
-                return new ServerResponse(ServerResponse.OK, 200, {
-                  user: profile,
-                  dashboardAccessToken,
-                });
+                return validateSession(profile, accessToken);
               }
               case ServerResponse.ERROR: {
                 return handleException(response, XQServices.VerifyAccount);

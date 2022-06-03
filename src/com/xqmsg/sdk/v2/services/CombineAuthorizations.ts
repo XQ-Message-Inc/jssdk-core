@@ -38,8 +38,8 @@ export default class CombineAuthorizations extends XQModule {
   /** The field name representing the list of tokens to merge */
   static TOKENS: "tokens" = "tokens";
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {[String]} maybePayLoad.tokens - The list of tokens to merge
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {[String]} maybePayload.tokens - The list of tokens to merge
    * @returns {Promise<ServerResponse<{payload:{token:string, merged:long}}>>}
    */
   supplyAsync: (maybePayload: { tokens: string[] }) => Promise<ServerResponse>;
@@ -50,9 +50,9 @@ export default class CombineAuthorizations extends XQModule {
     this.serviceName = "combined";
     this.requiredFields = [CombineAuthorizations.TOKENS];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
         const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
@@ -64,7 +64,7 @@ export default class CombineAuthorizations extends XQModule {
             this.serviceName,
             CallMethod.POST,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true
           )
           .then((response: ServerResponse) => {

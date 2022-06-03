@@ -25,8 +25,8 @@ export default class CheckApiKey extends XQModule {
   static SCOPES: "scopes" = "scopes";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {String} maybePayLoad.api-key - The API key whose scopes are to be checked
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {String} maybePayload.api-key - The API key whose scopes are to be checked
    *
    * @returns {Promise<ServerResponse<{payload:{scopes:[string]}}>>}
    */
@@ -37,9 +37,9 @@ export default class CheckApiKey extends XQModule {
     this.serviceName = "apikey";
     this.requiredFields = [CheckApiKey.API_KEY];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
         const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
@@ -52,7 +52,7 @@ export default class CheckApiKey extends XQModule {
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true
           )
           .then((response: ServerResponse) => {

@@ -22,20 +22,20 @@ export default class DisableContact extends XQModule {
   static ID: "id" = "id";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
    * @param {String} id - the user id of the Contact that will be disabled
    * @returns {Promise<ServerResponse<{payload:{id:int, status:string}}>>}
    */
-  supplyAsync: (maybePayLoad: { id: string }) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: { id: string }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
     this.serviceName = "contact";
     this.requiredFields = [DisableContact.ID];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
 
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
@@ -48,7 +48,7 @@ export default class DisableContact extends XQModule {
         return this.sdk
           .call(
             this.sdk.DASHBOARD_SERVER_URL,
-            `${this.serviceName}/${maybePayLoad[DisableContact.ID]}`,
+            `${this.serviceName}/${maybePayload[DisableContact.ID]}`,
             CallMethod.DELETE,
             additionalHeaderProperties,
             null,

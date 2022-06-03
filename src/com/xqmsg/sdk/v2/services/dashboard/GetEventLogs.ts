@@ -59,7 +59,7 @@ export default class GetEventLogs extends XQModule {
   static FULL: "full" = "full";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
    * @returns {Promise<ServerResponse<{payload: EventLogItem[] }>>}
    */
   supplyAsync: (
@@ -86,6 +86,8 @@ export default class GetEventLogs extends XQModule {
 
     this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );

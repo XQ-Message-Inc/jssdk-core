@@ -41,13 +41,13 @@ export default class AddContact extends XQModule {
   static TITLE: "title" = "title";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
    * @param {String} email - the email of the new Contact
    * @param {String} role - the role of the new Contact
    * @param {String} notifications - the notifications preference of the current user for the new Contact
    * @returns {Promise<ServerResponse<{payload:{id:int, status:string}}>>}
    */
-  supplyAsync: (maybePayLoad: {
+  supplyAsync: (maybePayload: {
     email: string;
     role: string;
     notifications: boolean;
@@ -62,9 +62,9 @@ export default class AddContact extends XQModule {
       AddContact.NOTIFICATIONS,
     ];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
 
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
@@ -80,7 +80,7 @@ export default class AddContact extends XQModule {
             this.serviceName,
             CallMethod.POST,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true,
             Destination.DASHBOARD
           )

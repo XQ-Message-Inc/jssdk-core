@@ -26,7 +26,7 @@ export default class AddApplication extends XQModule {
   static DESC: "desc" = "desc";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
    * @param {String} name - the name of the application
    * @param {String} desc - the description of the application
    * @returns {Promise<ServerResponse<{payload:{id: int}}>>}
@@ -41,8 +41,10 @@ export default class AddApplication extends XQModule {
     this.serviceName = "devapp";
     this.requiredFields = [AddApplication.NAME];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );
@@ -57,7 +59,7 @@ export default class AddApplication extends XQModule {
             this.serviceName,
             CallMethod.POST,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true,
             Destination.DASHBOARD
           )

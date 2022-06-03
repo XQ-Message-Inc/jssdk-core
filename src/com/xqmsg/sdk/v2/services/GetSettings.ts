@@ -25,7 +25,7 @@ export default class GetSettings extends XQModule {
   static NOTIFICATIONS: "notifications" = "notifications";
 
   /**
-   * @param {{}} [maybePayLoad=null]
+   * @param {{}} [maybePayload=null]
    * @returns {Promise<ServerResponse<{payload:{notifications:NotificationEnum.options, newsLetter:boolean}}>>}
    */
   supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
@@ -35,8 +35,10 @@ export default class GetSettings extends XQModule {
     this.serviceName = "settings";
     this.requiredFields = [];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
@@ -49,7 +51,7 @@ export default class GetSettings extends XQModule {
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true
           )
           .then((response: ServerResponse) => {
