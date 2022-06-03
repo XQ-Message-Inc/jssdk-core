@@ -23,8 +23,8 @@ export default class FileDecrypt extends XQModule {
   static SOURCE_FILE: "sourceFile" = "sourceFile";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {File} maybePayLoad.sourceFile - The file to be decrypted.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {File} maybePayload.sourceFile - The file to be decrypted.
    *
    *  @returns {Promise<ServerResponse<{payload:File}>>}
    */
@@ -36,9 +36,9 @@ export default class FileDecrypt extends XQModule {
     this.algorithm = algorithm;
     this.requiredFields = [FileDecrypt.SOURCE_FILE];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
       } catch (exception) {
         return new Promise((resolve) =>
           resolve(handleException(exception, XQServices.FileDecrypt))
@@ -46,7 +46,7 @@ export default class FileDecrypt extends XQModule {
       }
       const algorithm = this.algorithm;
       const sdk = this.sdk;
-      const sourceFile = maybePayLoad[FileDecrypt.SOURCE_FILE];
+      const sourceFile = maybePayload[FileDecrypt.SOURCE_FILE];
 
       try {
         return algorithm.decryptFile(

@@ -23,7 +23,7 @@ export default class GetApplications extends XQModule {
   static APPS: "apps" = "apps";
 
   /**
-   * @param {{}} [maybePayLoad=null]
+   * @param {{}} [maybePayload=null]
    * @returns {Promise<ServerResponse<{payload:{apps:[{id:int, name:string, description:string}]}}>>}
    */
   supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
@@ -33,8 +33,10 @@ export default class GetApplications extends XQModule {
     this.serviceName = "devapps";
     this.requiredFields = [];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );
@@ -49,7 +51,7 @@ export default class GetApplications extends XQModule {
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true,
             Destination.DASHBOARD
           )

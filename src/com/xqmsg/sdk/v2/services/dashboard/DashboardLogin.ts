@@ -27,11 +27,11 @@ export default class DashboardLogin extends XQModule {
   static PWD: "pwd" = "pwd";
 
   /**
-   * @param {Map} maybePayLoad - the container for the request parameters supplied to this method.
-   * @param {String} maybePayLoad.pwd - the provided OAuth token
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {String} maybePayload.pwd - the provided OAuth token
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
-  supplyAsync: (maybePayLoad: {
+  supplyAsync: (maybePayload: {
     [DashboardLogin.PWD]: string;
   }) => Promise<ServerResponse>;
 
@@ -40,14 +40,14 @@ export default class DashboardLogin extends XQModule {
     this.serviceName = DashboardLogin.LOGIN;
     this.requiredFields = [DashboardLogin.PWD];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
         const self = this;
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
         const loginRequest = {
           method: 1, // TODO(worstestes - 3.21.22): an obselete field which will be removed at a later date
-          [DashboardLogin.PWD]: maybePayLoad.pwd,
+          [DashboardLogin.PWD]: maybePayload.pwd,
         };
 
         return this.sdk

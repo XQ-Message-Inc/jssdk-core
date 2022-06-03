@@ -29,11 +29,11 @@ export default class AddUserGroup extends XQModule {
   static NAME: "name" = "name";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {[String]} maybePayLoad.name - the name of the user group
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {[String]} maybePayload.name - the name of the user group
    * @returns {Promise<ServerResponse<{}>>}
    */
-  supplyAsync: (maybePayLoad: { name: string }) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: { name: string }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -41,13 +41,13 @@ export default class AddUserGroup extends XQModule {
     this.requiredFields = [AddUserGroup.NAME];
 
     /**
-     * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+     * @param {Map} maybePayload - the container for the request parameters supplied to this method.
      * @param {String} name - the name of the new group
      * @returns {Promise<ServerResponse<{payload:{id:int, status:string}}>>}
      */
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
 
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
@@ -63,7 +63,7 @@ export default class AddUserGroup extends XQModule {
             this.serviceName,
             CallMethod.POST,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true,
             Destination.DASHBOARD
           )

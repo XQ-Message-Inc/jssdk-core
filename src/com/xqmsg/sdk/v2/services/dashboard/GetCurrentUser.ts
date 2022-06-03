@@ -23,7 +23,7 @@ export default class GetCurrentUser extends XQModule {
   static CONTACT: "contact" = "contact";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
    * @returns {Promise<ServerResponse<{payload: ContactSummary }>>}
    */
   supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
@@ -33,8 +33,10 @@ export default class GetCurrentUser extends XQModule {
     this.serviceName = GetCurrentUser.CONTACT;
     this.requiredFields = [];
 
-    this.supplyAsync = () => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const self = this;
 
         const dashboardAccessToken = this.sdk.validateAccessToken(

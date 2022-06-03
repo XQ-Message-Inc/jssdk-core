@@ -19,22 +19,21 @@ export default class GetEventTypes extends XQModule {
   /** Specified name of the service */
   serviceName: string;
 
-  /** The service name */
-  static EVENT_TYPES: "eventtypes" = "eventtypes";
-
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
    * @returns {Promise<ServerResponse<{payload: EventType[] }>>}
    */
-  supplyAsync: () => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = GetEventTypes.EVENT_TYPES;
+    this.serviceName = "eventtypes";
     this.requiredFields = [];
 
-    this.supplyAsync = () => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );

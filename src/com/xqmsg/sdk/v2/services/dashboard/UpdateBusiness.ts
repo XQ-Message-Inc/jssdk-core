@@ -52,7 +52,7 @@ export default class UpdateBusiness extends XQModule {
   static LOCKED: "locked" = "locked";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
    * @param {String} email - the main business email
    * @param {String} name - the name of the business
    * @param {String} street - the street address of the business
@@ -65,7 +65,7 @@ export default class UpdateBusiness extends XQModule {
    * @param {Boolean} locked - the flag for whether or the business is locked.
    * @returns {Promise<ServerResponse<{payload:{}}>>}
    */
-  supplyAsync: (maybePayLoad: {
+  supplyAsync: (maybePayload: {
     [UpdateBusiness.EMAIL]?: string;
     [UpdateBusiness.NAME]?: string;
     [UpdateBusiness.STREET]?: string;
@@ -83,9 +83,9 @@ export default class UpdateBusiness extends XQModule {
     this.serviceName = "business";
     this.requiredFields = [];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
 
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
@@ -101,7 +101,7 @@ export default class UpdateBusiness extends XQModule {
             this.serviceName,
             CallMethod.PATCH,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true,
             Destination.DASHBOARD
           )

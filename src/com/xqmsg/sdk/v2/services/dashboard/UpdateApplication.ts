@@ -29,10 +29,10 @@ export default class UpdateApplication extends XQModule {
   static DESC: "desc" = "desc";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {Number} id - the id of the application
-   * @param {String} name - the name of the application
-   * @param {String} desc - the description of the application
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {Number} maybePayload.id - the id of the application
+   * @param {String} maybePayload.name - the name of the application
+   * @param {String} maybePayload.desc - the description of the application
    * @returns {Promise<ServerResponse<{payload:{}}>>}
    */
   supplyAsync: (maybePayload: {
@@ -46,8 +46,10 @@ export default class UpdateApplication extends XQModule {
     this.serviceName = "devapp";
     this.requiredFields = [UpdateApplication.ID];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );
@@ -59,10 +61,10 @@ export default class UpdateApplication extends XQModule {
         return this.sdk
           .call(
             this.sdk.DASHBOARD_SERVER_URL,
-            this.serviceName + "/" + maybePayLoad[UpdateApplication.ID],
+            this.serviceName + "/" + maybePayload[UpdateApplication.ID],
             CallMethod.PATCH,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true,
             Destination.DASHBOARD
           )

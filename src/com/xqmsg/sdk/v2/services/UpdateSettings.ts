@@ -25,9 +25,9 @@ export default class UpdateSettings extends XQModule {
 
   /**
    *
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {boolean} maybePayLoad.newsLetter - the boolean indicating whether the user receive newsletters or not. This is only valid for new users, and is ignored if the user already exists
-   * @param {NotificationEnum.options} maybePayLoad.notifications - the boolean indicating whether the user receive notifications or not
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {boolean} maybePayload.newsLetter - the boolean indicating whether the user receive newsletters or not. This is only valid for new users, and is ignored if the user already exists
+   * @param {NotificationEnum.options} maybePayload.notifications - the boolean indicating whether the user receive notifications or not
    * @returns {Promise<ServerResponse<{}>>}
    */
   supplyAsync: (maybePayload: {
@@ -41,8 +41,10 @@ export default class UpdateSettings extends XQModule {
     this.serviceName = "settings";
     this.requiredFields = [];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
@@ -55,7 +57,7 @@ export default class UpdateSettings extends XQModule {
             this.serviceName,
             CallMethod.PATCH,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true
           )
           .then((response: ServerResponse) => {

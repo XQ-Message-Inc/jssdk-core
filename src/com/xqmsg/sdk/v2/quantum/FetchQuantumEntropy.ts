@@ -24,7 +24,7 @@ export default class FetchQuantumEntropy extends XQModule {
   static _256: "256" = "256";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
    * @param {String} ks -  The number of entropy bits to fetch
    * @returns {Promise<ServerResponse<{payload:{data:string}}>>}
    */
@@ -35,7 +35,7 @@ export default class FetchQuantumEntropy extends XQModule {
   constructor(sdk: XQSDK) {
     super(sdk);
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
         const additionalHeaderProperties = {
           [XQSDK.CONTENT_TYPE]: XQSDK.TEXT_PLAIN_UTF_8,
@@ -47,7 +47,7 @@ export default class FetchQuantumEntropy extends XQModule {
             null,
             CallMethod.GET,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             false
           )
           .then((response: ServerResponse) => {

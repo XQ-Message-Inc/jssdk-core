@@ -25,9 +25,9 @@ export default class RevokeUserAccess extends XQModule {
   static LOCATOR_KEY: "locatorKey" = "locatorKey";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {[String]} maybePayLoad.recipients! - the list of emails of users intended to have read access to the encrypted content removed.<br>
-   * @param {String} maybePayLoad.locatorKey! - thelocator key,  used as a URL to discover the key on  the server.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {[String]} maybePayload.recipients! - the list of emails of users intended to have read access to the encrypted content removed.<br>
+   * @param {String} maybePayload.locatorKey! - thelocator key,  used as a URL to discover the key on  the server.
    * The URL encoding part is handled internally in the service itself
    * @see #encodeURIComponent function encodeURIComponent (built-in since ES-5)
    * @returns {Promise<ServerResponse<{}>>}
@@ -46,18 +46,18 @@ export default class RevokeUserAccess extends XQModule {
       RevokeUserAccess.LOCATOR_KEY,
     ];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
         const accessToken = this.sdk.validateAccessToken();
 
-        const locatorKey = maybePayLoad[RevokeUserAccess.LOCATOR_KEY];
+        const locatorKey = maybePayload[RevokeUserAccess.LOCATOR_KEY];
 
         const flattenedRecipientList =
-          maybePayLoad[RevokeUserAccess.RECIPIENTS].join(",");
+          maybePayload[RevokeUserAccess.RECIPIENTS].join(",");
 
         const payload = {
-          ...maybePayLoad,
+          ...maybePayload,
           [RevokeUserAccess.RECIPIENTS]: flattenedRecipientList,
         };
 
