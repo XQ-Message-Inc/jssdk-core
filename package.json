@@ -1,6 +1,6 @@
 {
   "name": "@xqmsg/jssdk-core",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "description": "A Javascript Implementation of XQ Message SDK, V.2",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -67,7 +67,6 @@
     "webpack-cli": "^4.2.0"
   },
   "dependencies": {
-    "@xqmsg/jssdk-core": "file:.yalc/@xqmsg/jssdk-core",
     "buffer": "^6.0.3",
     "crypto-js": "3.1.9-1",
     "jwt-decode": "^3.1.2",
