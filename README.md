@@ -1,6 +1,6 @@
 # @xqmsg/jssdk-core
 
-[![version](https://img.shields.io/badge/version-0.2-green.svg)](https://semver.org)
+[![version](https://img.shields.io/badge/version-1.7.1-green.svg)](https://semver.org)
 
 A Javascript Implementation of XQ Message SDK (V.2) which provides convenient access to the XQ Message API.
 
