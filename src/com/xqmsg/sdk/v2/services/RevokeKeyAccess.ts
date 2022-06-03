@@ -23,8 +23,8 @@ export default class RevokeKeyAccess extends XQModule {
   static LOCATOR_KEYS: "locatorKeys" = "locatorKeys";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {[String]} maybePayLoad.locatorKey - the locator key used as a URL to discover the key on the server.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {[String]} maybePayload.locatorKey - the locator key used as a URL to discover the key on the server.
    * The URL encoding part is handled internally in the service itself
    * @see #encodeURIComponent function encodeURIComponent (built-in since ES-5)
    * @returns {Promise<ServerResponse<{}>>}
@@ -39,11 +39,11 @@ export default class RevokeKeyAccess extends XQModule {
     this.serviceName = "key";
     this.requiredFields = [RevokeKeyAccess.LOCATOR_KEYS];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
         const accessToken = this.sdk.validateAccessToken();
-        const locatorKeys = maybePayLoad[RevokeKeyAccess.LOCATOR_KEYS];
+        const locatorKeys = maybePayload[RevokeKeyAccess.LOCATOR_KEYS];
 
         const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,

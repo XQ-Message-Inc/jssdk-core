@@ -23,8 +23,8 @@ export default class RemoveApplication extends XQModule {
   static ID: "id" = "id";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {Number} id - the id of the application
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {Number} maybePayload.id - the id of the application
    * @returns {Promise<ServerResponse<{payload:{}}>>}
    */
   supplyAsync: (maybePayload: {
@@ -36,8 +36,10 @@ export default class RemoveApplication extends XQModule {
     this.serviceName = "devapp";
     this.requiredFields = [RemoveApplication.ID];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );
@@ -49,7 +51,7 @@ export default class RemoveApplication extends XQModule {
         return this.sdk
           .call(
             this.sdk.DASHBOARD_SERVER_URL,
-            this.serviceName + "/" + maybePayLoad[RemoveApplication.ID],
+            this.serviceName + "/" + maybePayload[RemoveApplication.ID],
             CallMethod.DELETE,
             additionalHeaderProperties,
             null,

@@ -40,7 +40,7 @@ export default class GetSubscriberInfo extends XQModule {
   static USER: "user" = "user";
 
   /**
-   * @param {Map} [maybePayLoad=null]
+   * @param {Map} [maybePayload=null]
    * @returns {Promise<ServerResponse<{payload:{id:long, usr:string, firstName:string, sub:string, starts:long, ends:Long}}>>}
    */
   supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
@@ -51,8 +51,10 @@ export default class GetSubscriberInfo extends XQModule {
     this.serviceName = "subscriber";
     this.requiredFields = [];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
@@ -65,7 +67,7 @@ export default class GetSubscriberInfo extends XQModule {
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true
           )
           .then((response: ServerResponse) => {

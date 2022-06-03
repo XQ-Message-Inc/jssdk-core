@@ -13,13 +13,16 @@ import handleException from "../exceptions/handleException";
  * @class [DeleteAuthorization]
  */
 export default class DeleteAuthorization extends XQModule {
+  /** The required fields of the payload needed to utilize the service */
+  requiredFields: string[];
+
   /** Specified name of the service */
   serviceName: string;
 
   /**
    *
    * @method supplyAsync
-   * @param {{}} [maybePayLoad=null]
+   * @param {{}} [maybePayload=null]
    * @returns {Promise<ServerResponse<{}>>}
    */
   supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
@@ -27,9 +30,12 @@ export default class DeleteAuthorization extends XQModule {
   constructor(sdk: XQSDK) {
     super(sdk);
     this.serviceName = "authorization";
+    this.requiredFields = [];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
@@ -42,7 +48,7 @@ export default class DeleteAuthorization extends XQModule {
             this.serviceName,
             CallMethod.DELETE,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true
           )
           .then((response: ServerResponse) => {

@@ -62,17 +62,17 @@ export default class FileEncrypt extends XQModule {
   static META: "meta" = "meta";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {File} maybePayLoad.sourceFile - The file to be encrypted.
-   * @param {[String]} maybePayLoad.recipients  - List of emails of users intended to have read access to the encrypted content.
-   * @param {Long} maybePayLoad.expires - Life span of the encrypted content, measured in hours.
-   * @param {Boolean} [maybePayLoad.dor=false] - Should the content be deleted after opening.
-   * @param {String} maybePayLoad.type - an optional string value which specifies the type of communication the user is encrypting. Defaults to `unknown`
-   * @param {Map} maybePayLoad.meta - an optional map value which can contain any arbitrary metadata the user wants
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {File} maybePayload.sourceFile - The file to be encrypted.
+   * @param {[String]} maybePayload.recipients  - List of emails of users intended to have read access to the encrypted content.
+   * @param {Long} maybePayload.expires - Life span of the encrypted content, measured in hours.
+   * @param {Boolean} [maybePayload.dor=false] - Should the content be deleted after opening.
+   * @param {String} maybePayload.type - an optional string value which specifies the type of communication the user is encrypting. Defaults to `unknown`
+   * @param {Map} maybePayload.meta - an optional map value which can contain any arbitrary metadata the user wants
    *
    * @returns {Promise<ServerResponse<{payload:File}>>}
    */
-  supplyAsync: (maybePayLoad: IFileEncryptParams) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: IFileEncryptParams) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK, algorithm: EncryptionAlgorithm) {
     super(sdk);
@@ -84,20 +84,20 @@ export default class FileEncrypt extends XQModule {
       FileEncrypt.EXPIRES_HOURS,
     ];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
 
         const algorithm = this.algorithm;
         const sdk = this.sdk;
-        const deleteOnReceipt = maybePayLoad[FileEncrypt.DELETE_ON_RECEIPT];
-        const expiration = maybePayLoad[FileEncrypt.EXPIRES_HOURS];
-        const recipients = maybePayLoad[FileEncrypt.RECIPIENTS];
-        const sourceFile = maybePayLoad[FileEncrypt.SOURCE_FILE];
+        const deleteOnReceipt = maybePayload[FileEncrypt.DELETE_ON_RECEIPT];
+        const expiration = maybePayload[FileEncrypt.EXPIRES_HOURS];
+        const recipients = maybePayload[FileEncrypt.RECIPIENTS];
+        const sourceFile = maybePayload[FileEncrypt.SOURCE_FILE];
 
         const type =
-          maybePayLoad[FileEncrypt.TYPE] ?? CommunicationsEnum.UNKNOWN;
-        const meta = maybePayLoad[FileEncrypt.META] ?? null;
+          maybePayload[FileEncrypt.TYPE] ?? CommunicationsEnum.UNKNOWN;
+        const meta = maybePayload[FileEncrypt.META] ?? null;
 
         return new FetchQuantumEntropy(sdk)
           .supplyAsync({ [FetchQuantumEntropy.KS]: FetchQuantumEntropy._256 })

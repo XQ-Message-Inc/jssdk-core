@@ -56,7 +56,7 @@ export default class GetCommunications extends XQModule {
   static TZ: "tz" = "tz";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
    * @returns {Promise<ServerResponse<{payload: EventLogItem[] }>>}
    */
   supplyAsync: (
@@ -80,8 +80,10 @@ export default class GetCommunications extends XQModule {
     this.serviceName = GetCommunications.COMMUNICATIONS;
     this.requiredFields = [];
 
-    this.supplyAsync = (maybePayload) => {
+    this.supplyAsync = (maybePayload = {}) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
         );

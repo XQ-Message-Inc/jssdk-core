@@ -26,9 +26,9 @@ export default class GrantUserAccess extends XQModule {
   static RECIPIENTS: "recipients" = "recipients";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {[String]} maybePayLoad.recipients  - the list of emails of users intended to have read access to the encrypted content
-   * @param {String} maybePayLoad.locatorToken - a URL encoded version of the key locator token to fetch the key from the server.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {[String]} maybePayload.recipients  - the list of emails of users intended to have read access to the encrypted content
+   * @param {String} maybePayload.locatorToken - a URL encoded version of the key locator token to fetch the key from the server.
    * @see #encodeURIComponent function encodeURIComponent (built-in since ES-5)
    * @returns {Promise<ServerResponse<{payload:{data:{}}}>>}
    */
@@ -46,16 +46,16 @@ export default class GrantUserAccess extends XQModule {
       GrantUserAccess.RECIPIENTS,
     ];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
         const accessToken = this.sdk.validateAccessToken();
 
         const flattenedRecipientList =
-          maybePayLoad[GrantUserAccess.RECIPIENTS].join(",");
+          maybePayload[GrantUserAccess.RECIPIENTS].join(",");
 
         const payload = {
-          ...maybePayLoad,
+          ...maybePayload,
           [GrantUserAccess.RECIPIENTS]: flattenedRecipientList,
         };
 
@@ -68,7 +68,7 @@ export default class GrantUserAccess extends XQModule {
             this.sdk.VALIDATION_SERVER_URL,
             this.serviceName +
               "/" +
-              encodeURIComponent(maybePayLoad[GrantUserAccess.LOCATOR_TOKEN]),
+              encodeURIComponent(maybePayload[GrantUserAccess.LOCATOR_TOKEN]),
             CallMethod.POST,
             additionalHeaderProperties,
             payload,

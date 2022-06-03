@@ -5,11 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.7.1] - 2022-06-03
+
+### Addition
+- Add `verifyJWTExpiration`, a utility function to quickly test the `exp` field value of a JWT, in this case an `accessToken`. This allows the SDK to fail faster if the provided JWT is expired and not worth the XQ API call to test against
+### Modification
+- Modify `VerifyAccount` to utilize `ValidateSession` after adding the user + profile to the in-memory cache
+- Modify documentation use of `maybePayLoad` -> `maybePayload` (minor naming bug)
+- Ensure all services, regardless of `maybePayload` value, has the `validateInput` method invocation which ensures the `requiredFields` matches what fields are provided to the service. Meaning, even if the service isn't expecting a required value, we check for it. This ensures parity for each service.
+
 ## [1.7.0] - 2022-06-01
 
 ### Addition
 - Add `ValidateSession` service which consumes the `/session` endpoint. This is used to determine the validity of the XQ Dashboard session
-### Modified
+### Modification
 - Error handling updates: Modified `catch` block of `trycatch` utilized in each service. Added `handleException` function used to return the `ServerResponse` or create one.
 
 ## [1.6.0] - 2022-05-16
@@ -17,16 +26,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Addition
 - Add CRUD operations for businesses, including `AddBusiness`, `GetCurrentBusiness`, and `UpdateBusiness`.
 - Add CRUD operations for applications, including `AddApplication`, `RemoveApplication`, and `UpdateApplication`.
-- 
-### Modified
+
+### Modification
 - Update the `README.md` documentation file to reflect recent changes to the sdk.
 
 ## [1.5.3] - 2022-04-18
-### Modified
+### Modification
 
-- Update `Authorize` params to include `text` and `target`. `text` is an interpolated text field when a mobile number is specified. Use $pin to interpolate the pin or $link to interpolate the maybePayLoad.target. `target` is A link that can be interpolated in the maybePayload.text. Used for inviting users by text
+- Update `Authorize` params to include `text` and `target`. `text` is an interpolated text field when a mobile number is specified. Use $pin to interpolate the pin or $link to interpolate the maybePayload.target. `target` is A link that can be interpolated in the maybePayload.text. Used for inviting users by text
 ## [1.5.1] - 2022-03-28
-### Modified
+### Modification
 
 - Update `RevokeKeyAccess` expected params of `locatorKey` --> `locatorKeys`, a `string` --> `string[]`
 - Update `call` method of XQSDK to include check from DELETE http method when factoring in `maybePayload` presence
@@ -113,7 +122,7 @@ Utilizing `memory-cache` in lieu of `localStorage` required a few syntactic upda
 
 ## [1.0.27] - 2021-11-09
 
-### Modified
+### Modification
 - return type of `FileEncrypt.supplyAsync` from `void` --> `Promise<ServerResponse>`
 - return type of `locateFn`, the second parameter of `OTPv2Encryption.decryptFile`, a callback used to fetch the locator key of a given source file. From `string` --> `Promise<string>`
 - return type of `OTPv2Encryption.decryptFile` from `void` --> `Promise<unknown>`
@@ -122,7 +131,7 @@ Utilizing `memory-cache` in lieu of `localStorage` required a few syntactic upda
 
 ## [1.0.26] - 2021-11-09
 
-### Modified
+### Modification
 
 - `FileDecrypt` - update the type of the algorithm parameter of the `FileDecrypt` constructor to the `EncryptionAlgorithm` super class, rather than an omitted/stripped down version of the type. Also update return type from `void` --> `Promise<ServerResponse>` which is the correct return type.
 
@@ -136,7 +145,7 @@ Return value type - the return value was set to a type called void, which all it
 
 - `publish` script to `package.json` -- runs `yarn build` then `npm publish --access public` to ensure we build out our latest updates before publishing to NPM
 
-### Modified
+### Modification
 
 - naming of the `OPTV2` variable back to standardized `OTPv2`
 
@@ -148,7 +157,7 @@ Return value type - the return value was set to a type called void, which all it
 
 ## [1.0.22] - 2021-10-27
 
-### Modified
+### Modification
 
 - `AuthorizeAlias` -- `putActiveProfile` added after successful `AuthorizeAlias` call. Without this present, a user will be considered unauthorized and receive `401` errors regardless of payload validity
 

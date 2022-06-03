@@ -14,7 +14,7 @@ export default class ExchangeForAccessToken extends XQModule {
   serviceName: string;
   requiredFields: string[];
   /**
-   * @param {Map} [maybePayLoad=null] - Container for the request parameters supplied to this method.
+   * @param {Map} [maybePayload=null] - Container for the request parameters supplied to this method.
    *
    * @returns {Promise<ServerResponse<{payload:String}>>}
    */
@@ -25,8 +25,10 @@ export default class ExchangeForAccessToken extends XQModule {
     this.serviceName = "exchange";
     this.requiredFields = [];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
+        this.sdk.validateInput(maybePayload, this.requiredFields);
+
         const self = this;
 
         const preAuthToken = this.sdk.validatePreAuthToken();
@@ -41,7 +43,7 @@ export default class ExchangeForAccessToken extends XQModule {
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true
           )
           .then((response: ServerResponse) => {

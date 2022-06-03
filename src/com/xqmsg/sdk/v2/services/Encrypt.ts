@@ -62,20 +62,20 @@ export default class Encrypt extends XQModule {
   static META: "meta" = "meta";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
-   * @param {[String]} maybePayLoad.recipients  - the list of emails of users intended to have read access to the encrypted content
-   * @param {String} maybePayLoad.text - the text that will be encrypted
-   * @param {Number} maybePayLoad.expires - the number of hours of life span until access to the encrypted text is expired
-   * @param {Boolean} [maybePayLoad.dor=false] - an optional boolean value which specifies if the content should be deleted after opening
-   * @param {String} maybePayLoad.locatorKey - an optional string value that may be used to utilize a pre-existing locator key
-   * @param {String} maybePayLoad.encryptionKey - an optional string value that may be used to utilize a pre-existing encryption key
-   * @param {String} maybePayLoad.type - an optional string value which specifies the type of communication the user is encrypting. Defaults to `unknown`
-   * @param {Map} maybePayLoad.meta - an optional map value which can contain any arbitrary metadata the user wants
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {[String]} maybePayload.recipients  - the list of emails of users intended to have read access to the encrypted content
+   * @param {String} maybePayload.text - the text that will be encrypted
+   * @param {Number} maybePayload.expires - the number of hours of life span until access to the encrypted text is expired
+   * @param {Boolean} [maybePayload.dor=false] - an optional boolean value which specifies if the content should be deleted after opening
+   * @param {String} maybePayload.locatorKey - an optional string value that may be used to utilize a pre-existing locator key
+   * @param {String} maybePayload.encryptionKey - an optional string value that may be used to utilize a pre-existing encryption key
+   * @param {String} maybePayload.type - an optional string value which specifies the type of communication the user is encrypting. Defaults to `unknown`
+   * @param {Map} maybePayload.meta - an optional map value which can contain any arbitrary metadata the user wants
    *
    * @returns {Promise<ServerResponse<{payload:{locatorKey:string, encryptedText:string}}>>}
    */
   supplyAsync: (
-    maybePayLoad: IEncryptParams
+    maybePayload: IEncryptParams
   ) => Promise<ServerResponse | undefined>;
 
   constructor(sdk: XQSDK, algorithm: EncryptionAlgorithm) {
@@ -88,23 +88,23 @@ export default class Encrypt extends XQModule {
       Encrypt.EXPIRES_HOURS,
     ];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
 
         const sdk = this.sdk;
         const algorithm = this.algorithm;
-        const message = maybePayLoad[Encrypt.TEXT];
-        const recipients = maybePayLoad[Encrypt.RECIPIENTS];
-        const expiresHours = maybePayLoad[Encrypt.EXPIRES_HOURS];
+        const message = maybePayload[Encrypt.TEXT];
+        const recipients = maybePayload[Encrypt.RECIPIENTS];
+        const expiresHours = maybePayload[Encrypt.EXPIRES_HOURS];
         const deleteOnReceipt =
-          maybePayLoad[Encrypt.DELETE_ON_RECEIPT] ?? false;
+          maybePayload[Encrypt.DELETE_ON_RECEIPT] ?? false;
 
-        const locatorKey = maybePayLoad[Encrypt.LOCATOR_KEY];
-        const encryptionKey = maybePayLoad[Encrypt.ENCRYPTION_KEY];
+        const locatorKey = maybePayload[Encrypt.LOCATOR_KEY];
+        const encryptionKey = maybePayload[Encrypt.ENCRYPTION_KEY];
 
-        const type = maybePayLoad[Encrypt.TYPE] ?? CommunicationsEnum.UNKNOWN;
-        const meta = maybePayLoad[Encrypt.META] ?? null;
+        const type = maybePayload[Encrypt.TYPE] ?? CommunicationsEnum.UNKNOWN;
+        const meta = maybePayload[Encrypt.META] ?? null;
 
         /**
          * A function utilized to take an encryption key and encrypt textual data.

@@ -67,7 +67,7 @@ export default class AddBusiness extends XQModule {
   static CONVERT_FROM_EXISTING: "convertFromExisting" = "convertFromExisting";
 
   /**
-   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
    * @param {String} email - the main business email
    * @param {String} workspace - the desired workspace for the business
    * @param {String} name - the name of the business
@@ -84,7 +84,7 @@ export default class AddBusiness extends XQModule {
    * @param {Boolean} convertFromExisting - the flag for whether or not to convert the existing dashboard into the newly created dashboard
    * @returns {Promise<ServerResponse<{payload: string}>>} - payload is the access token for the new business
    */
-  supplyAsync: (maybePayLoad: {
+  supplyAsync: (maybePayload: {
     [AddBusiness.EMAIL]: string;
     [AddBusiness.WORKSPACE]: string;
     [AddBusiness.NAME]: string;
@@ -111,9 +111,9 @@ export default class AddBusiness extends XQModule {
       AddBusiness.WORKSPACE,
     ];
 
-    this.supplyAsync = (maybePayLoad) => {
+    this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+        this.sdk.validateInput(maybePayload, this.requiredFields);
 
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
@@ -129,7 +129,7 @@ export default class AddBusiness extends XQModule {
             this.serviceName,
             CallMethod.POST,
             additionalHeaderProperties,
-            maybePayLoad,
+            maybePayload,
             true,
             Destination.DASHBOARD
           )
