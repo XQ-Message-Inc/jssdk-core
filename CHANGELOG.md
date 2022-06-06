@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+
+## [1.7.4] - 2022-06-06
+### Modification
+- Remove and re-generate yarn.lock
+
 ## [1.7.3] - 2022-06-03
 ### Modification
 - Remove .yalc package reference from dependencies
