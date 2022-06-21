@@ -178,7 +178,7 @@ export default class XQSimpleCache {
       const self = this;
       const availableProfiles = this.listProfiles();
       if (availableProfiles.length == 0) {
-        self.storage.put(this.PROFILE_LIST_KEY, JSON.stringify([user]));
+        self.storage.put(this.PROFILE_LIST_KEY, user);
       } else {
         if (!availableProfiles.includes(user)) {
           availableProfiles.push(user);
