@@ -5,7 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-
+## [1.7.5] - 2022-06-21
+### Modification
+- Move `putActiveProfile` call from `Authorize` service to `ExchangeForAccessToken` service. Since the authorization process is two-steps, we only add the active profile when the user is fully confirmed. Currently the only other service that uses `ExchangeForAccessToken` is the `CodeValidator` service, which is the second phase of the full authorization process.
+- Modify the `putActiveProfile` method in `XQSimpleCache` to place a JSON stringified version of the `user`, rather than the `user` wrapped in an array.
+- Modify the `VerifyAccount` service to `await` the `validateSession` call and return the response, rather than returning the `validateSession` directly.
 
 ## [1.7.4] - 2022-06-06
 ### Modification
