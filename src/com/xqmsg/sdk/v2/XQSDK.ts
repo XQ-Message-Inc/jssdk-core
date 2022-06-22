@@ -455,20 +455,12 @@ class XQSDK {
     };
 
     this.validatePreAuthToken = () => {
-      // Ensure that there is an active profile.
-      const activeProfile = this.cache.getActiveProfile(true);
+      const preAuthToken = this.cache.getXQPreAuthToken();
 
-      if (activeProfile == null) {
-        throw new StatusException(401, `No active profile found`);
+      if (!preAuthToken) {
+        throw new StatusException(401, `Pre-authorization token not found`);
       }
 
-      const preAuthToken = this.cache.getXQPreAuthToken(activeProfile);
-      if (preAuthToken == null) {
-        throw new StatusException(
-          401,
-          `Pre-authorization token not found for ${activeProfile}`
-        );
-      }
       return preAuthToken;
     };
 
