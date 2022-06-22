@@ -1,3 +1,5 @@
+import jwtDecode, { JwtPayload } from "jwt-decode";
+
 import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
@@ -50,9 +52,12 @@ export default class ExchangeForAccessToken extends XQModule {
             switch (response.status) {
               case ServerResponse.OK: {
                 const accessToken = response.payload;
-                const activeProfile = self.cache.getActiveProfile(true);
-                self.cache.putXQAccess(activeProfile, accessToken);
-                self.cache.removeXQPreAuthToken(activeProfile);
+                const decodedIncomingAccessToken: JwtPayload =
+                  jwtDecode(accessToken);
+                const profile = decodedIncomingAccessToken.sub || "";
+
+                self.cache.putXQAccess(profile, accessToken);
+                self.cache.removeXQPreAuthToken();
                 return response;
               }
               case ServerResponse.ERROR: {
