@@ -129,7 +129,9 @@ export default class VerifyAccount extends XQModule {
                 self.cache.putActiveProfile(profile);
                 self.cache.putDashboardAccess(profile, dashboardAccessToken);
 
-                return validateSession(profile, accessToken);
+                await validateSession(profile, accessToken);
+
+                return response;
               }
               case ServerResponse.ERROR: {
                 return handleException(response, XQServices.VerifyAccount);
