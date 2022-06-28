@@ -40,7 +40,7 @@ export enum XQServices {
   GetCurrentUser = "GetCurrentUser",
   GetEventLogs = "GetEventLogs",
   GetEventTypes = "GetEventTypes",
-  GetUserWorkspaces = "GetUserWorkspaces",
+  GetWorkspaces = "GetWorkspaces",
   RemoveApplication = "RemoveApplication",
   RemoveContact = "RemoveContact",
   RemoveUserGroup = "RemoveUserGroup",
