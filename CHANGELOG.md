@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.8.0] - 2022-06-28
 
 ### Addition
-- Add `GetUserWorkspces`, a service used to fetch all workspaces a given user is a part of. 
+- Add `GetWorkspaces`, a service used to fetch all workspaces a given user is a part of. 
 
 ## [1.7.6] - 2022-06-22
 ### Modification

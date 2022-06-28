@@ -1214,11 +1214,11 @@ new GetEventTypes(sdk)
 ```
 
 ### Managing workspaces
-Users may query for workspace related information. The SDK provides `GetUserWorkspaces`, a service that allows you to query for a list of workspaces a user belongs to. The query uses a user email as the unique identifier for the user.
+Users may query for workspace related information. The SDK provides `GetWorkspaces`, a service that allows you to query for a list of workspaces a user belongs to. The query uses a user email as the unique identifier for the user.
 
 ```javascript
 import { 
-  GetUserWorkspaces,
+  GetWorkspaces,
   ServerResponse, 
   XQSDK 
 } from "@xqmsg/jssdk-core";
@@ -1228,16 +1228,16 @@ const sdk = new XQSDK({
 });
 
 // Get list of workspaces a given user belongs to
-new GetUserWorkspaces(sdk)
+new GetWorkspaces(sdk)
   .supplyAsync({
-    [GetUserWorkspaces.EMAIL]: "joe@email.com"
+    [GetWorkspaces.EMAIL]: "joe@email.com"
   })
   .then((response) => {
     switch (response.status) {
       case ServerResponse.OK: {
         // Success. The list of businesses were returned.
         const data = response.payload;
-        const workspaces = data[GetUserWorkspaces.WORKSPACES];
+        const workspaces = data[GetWorkspaces.WORKSPACES];
         // The format of workspaces is WorkspaceSummary[]
         break;
       }

@@ -10,9 +10,9 @@ import handleException from "../../exceptions/handleException";
 /**
  * A service which is utilized to fetch the workspaces that a user belongs to.
  *
- * @class [GetUserWorkspaces]
+ * @class [GetWorkspaces]
  */
-export default class GetUserWorkspaces extends XQModule {
+export default class GetWorkspaces extends XQModule {
   /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
 
@@ -30,13 +30,13 @@ export default class GetUserWorkspaces extends XQModule {
    * @returns {Promise<ServerResponse<{payload: WorkspaceSummary[]}>>}
    */
   supplyAsync: (maybePayload: {
-    [GetUserWorkspaces.EMAIL]: string;
+    [GetWorkspaces.EMAIL]: string;
   }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = GetUserWorkspaces.WORKSPACES;
-    this.requiredFields = [GetUserWorkspaces.EMAIL];
+    this.serviceName = GetWorkspaces.WORKSPACES;
+    this.requiredFields = [GetWorkspaces.EMAIL];
 
     this.supplyAsync = (maybePayload) => {
       try {
@@ -45,7 +45,7 @@ export default class GetUserWorkspaces extends XQModule {
         return this.sdk
           .call(
             this.sdk.DASHBOARD_SERVER_URL,
-            this.serviceName + `/${maybePayload[GetUserWorkspaces.EMAIL]}`,
+            this.serviceName + `/${maybePayload[GetWorkspaces.EMAIL]}`,
             CallMethod.GET,
             null,
             null,
@@ -58,13 +58,13 @@ export default class GetUserWorkspaces extends XQModule {
                 return response;
               }
               case ServerResponse.ERROR: {
-                return handleException(response, XQServices.GetUserWorkspaces);
+                return handleException(response, XQServices.GetWorkspaces);
               }
             }
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GetUserWorkspaces))
+          resolve(handleException(exception, XQServices.GetWorkspaces))
         );
       }
     };
