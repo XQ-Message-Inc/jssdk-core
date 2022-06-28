@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.8.0] - 2022-06-28
+
+### Addition
+- Add `GetWorkspaces`, a service used to fetch all workspaces a given user is a part of. 
+
 ## [1.7.6] - 2022-06-22
 ### Modification
 - BUGFIX: In the last update in `v1.7.5` we altered the pre-auth process (`Authorize` -> `CodeValidator` -> `ExchangeForAccessToken`). Since we do not add an active profile until the user is fully authenticated we need to account for this in `CodeValidator` which uses the `validatePreAuthToken` fn to ensure their is an available pre-auth token. Apart of `validatePreAuthToken` also checks for an active profile, which now doesn't exist until the user is fully authenticated. We now simply check solely for an available pre-auth token.

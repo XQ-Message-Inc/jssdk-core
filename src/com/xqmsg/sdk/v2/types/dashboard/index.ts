@@ -6,6 +6,15 @@ export enum UserRole {
   Customer = "Customer",
 }
 
+export interface WorkspaceSummary {
+  instance: string;
+  business: string;
+  bid: number;
+  workspace: string;
+  tag: string;
+  role: UserRole;
+}
+
 export enum UserNotificationStatus {
   None = 0,
   WarningsAndAlerts = 2,
