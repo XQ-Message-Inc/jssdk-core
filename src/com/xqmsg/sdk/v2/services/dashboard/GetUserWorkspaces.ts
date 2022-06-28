@@ -8,7 +8,7 @@ import { XQServices } from "../../XQServicesEnum";
 import handleException from "../../exceptions/handleException";
 
 /**
- * A service which is utilized to fetch the businesses/workspaces that a user belongs to.
+ * A service which is utilized to fetch the workspaces that a user belongs to.
  *
  * @class [GetUserWorkspaces]
  */
