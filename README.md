@@ -568,6 +568,7 @@ a user must be signed into XQ with an authorized email account associated with t
 - [User Groups](#managing-a-user-group)
 - [Contacts](#using-an-external-id-based-contact-for-tracking)
 - [Event Logs](#using-event-logs)
+- [Workspaces](#managing-a-workspace)
 
 #### Connecting to the Dashboard
 
@@ -1200,6 +1201,44 @@ new GetEventTypes(sdk)
         const data = response.payload
         const eventTypes = data[GetEventLogs.EVENT_TYPES]
         // The format of eventLogs is EventType[]
+        break;
+      }
+      case ServerResponse.ERROR: {
+        // Something went wrong...
+        break;
+      }
+    }
+
+    return response;
+  });
+```
+
+### Managing workspaces
+Users may query for workspace related information. The SDK provides `GetUserWorkspaces`, a service that allows you to query for a list of workspaces a user belongs to. The query uses a user email as the unique identifier for the user.
+
+```javascript
+import { 
+  GetUserWorkspaces,
+  ServerResponse, 
+  XQSDK 
+} from "@xqmsg/jssdk-core";
+
+const sdk = new XQSDK({
+  DASHBOARD_API_KEY: "YOUR_DASHBOARD_API_KEY"
+});
+
+// Get list of workspaces a given user belongs to
+new GetUserWorkspaces(sdk)
+  .supplyAsync({
+    [GetUserWorkspaces.EMAIL]: "joe@email.com"
+  })
+  .then((response) => {
+    switch (response.status) {
+      case ServerResponse.OK: {
+        // Success. The list of businesses were returned.
+        const data = response.payload;
+        const workspaces = data[GetUserWorkspaces.WORKSPACES];
+        // The format of workspaces is WorkspaceSummary[]
         break;
       }
       case ServerResponse.ERROR: {
