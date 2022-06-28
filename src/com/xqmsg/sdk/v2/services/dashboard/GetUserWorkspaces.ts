@@ -10,30 +10,33 @@ import handleException from "../../exceptions/handleException";
 /**
  * A service which is utilized to fetch the businesses/workspaces that a user belongs to.
  *
- * @class [GetUsersBusinesses]
+ * @class [GetUserWorkspaces]
  */
-export default class GetUsersBusinesses extends XQModule {
+export default class GetUserWorkspaces extends XQModule {
   /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
 
   /** Specified name of the service */
   serviceName: string;
 
+  /** The service name */
+  static WORKSPACES: "workspaces" = "workspaces";
+
   /** Email of the user whose workspaces we are querying for */
   static EMAIL: "email" = "email";
 
   /**
    * @param {Map} maybePayload - the container for the request parameters supplied to this method.
-   * @returns {Promise<ServerResponse<{payload: CurrentBusinessSummary}>>}
+   * @returns {Promise<ServerResponse<{payload: WorkspaceSummary[]}>>}
    */
   supplyAsync: (maybePayload: {
-    [GetUsersBusinesses.EMAIL]: string;
+    [GetUserWorkspaces.EMAIL]: string;
   }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "workspaces";
-    this.requiredFields = [GetUsersBusinesses.EMAIL];
+    this.serviceName = GetUserWorkspaces.WORKSPACES;
+    this.requiredFields = [GetUserWorkspaces.EMAIL];
 
     this.supplyAsync = (maybePayload) => {
       try {
@@ -42,7 +45,7 @@ export default class GetUsersBusinesses extends XQModule {
         return this.sdk
           .call(
             this.sdk.DASHBOARD_SERVER_URL,
-            this.serviceName + `/${maybePayload[GetUsersBusinesses.EMAIL]}`,
+            this.serviceName + `/${maybePayload[GetUserWorkspaces.EMAIL]}`,
             CallMethod.GET,
             null,
             null,
@@ -55,13 +58,13 @@ export default class GetUsersBusinesses extends XQModule {
                 return response;
               }
               case ServerResponse.ERROR: {
-                return handleException(response, XQServices.GetUsersBusinesses);
+                return handleException(response, XQServices.GetUserWorkspaces);
               }
             }
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GetUsersBusinesses))
+          resolve(handleException(exception, XQServices.GetUserWorkspaces))
         );
       }
     };
