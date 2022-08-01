@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.9.0] - 2022-08-01
+
+### Addition
+- Add `GetTrustedRanges`, a service used to fetch all the address ranges for a team that are trusted
+
 ## [1.8.0] - 2022-06-28
 
 ### Addition

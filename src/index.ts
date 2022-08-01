@@ -49,6 +49,7 @@ import GetCurrentBusiness from "./com/xqmsg/sdk/v2/services/dashboard/GetCurrent
 import GetCurrentUser from "./com/xqmsg/sdk/v2/services/dashboard/GetCurrentUser";
 import GetEventLogs from "./com/xqmsg/sdk/v2/services/dashboard/GetEventLogs";
 import GetEventTypes from "./com/xqmsg/sdk/v2/services/dashboard/GetEventTypes";
+import GetTrustedRanges from "./com/xqmsg/sdk/v2/services/dashboard/GetTrustedRanges";
 import GetWorkspaces from "./com/xqmsg/sdk/v2/services/dashboard/GetWorkspaces";
 import RemoveApplication from "./com/xqmsg/sdk/v2/services/dashboard/RemoveApplication";
 import RemoveContact from "./com/xqmsg/sdk/v2/services/dashboard/RemoveContact";
@@ -96,6 +97,7 @@ export {
   GetEventTypes,
   GetSettings,
   GetSubscriberInfo,
+  GetTrustedRanges,
   GetWorkspaces,
   GrantUserAccess,
   NotificationEnum,
