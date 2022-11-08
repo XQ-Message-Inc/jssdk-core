@@ -15,7 +15,7 @@
       "sourceMap": true,
       "strict": true /* Enable all strict type-checking options. */,
       "strictPropertyInitialization": false,
-      "target": "ES2015" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */
+      "target": "esnext" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */
     },
     "include": ["index.ts"]
    }

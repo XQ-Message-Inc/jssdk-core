@@ -1,44 +1,11 @@
 import EncryptionAlgorithm from "./EncryptionAlgorithm";
 import ServerResponse from "../ServerResponse";
-import { XQEncryptionAlgorithms } from "../XQServicesEnum";
 import XQSDK from "../XQSDK";
-
-import handleException from "../exceptions/handleException";
 
 type ParsedFile = {
   locator: string;
   nameEncrypted: Uint8Array;
   contentEncrypted: Uint8Array;
-};
-
-/**
- * The btoa() method creates a Base64-encoded ASCII string from a binary string
- * (i.e., a String object in which each character in the string is treated as a byte of binary data).
- *
- * Since `btoa` is a Web API, we provide a fallback for all other environments utilizing `Buffer`
- * @param binaryString - `string`
- * @returns `string`;
- */
-
-const universalBtoa = (binaryString: string) => {
-  try {
-    return btoa(binaryString);
-  } catch (err) {
-    return Buffer.from(binaryString).toString("base64");
-  }
-};
-
-/**
- * The atob() function decodes a string of data which has been encoded using Base64 encoding
- * @param b64Encoded - a `string` encoded using Base64 encoding
- * @returns `string`;
- */
-const universalAtob = (b64Encoded: string) => {
-  try {
-    return atob(b64Encoded);
-  } catch (err) {
-    return Buffer.from(b64Encoded, "base64").toString();
-  }
 };
 
 export default class OTPv2Encryption extends EncryptionAlgorithm {
@@ -49,12 +16,12 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
    * @return {Promise<ServerResponse<{payload:{decryptedText:string}}>>} A Promise of the Response containing the decrypted text.
    */
   decryptFile: (
-    sourceFile: File,
-    locateFn: (aLocatorToken: string) => Promise<string>
-  ) => Promise<ServerResponse>;
+    file: File,
+    retrieveKeyFunction: (locatorKey: string) => string
+  ) => Promise<unknown>;
 
   /**
-   * Takes an OTPv2 encrypted text string and attempts to decrypt with the provided key.
+   * Takes an OTPV2 encrypted text string and attempts to decrypt with the provided key.
    * @param  {String} text - the text to decrypt.
    * @param  {String} key - the encryption key.
    * @return {Promise<ServerResponse<{payload:{decryptedText:string}}>>} A Promise of the Response containing the decrypted text.
@@ -62,7 +29,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
   decryptText: (text: string, key: string) => Promise<ServerResponse>;
 
   /**
-   * Takes an OTPv2 encrypted Uint8Array and attempts to decrypt with the provided key.
+   * Takes an OTPV2 encrypted Uint8Array and attempts to decrypt with the provided key.
    * @param  {Uint8Array} encrypted - the Uint8Array to decrypt.
    * @param  {String} key - the encryption key.
    * @return {Uint8Array} the decrypted Uint8Array
@@ -71,10 +38,10 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
 
   /**
    * @param {ParsedFile} parsed - the parsed file to be decrypted
-   * @return {String} locatorKey - the quantum key used to decrypt the file
+   * @return {String} keyString - the quantum key used to decrypt the file
    * @return {[File, String]} the decrypted file tuple
    */
-  doDecrypt: (parsed: ParsedFile, locatorKey: string) => [File, string];
+  doDecrypt: (parsed: ParsedFile, keyString: string) => [File, string];
 
   /**
    * @param {Uint8Array} data - data to be encrypted
@@ -135,25 +102,23 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
     this.keyPos = 0;
     this.key;
 
-    this.encryptText = (text, key, skipKeyExpansion = false) => {
+    this.encryptText = (text, key) => {
       try {
         const self = this;
         self.sdk.validateAccessToken();
 
         return new Promise((resolve) => {
           if (key === "" || key == undefined) {
-            console.error("OTPv2 Source Key cannot be empty.");
+            console.error("OTPV2 Source Key cannot be empty.");
             resolve(
               new ServerResponse(
                 ServerResponse.ERROR,
                 500,
-                "OTPv2 Source Key cannot be empty."
+                "OTPV2 Source Key cannot be empty."
               )
             );
           }
-          const expandedKey = skipKeyExpansion
-            ? key
-            : self.expandKey(key, 2048);
+          const expandedKey = self.expandKey(key, 2048);
           if (expandedKey == null) {
             console.error("Key could not be UTF8 encoded.");
             return resolve(
@@ -175,7 +140,11 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            handleException(exception, XQEncryptionAlgorithms.OTPv2Encryption)
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
           );
         });
       }
@@ -240,7 +209,11 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            handleException(exception, XQEncryptionAlgorithms.OTPv2Encryption)
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
           );
         });
       }
@@ -262,7 +235,7 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
 
         return new Promise((resolve) => {
           try {
-            const payload = universalAtob(text);
+            const payload = atob(text);
 
             const encoder = new TextEncoder();
 
@@ -286,52 +259,51 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
                 })
               );
             } catch (exception) {
-              return new Promise((resolve) => {
-                resolve(
-                  handleException(
-                    exception,
-                    XQEncryptionAlgorithms.OTPv2Encryption
-                  )
-                );
-              });
+              resolve(
+                new ServerResponse(ServerResponse.ERROR, 500, exception.message)
+              );
             }
           } catch (exception) {
-            return new Promise((resolve) => {
-              resolve(
-                handleException(
-                  exception,
-                  XQEncryptionAlgorithms.OTPv2Encryption
-                )
-              );
-            });
+            resolve(
+              new ServerResponse(ServerResponse.ERROR, 500, exception.message)
+            );
           }
         });
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            handleException(exception, XQEncryptionAlgorithms.OTPv2Encryption)
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
           );
         });
       }
     };
 
     this.exclusiveDisjunction = (text: string, expandedKey: string): string => {
-      const encoder = new TextEncoder();
+      try {
+        const encoder = new TextEncoder();
 
-      const keyBytes = encoder.encode(expandedKey);
-      const payloadBytes = encoder.encode(encodeURIComponent(text));
+        const keyBytes = encoder.encode(expandedKey);
+        const payloadBytes = encoder.encode(encodeURIComponent(text));
 
-      const j = [];
+        const j = [];
 
-      for (let idx = 0; idx < payloadBytes.length; ++idx) {
-        const mi = idx % keyBytes.length;
-        j.push(payloadBytes[idx] ^ keyBytes[mi]);
+        for (let idx = 0; idx < payloadBytes.length; ++idx) {
+          const mi = idx % keyBytes.length;
+          j.push(payloadBytes[idx] ^ keyBytes[mi]);
+        }
+
+        const decoder = new TextDecoder();
+        const dt = decoder.decode(new Uint8Array(j));
+
+        return btoa(dt);
+      } catch (err) {
+        console.info("ERROR: " + err.message);
+        return err.message;
       }
-
-      const decoder = new TextDecoder();
-      const dt = decoder.decode(new Uint8Array(j));
-
-      return universalBtoa(dt);
     };
 
     this.decryptFile = (file, retrieveKeyFunction) => {
@@ -347,8 +319,8 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
               parsedFile = pf;
               return retrieveKeyFunction(pf.locator);
             })
-            .then((decryptedPayload) => {
-              const result = self.doDecrypt(parsedFile, decryptedPayload);
+            .then((key) => {
+              const result = self.doDecrypt(parsedFile, key);
               const file = result[0];
               // const name = result[1];
               resolve(new ServerResponse(ServerResponse.OK, 200, file));
@@ -357,14 +329,18 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            handleException(exception, XQEncryptionAlgorithms.OTPv2Encryption)
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
           );
         });
       }
     };
 
-    this.doDecrypt = (parsed, locatorKey) => {
-      const key = new TextEncoder().encode(locatorKey);
+    this.doDecrypt = (parsed, keyString) => {
+      const key = new TextEncoder().encode(keyString);
       const fileName = this.decryptUint(parsed.nameEncrypted, key);
       const content = this.decryptUint(parsed.contentEncrypted, key);
 
@@ -383,36 +359,44 @@ export default class OTPv2Encryption extends EncryptionAlgorithm {
       return result;
     };
 
-    this.parseFileForDecrypt = async (file) => {
-      const buffer = await new Response(file).arrayBuffer();
-      let pos = 0;
-      const locatorSize = new Uint32Array(buffer.slice(pos, pos + 4))[0];
-      if (locatorSize > 256) {
-        throw new Error(
-          "Unable to decrypt file, check that the file is valid and not damaged"
+    this.parseFileForDecrypt = (file) => {
+      return new Promise((resolve) => {
+        // Fetch the length of the token and the actual token. Wrapping in the "Response"
+        // class because Safari does not support Blob.arrayBuffer
+        resolve(
+          file.arrayBuffer().then((buffer: ArrayBuffer) => {
+            let pos = 0;
+            const locatorSize = new Uint32Array(buffer.slice(pos, pos + 4))[0];
+            if (locatorSize > 256) {
+              throw new Error(
+                "Unable to decrypt file, check that the file is valid and not damaged"
+              );
+            }
+            pos += 4;
+            const locator = new TextDecoder().decode(
+              new Uint8Array(buffer.slice(pos, locatorSize + pos))
+            );
+            pos += locatorSize;
+            const fileNameSize = new Uint32Array(buffer.slice(pos, pos + 4))[0];
+            if (fileNameSize < 2 || fileNameSize > 2000) {
+              throw new Error(
+                "Unable to decrypt file, check that the file is valid and not damaged"
+              );
+            }
+            pos += 4;
+            const nameEncrypted = new Uint8Array(
+              buffer.slice(pos, fileNameSize + pos)
+            );
+            pos += fileNameSize;
+
+            return {
+              locator: locator,
+              nameEncrypted: nameEncrypted,
+              contentEncrypted: new Uint8Array(buffer.slice(pos)),
+            };
+          })
         );
-      }
-      pos += 4;
-      const locator = new TextDecoder().decode(
-        new Uint8Array(buffer.slice(pos, locatorSize + pos))
-      );
-      pos += locatorSize;
-      const fileNameSize = new Uint32Array(buffer.slice(pos, pos + 4))[0];
-      if (fileNameSize < 2 || fileNameSize > 2000) {
-        throw new Error(
-          "Unable to decrypt file, check that the file is valid and not damaged"
-        );
-      }
-      pos += 4;
-      const nameEncrypted = new Uint8Array(
-        buffer.slice(pos, fileNameSize + pos)
-      );
-      pos += fileNameSize;
-      return {
-        locator,
-        nameEncrypted,
-        contentEncrypted: new Uint8Array(buffer.slice(pos)),
-      };
+      });
     };
   }
 }

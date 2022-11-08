@@ -3,9 +3,6 @@ import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
-import { XQServices } from "../../XQServicesEnum";
-
-import handleException from "../../exceptions/handleException";
 
 /**
  * A service which is utilized to create a new Contact for the dashboard
@@ -41,13 +38,13 @@ export default class AddContact extends XQModule {
   static TITLE: "title" = "title";
 
   /**
-   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
    * @param {String} email - the email of the new Contact
    * @param {String} role - the role of the new Contact
    * @param {String} notifications - the notifications preference of the current user for the new Contact
    * @returns {Promise<ServerResponse<{payload:{id:int, status:string}}>>}
    */
-  supplyAsync: (maybePayload: {
+  supplyAsync: (maybePayLoad: {
     email: string;
     role: string;
     notifications: boolean;
@@ -62,9 +59,9 @@ export default class AddContact extends XQModule {
       AddContact.NOTIFICATIONS,
     ];
 
-    this.supplyAsync = (maybePayload) => {
+    this.supplyAsync = (maybePayLoad) => {
       try {
-        this.sdk.validateInput(maybePayload, this.requiredFields);
+        this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
@@ -74,30 +71,25 @@ export default class AddContact extends XQModule {
           Authorization: "Bearer " + dashboardAccessToken,
         };
 
-        return this.sdk
-          .call(
-            this.sdk.DASHBOARD_SERVER_URL,
-            this.serviceName,
-            CallMethod.POST,
-            additionalHeaderProperties,
-            maybePayload,
-            true,
-            Destination.DASHBOARD
-          )
-          .then((response: ServerResponse) => {
-            switch (response.status) {
-              case ServerResponse.OK: {
-                return response;
-              }
-              case ServerResponse.ERROR: {
-                return handleException(response, XQServices.AddContact);
-              }
-            }
-          });
-      } catch (exception) {
-        return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.AddContact))
+        return this.sdk.call(
+          this.sdk.DASHBOARD_SERVER_URL,
+          this.serviceName,
+          CallMethod.POST,
+          additionalHeaderProperties,
+          maybePayLoad,
+          true,
+          Destination.DASHBOARD
         );
+      } catch (exception) {
+        return new Promise((resolve) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
+          );
+        });
       }
     };
   }

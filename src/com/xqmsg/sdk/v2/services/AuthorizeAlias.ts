@@ -2,9 +2,6 @@ import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-import { XQServices } from "../XQServicesEnum";
-
-import handleException from "../exceptions/handleException";
 
 interface IAuthorizeAliasParams {
   user: string;
@@ -30,14 +27,14 @@ export default class AuthorizeAlias extends XQModule {
   /** The field name representing the last name of the user */
   static LAST_NAME: "lastName" = "lastName";
 
-  /** The field name representing the user's email or phone number */
+  /** The field name representing the news letter service */
   static USER: "user" = "user";
 
   /**
-   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
-   * @param {String} maybePayload.user - Email of the user to be validated.
-   * @param {String} [maybePayload.firstName] - First name of the user. (Optional)
-   * @param {String} [maybePayload.lastName] - Last name of the user. (Optional)
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {String} maybePayLoad.user - Email of the user to be validated.
+   * @param {String} [maybePayLoad.firstName] - First name of the user. (Optional)
+   * @param {String} [maybePayLoad.lastName] - Last name of the user. (Optional)
    *
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
@@ -49,14 +46,14 @@ export default class AuthorizeAlias extends XQModule {
     this.serviceName = "authorizealias";
     this.requiredFields = [AuthorizeAlias.USER];
 
-    this.supplyAsync = (maybePayload) => {
+    this.supplyAsync = (maybePayLoad) => {
       try {
-        this.sdk.validateInput(maybePayload, this.requiredFields);
-
         const self = this;
 
+        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+
         const aliasUser =
-          maybePayload[AuthorizeAlias.USER as keyof IAuthorizeAliasParams] ??
+          maybePayLoad[AuthorizeAlias.USER as keyof IAuthorizeAliasParams] ??
           "";
 
         return this.sdk
@@ -65,26 +62,36 @@ export default class AuthorizeAlias extends XQModule {
             this.serviceName,
             CallMethod.POST,
             null,
-            maybePayload,
+            maybePayLoad,
             true
           )
-          .then((response: ServerResponse) => {
-            switch (response.status) {
+          .then((authorizeAliasResponse: ServerResponse) => {
+            switch (authorizeAliasResponse.status) {
               case ServerResponse.OK: {
-                const accessToken = response.payload;
-
-                self.cache.putXQAccess(aliasUser, accessToken);
-                self.cache.putActiveProfile(aliasUser);
-
-                return response;
+                const accessToken = authorizeAliasResponse.payload;
+                try {
+                  self.cache.putXQAccess(aliasUser, accessToken);
+                  return authorizeAliasResponse;
+                } catch (e) {
+                  console.log(e.message);
+                  return null;
+                }
               }
-              case ServerResponse.ERROR: {
-                return handleException(response, XQServices.AuthorizeAlias);
+              default: {
+                return console.error("Error retrieving alias authorization");
               }
             }
           });
-      } catch (exception) {
-        return handleException(exception, XQServices.AuthorizeAlias);
+      } catch (validationException) {
+        return new Promise((resolve) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              validationException.code,
+              validationException.reason
+            )
+          );
+        });
       }
     };
   }

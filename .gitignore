@@ -74,6 +74,10 @@ web_modules/
 .env
 .env.test
 
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
 # Next.js build output
 .next
 out
@@ -120,6 +124,3 @@ xq-javascript-sdk.iml
 dist
 
 .vscode
-
-.yalc
-yalc.lock

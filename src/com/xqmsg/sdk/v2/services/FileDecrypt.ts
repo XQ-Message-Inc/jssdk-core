@@ -1,11 +1,14 @@
-import EncryptionAlgorithm from "../algorithms/EncryptionAlgorithm";
 import FetchKey from "./FetchKey";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-import { XQServices } from "../XQServicesEnum";
 
-import handleException from "../exceptions/handleException";
+type EncryptionAlgorithm = {
+  decryptFile: (
+    sourceFile: File,
+    locateFn: (aLocatorToken: string) => Promise<Record<string, string>>
+  ) => void;
+};
 
 /**
  * A service which is utilized to decrypt data stored in a file using the {@link EncryptionAlgorithm} provided.
@@ -23,12 +26,12 @@ export default class FileDecrypt extends XQModule {
   static SOURCE_FILE: "sourceFile" = "sourceFile";
 
   /**
-   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
-   * @param {File} maybePayload.sourceFile - The file to be decrypted.
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {File} maybePayLoad.sourceFile - The file to be decrypted.
    *
    *  @returns {Promise<ServerResponse<{payload:File}>>}
    */
-  supplyAsync: (maybePayload: { sourceFile: File }) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: { sourceFile: File }) => void;
 
   constructor(sdk: XQSDK, algorithm: EncryptionAlgorithm) {
     super(sdk);
@@ -36,40 +39,41 @@ export default class FileDecrypt extends XQModule {
     this.algorithm = algorithm;
     this.requiredFields = [FileDecrypt.SOURCE_FILE];
 
-    this.supplyAsync = (maybePayload) => {
+    this.supplyAsync = (maybePayLoad) => {
       try {
-        this.sdk.validateInput(maybePayload, this.requiredFields);
-      } catch (exception) {
-        return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.FileDecrypt))
-        );
+        this.sdk.validateInput(maybePayLoad, this.requiredFields);
+      } catch (validationException) {
+        return new Promise((resolve) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              validationException.code,
+              validationException.reason
+            )
+          );
+        });
       }
       const algorithm = this.algorithm;
       const sdk = this.sdk;
-      const sourceFile = maybePayload[FileDecrypt.SOURCE_FILE];
+      const sourceFile = maybePayLoad[FileDecrypt.SOURCE_FILE];
 
-      try {
-        return algorithm.decryptFile(
-          sourceFile,
-          async (aLocatorToken: string) => {
-            const response = await new FetchKey(sdk).supplyAsync({
-              [FetchKey.LOCATOR_KEY]: aLocatorToken,
-            });
-            switch (response.status) {
+      return algorithm.decryptFile(sourceFile, (aLocatorToken: string) => {
+        return new FetchKey(sdk)
+          .supplyAsync({ [FetchKey.LOCATOR_KEY]: aLocatorToken })
+          .then((retrieveKeyRespose: ServerResponse) => {
+            switch (retrieveKeyRespose.status) {
               case ServerResponse.OK: {
-                return response.payload as string;
+                return retrieveKeyRespose.payload;
               }
-              default: {
-                throw response;
+              case ServerResponse.ERROR: {
+                console.error(
+                  `${algorithm.constructor.name}.decryptFile() failed, code: ${retrieveKeyRespose.statusCode}, reason: ${retrieveKeyRespose.payload}`
+                );
+                return retrieveKeyRespose;
               }
             }
-          }
-        );
-      } catch (exception) {
-        return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.FileDecrypt))
-        );
-      }
+          });
+      });
     };
   }
 }

@@ -1,19 +1,7 @@
 import CallMethod from "../CallMethod";
-import { CommunicationsEnum } from "../CommunicationsEnum";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-import { XQServices } from "../XQServicesEnum";
-import handleException from "../exceptions/handleException";
-
-export interface IGeneratePacketParams {
-  key: string;
-  expires: number;
-  recipients: string[];
-  dor: boolean;
-  type: CommunicationsEnum;
-  meta: Record<string, unknown> | null;
-}
 
 /**
  * A service which is utilized to generate an encrypted packet containing the encryption key that you want to
@@ -40,24 +28,24 @@ export default class GeneratePacket extends XQModule {
   /** The field name representing the list of emails of users intended to have read access to the encrypted content */
   static RECIPIENTS: "recipients" = "recipients";
 
-  /** The field name representing the type of communication that the user is encrypting (ex. File, Email, Chat, etc.) */
+  /** The field name representing the type */
   static TYPE: "type" = "type";
 
-  /** The field name representing the arbitrary metadata the user would like to attach to the log of the encrypted payload */
-  static META: "meta" = "meta";
-
   /**
-   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
-   * @param {String} maybePayload.key - The secret key that the user wants to protect.
-   * @param {Long} maybePayload.expires - The number of hours that this key will remain valid for. After this time, it will no longer be accessible.
-   * @param {[String]} maybePayload.recipients  -  list of emails of those recipients who are allowed to access the key.
-   * @param {Boolean} [maybePayload.dor=false] - Should the content be deleted after opening.
-   * @param {String} maybePayload.type - an optional string value which specifies the type of communication the user is encrypting. Defaults to `unknown`
-   * @param {Map} maybePayload.meta - an optional map value which can contain any arbitrary metadata the user wants
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {String} maybePayLoad.key - The secret key that the user wants to protect.
+   * @param {Long} maybePayLoad.expires - The number of hours that this key will remain valid for. After this time, it will no longer be accessible.
+   * @param {[String]} maybePayLoad.recipients  -  list of emails of those recipients who are allowed to access the key.
+   * @param {Boolean} [maybePayLoad.dor=false] - Should the content be deleted after opening.
    *
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
-  supplyAsync: (maybePayload: IGeneratePacketParams) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: {
+    key: string;
+    expires: number;
+    recipients: string[];
+    dor: boolean;
+  }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -69,9 +57,9 @@ export default class GeneratePacket extends XQModule {
       GeneratePacket.EXPIRES_HOURS,
     ];
 
-    this.supplyAsync = (maybePayload) => {
+    this.supplyAsync = (maybePayLoad) => {
       try {
-        this.sdk.validateInput(maybePayload, this.requiredFields);
+        this.sdk.validateInput(maybePayLoad, this.requiredFields);
         const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
@@ -79,10 +67,10 @@ export default class GeneratePacket extends XQModule {
         };
 
         const flattenedRecipientList =
-          maybePayload[GeneratePacket.RECIPIENTS].join(",");
+          maybePayLoad[GeneratePacket.RECIPIENTS].join(",");
 
         const payload = {
-          ...maybePayload,
+          ...maybePayLoad,
           [GeneratePacket.RECIPIENTS]: flattenedRecipientList,
         };
 
@@ -111,14 +99,26 @@ export default class GeneratePacket extends XQModule {
                 );
               }
               case ServerResponse.ERROR: {
-                return handleException(response, XQServices.GeneratePacket);
+                console.error(
+                  `GeneratePacket failed, code: ${response.statusCode}, reason: ${response.payload}`
+                );
+                return response;
+              }
+              default: {
+                return response;
               }
             }
           });
-      } catch (exception) {
-        return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GeneratePacket))
-        );
+      } catch (validationException) {
+        return new Promise((resolve) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              validationException.code,
+              validationException.reason
+            )
+          );
+        });
       }
     };
   }

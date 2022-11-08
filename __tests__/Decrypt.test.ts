@@ -110,7 +110,7 @@ describe("Testing `Decrypt` service", () => {
       await testDecrypt(testToSucceedEncryptionPayload, AESAlgorithm)
     ).toEqual(true));
 
-  it(`should successfully encrypt the given text via OTPv2 algorithm`, async () =>
+  it(`should successfully encrypt the given text via OTPV2 algorithm`, async () =>
     expect(
       await testDecrypt(testToSucceedEncryptionPayload, OTPv2Algorithm)
     ).toEqual(true));
@@ -126,7 +126,7 @@ describe("Testing `Decrypt` service", () => {
     console.error = originalError;
   });
 
-  it(`should fail to encrypt the given text via OTPv2 algorithm`, async () => {
+  it(`should fail to encrypt the given text via OTPV2 algorithm`, async () => {
     const originalError = console.error;
     console.error = jest.fn();
 

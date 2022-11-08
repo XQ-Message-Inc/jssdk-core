@@ -2,9 +2,6 @@ import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-import { XQServices } from "../XQServicesEnum";
-
-import handleException from "../exceptions/handleException";
 
 /**
  * A service which is used to fetch an encryption key using a valid locator key.
@@ -29,11 +26,11 @@ export default class FetchKey extends XQModule {
   static LOCATOR_KEY: "locatorKey" = "locatorKey";
 
   /**
-   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
-   * @param {String} maybePayload.locatorKey - the key used to fetch the encryption key from the server
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {String} maybePayLoad.locatorKey - the key used to fetch the encryption key from the server
    * @returns {Promise<ServerResponse<{payload:string}>>}
    */
-  supplyAsync: (maybePayload: {
+  supplyAsync: (maybePayLoad: {
     locatorKey: string;
   }) => Promise<ServerResponse>;
 
@@ -44,12 +41,12 @@ export default class FetchKey extends XQModule {
     this.serviceName = "key";
     this.requiredFields = [FetchKey.LOCATOR_KEY];
 
-    this.supplyAsync = (maybePayload) => {
+    this.supplyAsync = (maybePayLoad) => {
       try {
-        this.sdk.validateInput(maybePayload, this.requiredFields);
+        this.sdk.validateInput(maybePayLoad, this.requiredFields);
         const accessToken = this.sdk.validateAccessToken();
 
-        const locatorKey = maybePayload[FetchKey.LOCATOR_KEY];
+        const locatorKey = maybePayLoad[FetchKey.LOCATOR_KEY];
         const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };
@@ -63,22 +60,35 @@ export default class FetchKey extends XQModule {
             null,
             true
           )
-          .then((response: ServerResponse) => {
-            switch (response.status) {
-              case ServerResponse.OK: {
-                let key = response.payload;
-                if (key.startsWith(".")) key = key.substr(2);
-                return new ServerResponse(ServerResponse.OK, 200, key);
+          .then((serverResponse: ServerResponse) => {
+            return new Promise((resolve) => {
+              switch (serverResponse.status) {
+                case ServerResponse.OK: {
+                  let key = serverResponse.payload;
+                  if (key.startsWith(".")) key = key.substr(2);
+                  resolve(new ServerResponse(ServerResponse.OK, 200, key));
+                  break;
+                }
+                case ServerResponse.ERROR: {
+                  console.error(
+                    `RetrieveKey failed, code: ${serverResponse.statusCode}, reason: ${serverResponse.payload}`
+                  );
+                  resolve(serverResponse);
+                  break;
+                }
               }
-              case ServerResponse.ERROR: {
-                return handleException(response, XQServices.FetchKey);
-              }
-            }
+            });
           });
-      } catch (exception) {
-        return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.FetchKey))
-        );
+      } catch (validationException) {
+        return new Promise((resolve) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              validationException.code,
+              validationException.reason
+            )
+          );
+        });
       }
     };
   }

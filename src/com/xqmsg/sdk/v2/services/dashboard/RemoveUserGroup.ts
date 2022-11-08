@@ -3,9 +3,6 @@ import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
-import { XQServices } from "../../XQServicesEnum";
-
-import handleException from "../../exceptions/handleException";
 
 /**
  * A service which is utilized to remove a grouping of dashboard users
@@ -23,7 +20,7 @@ export default class RemoveUserGroup extends XQModule {
   static ID: "id" = "id";
 
   /**
-   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
    * @returns {Promise<ServerResponse<{payload:{}>>}
    */
   supplyAsync: (maybePayload: { id: string }) => Promise<ServerResponse>;
@@ -33,9 +30,9 @@ export default class RemoveUserGroup extends XQModule {
     this.serviceName = "usergroup";
     this.requiredFields = [RemoveUserGroup.ID];
 
-    this.supplyAsync = (maybePayload) => {
+    this.supplyAsync = (maybePayLoad) => {
       try {
-        this.sdk.validateInput(maybePayload, this.requiredFields);
+        this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
@@ -45,30 +42,25 @@ export default class RemoveUserGroup extends XQModule {
           Authorization: "Bearer " + dashboardAccessToken,
         };
 
-        return this.sdk
-          .call(
-            this.sdk.DASHBOARD_SERVER_URL,
-            this.serviceName + "/" + maybePayload[RemoveUserGroup.ID],
-            CallMethod.DELETE,
-            additionalHeaderProperties,
-            null,
-            true,
-            Destination.DASHBOARD
-          )
-          .then(async (response: ServerResponse) => {
-            switch (response.status) {
-              case ServerResponse.OK: {
-                return response;
-              }
-              case ServerResponse.ERROR: {
-                return handleException(response, XQServices.RemoveUserGroup);
-              }
-            }
-          });
-      } catch (exception) {
-        return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.RemoveUserGroup))
+        return this.sdk.call(
+          this.sdk.DASHBOARD_SERVER_URL,
+          this.serviceName + "/" + maybePayLoad[RemoveUserGroup.ID],
+          CallMethod.DELETE,
+          additionalHeaderProperties,
+          null,
+          true,
+          Destination.DASHBOARD
         );
+      } catch (exception) {
+        return new Promise((resolve) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
+          );
+        });
       }
     };
   }

@@ -2,9 +2,6 @@ import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-import { XQServices } from "../XQServicesEnum";
-
-import handleException from "../exceptions/handleException";
 
 /**
  * A service which is utilized to merge two or more valid access tokens (along with the access
@@ -38,8 +35,8 @@ export default class CombineAuthorizations extends XQModule {
   /** The field name representing the list of tokens to merge */
   static TOKENS: "tokens" = "tokens";
   /**
-   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
-   * @param {[String]} maybePayload.tokens - The list of tokens to merge
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {[String]} maybePayLoad.tokens - The list of tokens to merge
    * @returns {Promise<ServerResponse<{payload:{token:string, merged:long}}>>}
    */
   supplyAsync: (maybePayload: { tokens: string[] }) => Promise<ServerResponse>;
@@ -50,40 +47,32 @@ export default class CombineAuthorizations extends XQModule {
     this.serviceName = "combined";
     this.requiredFields = [CombineAuthorizations.TOKENS];
 
-    this.supplyAsync = (maybePayload) => {
+    this.supplyAsync = (maybePayLoad) => {
       try {
-        this.sdk.validateInput(maybePayload, this.requiredFields);
+        this.sdk.validateInput(maybePayLoad, this.requiredFields);
         const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };
-        return this.sdk
-          .call(
-            this.sdk.SUBSCRIPTION_SERVER_URL,
-            this.serviceName,
-            CallMethod.POST,
-            additionalHeaderProperties,
-            maybePayload,
-            true
-          )
-          .then((response: ServerResponse) => {
-            switch (response.status) {
-              case ServerResponse.OK: {
-                return response;
-              }
-              case ServerResponse.ERROR: {
-                return handleException(
-                  response,
-                  XQServices.CombineAuthorizations
-                );
-              }
-            }
-          });
-      } catch (exception) {
-        return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.CombineAuthorizations))
+        return this.sdk.call(
+          this.sdk.SUBSCRIPTION_SERVER_URL,
+          this.serviceName,
+          CallMethod.POST,
+          additionalHeaderProperties,
+          maybePayLoad,
+          true
         );
+      } catch (exception) {
+        return new Promise((resolve) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
+          );
+        });
       }
     };
   }

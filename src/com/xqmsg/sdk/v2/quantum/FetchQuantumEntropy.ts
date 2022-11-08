@@ -2,9 +2,6 @@ import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "../services/XQModule";
 import XQSDK from "../XQSDK";
-import { XQServices } from "../XQServicesEnum";
-
-import handleException from "../exceptions/handleException";
 
 /**
  * Fetches quantum entropy from the server. When the user makes the request,
@@ -24,7 +21,7 @@ export default class FetchQuantumEntropy extends XQModule {
   static _256: "256" = "256";
 
   /**
-   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
    * @param {String} ks -  The number of entropy bits to fetch
    * @returns {Promise<ServerResponse<{payload:{data:string}}>>}
    */
@@ -35,36 +32,30 @@ export default class FetchQuantumEntropy extends XQModule {
   constructor(sdk: XQSDK) {
     super(sdk);
 
-    this.supplyAsync = (maybePayload) => {
+    this.supplyAsync = (maybePayLoad) => {
       try {
         const additionalHeaderProperties = {
           [XQSDK.CONTENT_TYPE]: XQSDK.TEXT_PLAIN_UTF_8,
         };
 
-        return this.sdk
-          .call(
-            this.sdk.KEY_SERVER_URL,
-            null,
-            CallMethod.GET,
-            additionalHeaderProperties,
-            maybePayload,
-            false
-          )
-          .then((response: ServerResponse) => {
-            switch (response.status) {
-              case ServerResponse.OK: {
-                return response;
-              }
-              case ServerResponse.ERROR: {
-                return handleException(
-                  response,
-                  XQServices.FetchQuantumEntropy
-                );
-              }
-            }
-          });
+        return this.sdk.call(
+          this.sdk.KEY_SERVER_URL,
+          null,
+          CallMethod.GET,
+          additionalHeaderProperties,
+          maybePayLoad,
+          false
+        );
       } catch (exception) {
-        return handleException(exception, XQServices.FetchQuantumEntropy);
+        return new Promise((resolve) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
+          );
+        });
       }
     };
   }

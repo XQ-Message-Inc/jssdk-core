@@ -5,29 +5,44 @@ import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
 
 /**
- * A service which is utilized to retrieve a listing of dashboard applications associated with the user
+ * A service which is utilized to find a given dashboard's Contacts
  *
- * @class [GetApplications]
+ * @class [FindContacts]
  */
-export default class GetApplications extends XQModule {
+export default class FindContacts extends XQModule {
   /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
 
   /** Specified name of the service */
   serviceName: string;
 
-  /** The field name representing the list of apps returned by the `GetApplications` service */
-  static APPS: "apps" = "apps";
+  /** The field name representing the Contacts */
+  static CONTACTS: "contacts" = "contacts";
+
+  /** The field name representing the filter for the list of Contacts */
+  static FILTER: "filter" = "filter";
+
+  /** The field name representing the id */
+  static ID: "id" = "id";
+
+  /** The field name representing the limit of the list of Contacts */
+  static LIMIT: "limit" = "limit";
+
+  /** The field name representing the page of the list of Contacts */
+  static PAGE: "page" = "page";
+
+  /** The field name representing the role */
+  static ROLE: "role" = "role";
 
   /**
-   * @param {{}} [maybePayLoad=null]
-   * @returns {Promise<ServerResponse<{payload:{apps:[{id:int, name:string, description:string}]}}>>}
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @returns {Promise<ServerResponse<{payload:{groups:[{id:int, name:string, bid:int}]}}>>}
    */
   supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "devapps";
+    this.serviceName = "contact";
     this.requiredFields = [];
 
     this.supplyAsync = (maybePayLoad) => {

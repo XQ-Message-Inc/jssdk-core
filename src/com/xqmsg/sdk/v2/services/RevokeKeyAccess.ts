@@ -2,9 +2,6 @@ import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-import { XQServices } from "../XQServicesEnum";
-
-import handleException from "../exceptions/handleException";
 
 /**
  * A service which is utilized to revoke a key using a locator token.
@@ -20,58 +17,53 @@ export default class RevokeKeyAccess extends XQModule {
   serviceName: string;
 
   /** The field name representing the locator key */
-  static LOCATOR_KEYS: "locatorKeys" = "locatorKeys";
+  static LOCATOR_KEY: "locatorKey" = "locatorKey";
 
   /**
-   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
-   * @param {[String]} maybePayload.locatorKey - the locator key used as a URL to discover the key on the server.
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {[String]} maybePayLoad.locatorKey - the locator key used as a URL to discover the key on the server.
    * The URL encoding part is handled internally in the service itself
    * @see #encodeURIComponent function encodeURIComponent (built-in since ES-5)
    * @returns {Promise<ServerResponse<{}>>}
    */
   supplyAsync: (maybePayload: {
-    locatorKeys: string[];
+    locatorKey: string;
   }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
 
     this.serviceName = "key";
-    this.requiredFields = [RevokeKeyAccess.LOCATOR_KEYS];
+    this.requiredFields = [RevokeKeyAccess.LOCATOR_KEY];
 
-    this.supplyAsync = (maybePayload) => {
+    this.supplyAsync = (maybePayLoad) => {
       try {
-        this.sdk.validateInput(maybePayload, this.requiredFields);
+        this.sdk.validateInput(maybePayLoad, this.requiredFields);
         const accessToken = this.sdk.validateAccessToken();
-        const locatorKeys = maybePayload[RevokeKeyAccess.LOCATOR_KEYS];
+        const locatorKey = maybePayLoad[RevokeKeyAccess.LOCATOR_KEY];
 
         const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };
 
-        return this.sdk
-          .call(
-            this.sdk.VALIDATION_SERVER_URL,
-            this.serviceName,
-            CallMethod.DELETE,
-            additionalHeaderProperties,
-            { tokens: locatorKeys },
-            true
-          )
-          .then((response: ServerResponse) => {
-            switch (response.status) {
-              case ServerResponse.OK: {
-                return response;
-              }
-              case ServerResponse.ERROR: {
-                return handleException(response, XQServices.RevokeKeyAccess);
-              }
-            }
-          });
-      } catch (exception) {
-        return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.RevokeKeyAccess))
+        return this.sdk.call(
+          this.sdk.VALIDATION_SERVER_URL,
+          this.serviceName + "/" + encodeURIComponent(locatorKey),
+          CallMethod.OPTIONS,
+          additionalHeaderProperties,
+          null,
+          true
         );
+      } catch (exception) {
+        return new Promise((resolve) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
+          );
+        });
       }
     };
   }

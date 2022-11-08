@@ -3,9 +3,6 @@ import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
-import { XQServices } from "../../XQServicesEnum";
-
-import handleException from "../../exceptions/handleException";
 
 /**
  * A service which is utilized to remove an existing Contact
@@ -23,22 +20,20 @@ export default class RemoveContact extends XQModule {
   static ID: "id" = "id";
 
   /**
-   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
    * @param {String} id - the user id of the Contact that will be removed
-   * @returns {Promise<ServerResponse<{payload:{}}>>}
+   * @returns {Promise<ServerResponse<{payload:{id:int, status:string}}>>}
    */
-  supplyAsync: (maybePayload: {
-    [RemoveContact.ID]: string;
-  }) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: { id: string }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
     this.serviceName = "contact";
     this.requiredFields = [RemoveContact.ID];
 
-    this.supplyAsync = (maybePayload) => {
+    this.supplyAsync = (maybePayLoad) => {
       try {
-        this.sdk.validateInput(maybePayload, this.requiredFields);
+        this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
@@ -48,30 +43,25 @@ export default class RemoveContact extends XQModule {
           Authorization: "Bearer " + dashboardAccessToken,
         };
 
-        return this.sdk
-          .call(
-            this.sdk.DASHBOARD_SERVER_URL,
-            `${this.serviceName}/${maybePayload[RemoveContact.ID]}?delete=true`,
-            CallMethod.DELETE,
-            additionalHeaderProperties,
-            null,
-            true,
-            Destination.DASHBOARD
-          )
-          .then(async (response: ServerResponse) => {
-            switch (response.status) {
-              case ServerResponse.OK: {
-                return response;
-              }
-              case ServerResponse.ERROR: {
-                return handleException(response, XQServices.RemoveContact);
-              }
-            }
-          });
-      } catch (exception) {
-        return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.RemoveContact))
+        return this.sdk.call(
+          this.sdk.DASHBOARD_SERVER_URL,
+          `${this.serviceName}/${maybePayLoad[RemoveContact.ID]}?delete=true`,
+          CallMethod.DELETE,
+          additionalHeaderProperties,
+          null,
+          true,
+          Destination.DASHBOARD
         );
+      } catch (exception) {
+        return new Promise((resolve) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
+          );
+        });
       }
     };
   }

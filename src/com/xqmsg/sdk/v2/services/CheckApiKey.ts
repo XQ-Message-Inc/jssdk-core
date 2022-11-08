@@ -2,9 +2,6 @@ import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-import { XQServices } from "../XQServicesEnum";
-
-import handleException from "../exceptions/handleException";
 
 /**
  * A service which is utilized to validate an API key and returns the scopes associated with it.
@@ -25,8 +22,8 @@ export default class CheckApiKey extends XQModule {
   static SCOPES: "scopes" = "scopes";
 
   /**
-   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
-   * @param {String} maybePayload.api-key - The API key whose scopes are to be checked
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
+   * @param {String} maybePayLoad.api-key - The API key whose scopes are to be checked
    *
    * @returns {Promise<ServerResponse<{payload:{scopes:[string]}}>>}
    */
@@ -37,38 +34,33 @@ export default class CheckApiKey extends XQModule {
     this.serviceName = "apikey";
     this.requiredFields = [CheckApiKey.API_KEY];
 
-    this.supplyAsync = (maybePayload) => {
+    this.supplyAsync = (maybePayLoad) => {
       try {
-        this.sdk.validateInput(maybePayload, this.requiredFields);
+        this.sdk.validateInput(maybePayLoad, this.requiredFields);
         const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };
 
-        return this.sdk
-          .call(
-            this.sdk.SUBSCRIPTION_SERVER_URL,
-            this.serviceName,
-            CallMethod.GET,
-            additionalHeaderProperties,
-            maybePayload,
-            true
-          )
-          .then((response: ServerResponse) => {
-            switch (response.status) {
-              case ServerResponse.OK: {
-                return response;
-              }
-              case ServerResponse.ERROR: {
-                return handleException(response, XQServices.CheckApiKey);
-              }
-            }
-          });
-      } catch (exception) {
-        return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.CheckApiKey))
+        return this.sdk.call(
+          this.sdk.SUBSCRIPTION_SERVER_URL,
+          this.serviceName,
+          CallMethod.GET,
+          additionalHeaderProperties,
+          maybePayLoad,
+          true
         );
+      } catch (exception) {
+        return new Promise((resolve) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
+          );
+        });
       }
     };
   }

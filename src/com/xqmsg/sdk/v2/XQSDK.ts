@@ -10,16 +10,10 @@ import StatusException from "./exceptions/StatusException";
 import ValidationException from "./exceptions/ValidationException";
 import XQSimpleCache from "./caching/XQSimpleCache";
 
-import handleException from "./exceptions/handleException";
-
-import memoryCache from "memory-cache";
-
-var XMLHttpRequest = require("xhr2");
-
-const DASHBOARD_SERVER_URL = "https://dashboard.xqmsg.net/v2";
-const KEY_SERVER_URL = "https://quantum.xqmsg.net/v2/";
 const SUBSCRIPTION_SERVER_URL = "https://subscription.xqmsg.net/v2";
 const VALIDATION_SERVER_URL = "https://validation.xqmsg.net/v2";
+const KEY_SERVER_URL = "https://quantum.xqmsg.net/v2/";
+const DASHBOARD_SERVER_URL = "https://dashboard.xqmsg.net/v2";
 
 interface XQSDKProps {
   /** A string representing the AES encryption algorithm */
@@ -167,44 +161,25 @@ class XQSDK {
   static TEXT_PLAIN_UTF_8: "text/plain;charset=UTF-8" =
     "text/plain;charset=UTF-8";
 
-  constructor(
-    credentials: { XQ_API_KEY: string; DASHBOARD_API_KEY: string },
-    serverConfig?: {
-      DASHBOARD_SERVER_URL?: string;
-      KEY_SERVER_URL?: string;
-      SUBSCRIPTION_SERVER_URL?: string;
-      VALIDATION_SERVER_URL?: string;
-    }
-  ) {
-    /** The required API keys to utilize XQ Services */
-    const credentialConfiguration = {
-      XQ_API_KEY: credentials.XQ_API_KEY,
-      DASHBOARD_API_KEY: credentials.DASHBOARD_API_KEY,
-    };
-
-    /** The parameterized server URLs */
-    const serverConfiguration = {
-      SUBSCRIPTION_SERVER_URL:
-        serverConfig?.SUBSCRIPTION_SERVER_URL || SUBSCRIPTION_SERVER_URL,
-      DASHBOARD_SERVER_URL:
-        serverConfig?.DASHBOARD_SERVER_URL || DASHBOARD_SERVER_URL,
-      KEY_SERVER_URL: serverConfig?.KEY_SERVER_URL || KEY_SERVER_URL,
-      VALIDATION_SERVER_URL:
-        serverConfig?.VALIDATION_SERVER_URL || VALIDATION_SERVER_URL,
-    };
+  constructor(credentials: { XQ_API_KEY: string; DASHBOARD_API_KEY: string }) {
+    const { XQ_API_KEY, DASHBOARD_API_KEY } = credentials;
 
     const config = {
       application: {
-        ...credentialConfiguration,
-        ...serverConfiguration,
+        XQ_API_KEY,
+        DASHBOARD_API_KEY,
+        SUBSCRIPTION_SERVER_URL,
+        VALIDATION_SERVER_URL,
+        KEY_SERVER_URL,
+        DASHBOARD_SERVER_URL,
       },
     };
 
     this.XQ_API_KEY = config.application.XQ_API_KEY;
     this.DASHBOARD_API_KEY = config.application.DASHBOARD_API_KEY;
 
-    this.cache = new XQSimpleCache(memoryCache);
-    this.OTPv2_ALGORITHM = "OTPv2";
+    this.cache = new XQSimpleCache(localStorage);
+    this.OTPv2_ALGORITHM = "OTPV2";
     this.AES_ALGORITHM = "AES";
 
     this.SUBSCRIPTION_SERVER_URL = config.application.SUBSCRIPTION_SERVER_URL;
@@ -345,8 +320,12 @@ class XQSDK {
                     try {
                       dataMap = JSON.parse(responseString.replace(/\n/g, ""));
                     } catch (e) {
-                      return new Promise((resolve) =>
-                        resolve(handleException(e))
+                      return resolve(
+                        new ServerResponse(
+                          ServerResponse.ERROR,
+                          this.status,
+                          e.errorText
+                        )
                       );
                     }
                     return resolve(
@@ -380,9 +359,7 @@ class XQSDK {
         };
         if (
           maybePayload &&
-          [CallMethod.POST, CallMethod.PATCH, CallMethod.DELETE].includes(
-            method
-          )
+          [CallMethod.POST, CallMethod.PATCH].includes(method)
         ) {
           if (
             maybeHeaderProperties != null &&
@@ -455,12 +432,20 @@ class XQSDK {
     };
 
     this.validatePreAuthToken = () => {
-      const preAuthToken = this.cache.getXQPreAuthToken();
+      // Ensure that there is an active profile.
+      const activeProfile = this.cache.getActiveProfile(true);
 
-      if (!preAuthToken) {
-        throw new StatusException(401, `Pre-authorization token not found`);
+      if (activeProfile == null) {
+        throw new StatusException(401, `No active profile found`);
       }
 
+      const preAuthToken = this.cache.getXQPreAuthToken(activeProfile);
+      if (preAuthToken == null) {
+        throw new StatusException(
+          401,
+          `Pre-authorization token not found for ${activeProfile}`
+        );
+      }
       return preAuthToken;
     };
 

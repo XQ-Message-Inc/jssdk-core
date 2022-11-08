@@ -3,9 +3,6 @@ import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
-import { XQServices } from "../../XQServicesEnum";
-
-import handleException from "../../exceptions/handleException";
 
 /**
  * A service which is utilized to update a grouping of dashboard users
@@ -29,7 +26,7 @@ export default class UpdateUserGroup extends XQModule {
   static NAME: "name" = "name";
 
   /**
-   * @param {Map} maybePayload - the container for the request parameters supplied to this method.
+   * @param {Map} maybePayLoad - Container for the request parameters supplied to this method.
    * @param {String} id - the id of the user group to be updated
    * @param {String} name - the updated name of the user group
    * @param {String} members - the updated members of the user group
@@ -46,9 +43,9 @@ export default class UpdateUserGroup extends XQModule {
     this.serviceName = "usergroup";
     this.requiredFields = [UpdateUserGroup.ID];
 
-    this.supplyAsync = (maybePayload) => {
+    this.supplyAsync = (maybePayLoad) => {
       try {
-        this.sdk.validateInput(maybePayload, this.requiredFields);
+        this.sdk.validateInput(maybePayLoad, this.requiredFields);
 
         const dashboardAccessToken = this.sdk.validateAccessToken(
           Destination.DASHBOARD
@@ -59,34 +56,29 @@ export default class UpdateUserGroup extends XQModule {
         };
 
         const payload = {
-          [UpdateUserGroup.NAME]: maybePayload[UpdateUserGroup.NAME],
-          [UpdateUserGroup.MEMBERS]: maybePayload[UpdateUserGroup.MEMBERS],
+          [UpdateUserGroup.NAME]: maybePayLoad[UpdateUserGroup.NAME],
+          [UpdateUserGroup.MEMBERS]: maybePayLoad[UpdateUserGroup.MEMBERS],
         };
 
-        return this.sdk
-          .call(
-            this.sdk.DASHBOARD_SERVER_URL,
-            this.serviceName + "/" + maybePayload[UpdateUserGroup.ID],
-            CallMethod.PATCH,
-            additionalHeaderProperties,
-            payload,
-            true,
-            Destination.DASHBOARD
-          )
-          .then(async (response: ServerResponse) => {
-            switch (response.status) {
-              case ServerResponse.OK: {
-                return response;
-              }
-              case ServerResponse.ERROR: {
-                return handleException(response, XQServices.UpdateUserGroup);
-              }
-            }
-          });
-      } catch (exception) {
-        return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.UpdateUserGroup))
+        return this.sdk.call(
+          this.sdk.DASHBOARD_SERVER_URL,
+          this.serviceName + "/" + maybePayLoad[UpdateUserGroup.ID],
+          CallMethod.PATCH,
+          additionalHeaderProperties,
+          payload,
+          true,
+          Destination.DASHBOARD
         );
+      } catch (exception) {
+        return new Promise((resolve) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
+          );
+        });
       }
     };
   }

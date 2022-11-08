@@ -1,12 +1,7 @@
-import jwtDecode, { JwtPayload } from "jwt-decode";
-
 import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-import { XQServices } from "../XQServicesEnum";
-
-import handleException from "../exceptions/handleException";
 
 /**
  *  A service which is utilized to exchange a temporary access token with a real access token used in all secured XQ Message interactions
@@ -16,7 +11,7 @@ export default class ExchangeForAccessToken extends XQModule {
   serviceName: string;
   requiredFields: string[];
   /**
-   * @param {Map} [maybePayload=null] - Container for the request parameters supplied to this method.
+   * @param {Map} [maybePayLoad=null] - Container for the request parameters supplied to this method.
    *
    * @returns {Promise<ServerResponse<{payload:String}>>}
    */
@@ -27,10 +22,8 @@ export default class ExchangeForAccessToken extends XQModule {
     this.serviceName = "exchange";
     this.requiredFields = [];
 
-    this.supplyAsync = (maybePayload) => {
+    this.supplyAsync = (maybePayLoad) => {
       try {
-        this.sdk.validateInput(maybePayload, this.requiredFields);
-
         const self = this;
 
         const preAuthToken = this.sdk.validatePreAuthToken();
@@ -45,33 +38,34 @@ export default class ExchangeForAccessToken extends XQModule {
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
-            maybePayload,
+            maybePayLoad,
             true
           )
-          .then((response: ServerResponse) => {
-            switch (response.status) {
+          .then((exchangeResponse: ServerResponse) => {
+            switch (exchangeResponse.status) {
               case ServerResponse.OK: {
-                const accessToken = response.payload;
-                const decodedIncomingAccessToken: JwtPayload =
-                  jwtDecode(accessToken);
-                const profile = decodedIncomingAccessToken.sub || "";
-
-                self.cache.putXQAccess(profile, accessToken);
-                self.cache.removeXQPreAuthToken();
-                return response;
+                const accessToken = exchangeResponse.payload;
+                try {
+                  const activeProfile = self.cache.getActiveProfile(true);
+                  self.cache.putXQAccess(activeProfile, accessToken);
+                  self.cache.removeXQPreAuthToken(activeProfile);
+                  return exchangeResponse;
+                } catch (e) {
+                  console.log(e.message);
+                  return null;
+                }
               }
-              case ServerResponse.ERROR: {
-                return handleException(
-                  response,
-                  XQServices.ExchangeForAccessToken
-                );
+              default: {
+                return exchangeResponse;
               }
             }
           });
-      } catch (exception) {
-        return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.ExchangeForAccessToken))
-        );
+      } catch (exc) {
+        return new Promise((resolve) => {
+          resolve(
+            new ServerResponse(ServerResponse.ERROR, exc.code, exc.reason)
+          );
+        });
       }
     };
   }

@@ -1,6 +1,6 @@
 {
   "name": "@xqmsg/jssdk-core",
-  "version": "1.9.0",
+  "version": "1.0.15",
   "description": "A Javascript Implementation of XQ Message SDK, V.2",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -17,13 +17,11 @@
     "build": "concurrently \"webpack --config webpack.config.js\" \"tsc -p tsconfig-esm.json\" \"tsc -p tsconfig-cjs.json\"",
     "lint": "eslint src/**  --ext .ts",
     "clean": "rm -rf node_modules && rm -rf dist",
-    "test": "jest",
-    "npm-publish": "yarn build && npm publish --access public",
-    "yalc-publish": "yarn build && yalc publish"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/XQ-Message-Inc/jssdk-core.git"
+    "url": "git+https://github.com/xqmsg/jssdk-core.git"
   },
   "keywords": [
     "security",
@@ -41,13 +39,14 @@
   "author": "XQ Message",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/XQ-Message-Inc/jssdk-core/issues"
+    "url": "https://github.com/xqmsg/jssdk-core/issues"
   },
-  "homepage": "https://github.com/XQ-Message-Inc/jssdk-core#readme",
+  "homepage": "https://github.com/xqmsg/jssdk-core#readme",
   "devDependencies": {
+    "@babel/core": "^7.14.2",
+    "@babel/preset-env": "^7.14.2",
     "@types/crypto-js": "^4.0.1",
     "@types/jest": "^26.0.23",
-    "@types/memory-cache": "^0.2.1",
     "@types/node": "^15.6.0",
     "@typescript-eslint/eslint-plugin": "4.26.0",
     "@typescript-eslint/parser": "4.26.0",
@@ -67,10 +66,6 @@
     "webpack-cli": "^4.2.0"
   },
   "dependencies": {
-    "buffer": "^6.0.3",
-    "crypto-js": "3.1.9-1",
-    "jwt-decode": "^3.1.2",
-    "memory-cache": "^0.2.0",
-    "xhr2": "^0.2.1"
+    "crypto-js": "3.1.9-1"
   }
 }

@@ -2,9 +2,6 @@ import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-import { XQServices } from "../XQServicesEnum";
-
-import handleException from "../exceptions/handleException";
 
 /**
  * A service which is utilized to retrieve the notification and newsletter settings for the current user.
@@ -25,7 +22,7 @@ export default class GetSettings extends XQModule {
   static NOTIFICATIONS: "notifications" = "notifications";
 
   /**
-   * @param {{}} [maybePayload=null]
+   * @param {{}} [maybePayLoad=null]
    * @returns {Promise<ServerResponse<{payload:{notifications:NotificationEnum.options, newsLetter:boolean}}>>}
    */
   supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
@@ -35,39 +32,32 @@ export default class GetSettings extends XQModule {
     this.serviceName = "settings";
     this.requiredFields = [];
 
-    this.supplyAsync = (maybePayload) => {
+    this.supplyAsync = (maybePayLoad) => {
       try {
-        this.sdk.validateInput(maybePayload, this.requiredFields);
-
         const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };
 
-        return this.sdk
-          .call(
-            this.sdk.SUBSCRIPTION_SERVER_URL,
-            this.serviceName,
-            CallMethod.GET,
-            additionalHeaderProperties,
-            maybePayload,
-            true
-          )
-          .then((response: ServerResponse) => {
-            switch (response.status) {
-              case ServerResponse.OK: {
-                return response;
-              }
-              case ServerResponse.ERROR: {
-                return handleException(response, XQServices.GetSettings);
-              }
-            }
-          });
-      } catch (exception) {
-        return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GetSettings))
+        return this.sdk.call(
+          this.sdk.SUBSCRIPTION_SERVER_URL,
+          this.serviceName,
+          CallMethod.GET,
+          additionalHeaderProperties,
+          maybePayLoad,
+          true
         );
+      } catch (exception) {
+        return new Promise((resolve) => {
+          resolve(
+            new ServerResponse(
+              ServerResponse.ERROR,
+              exception.code,
+              exception.reason
+            )
+          );
+        });
       }
     };
   }
