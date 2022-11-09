@@ -57,7 +57,7 @@ export default class ExchangeForAccessToken extends XQModule {
                 const profile = decodedIncomingAccessToken.sub || "";
 
                 self.cache.putXQAccess(profile, accessToken);
-                self.cache.removeXQPreAuthToken();
+                self.cache.removeXQPreAuthToken(profile);
                 return response;
               }
               case ServerResponse.ERROR: {

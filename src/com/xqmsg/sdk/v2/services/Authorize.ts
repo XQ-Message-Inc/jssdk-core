@@ -121,8 +121,8 @@ export default class Authorize extends XQModule {
           .then((response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
-                const preAuthToken = response.payload;
-                self.cache.putXQPreAuthToken(preAuthToken);
+                const temporaryAccessToken = response.payload;
+                self.cache.putXQPreAuthToken(user, temporaryAccessToken);
                 return response;
               }
               case ServerResponse.ERROR: {

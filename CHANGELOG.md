@@ -5,20 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.9.0] - 2022-08-01
-
-### Addition
-- Add `GetTrustedRanges`, a service used to fetch all the address ranges for a team that are trusted
-
-## [1.8.0] - 2022-06-28
-
-### Addition
-- Add `GetWorkspaces`, a service used to fetch all workspaces a given user is a part of. 
-
-## [1.7.6] - 2022-06-22
-### Modification
-- BUGFIX: In the last update in `v1.7.5` we altered the pre-auth process (`Authorize` -> `CodeValidator` -> `ExchangeForAccessToken`). Since we do not add an active profile until the user is fully authenticated we need to account for this in `CodeValidator` which uses the `validatePreAuthToken` fn to ensure their is an available pre-auth token. Apart of `validatePreAuthToken` also checks for an active profile, which now doesn't exist until the user is fully authenticated. We now simply check solely for an available pre-auth token.
-
 ## [1.7.5] - 2022-06-21
 ### Modification
 - Move `putActiveProfile` call from `Authorize` service to `ExchangeForAccessToken` service. Since the authorization process is two-steps, we only add the active profile when the user is fully confirmed. Currently the only other service that uses `ExchangeForAccessToken` is the `CodeValidator` service, which is the second phase of the full authorization process.
@@ -36,7 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.7.2] - 2022-06-03
 ### Modification
 - Modify due to build issue, republish at a bumped version
-- 
+
 ## [1.7.1] - 2022-06-03
 
 ### Addition
@@ -51,15 +37,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Addition
 - Add `ValidateSession` service which consumes the `/session` endpoint. This is used to determine the validity of the XQ Dashboard session
 ### Modification
+
 - Error handling updates: Modified `catch` block of `trycatch` utilized in each service. Added `handleException` function used to return the `ServerResponse` or create one.
 
-## [1.6.0] - 2022-05-16
+## [1.7.0] - 2022-06-01
+
+### Addition
+- Add `ValidateSession` service which consumes the `/session` endpoint. This is used to determine the validity of the XQ Dashboard session
+### Modification
+
+- Error handling updates: Modified `catch` block of `trycatch` utilized in each service. Added `handleException` function used to return the `ServerResponse` or create one.
+
+## [1.6.0] - 2022-04-18
 
 ### Addition
 - Add CRUD operations for businesses, including `AddBusiness`, `GetCurrentBusiness`, and `UpdateBusiness`.
-- Add CRUD operations for applications, including `AddApplication`, `RemoveApplication`, and `UpdateApplication`.
 
+- Add CRUD operations for applications, including `AddApplication`, `RemoveApplication`, and `UpdateApplication`.
 ### Modification
+
 - Update the `README.md` documentation file to reflect recent changes to the sdk.
 
 ## [1.5.3] - 2022-04-18
