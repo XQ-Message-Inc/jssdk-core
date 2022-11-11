@@ -20,42 +20,42 @@ export default class RevokeKeyAccess extends XQModule {
   serviceName: string;
 
   /** The field name representing the locator key */
-  static LOCATOR_KEYS: "locatorKeys" = "locatorKeys";
+  static LOCATOR_TOKENS: "tokens" = "tokens";
 
   /**
    * @param {Map} maybePayload - the container for the request parameters supplied to this method.
-   * @param {[String]} maybePayload.locatorKey - the locator key used as a URL to discover the key on the server.
+   * @param {[String]} maybePayload.tokens - the tokens used to discover the key on the server.
    * The URL encoding part is handled internally in the service itself
    * @see #encodeURIComponent function encodeURIComponent (built-in since ES-5)
    * @returns {Promise<ServerResponse<{}>>}
    */
-  supplyAsync: (maybePayload: {
-    locatorKeys: string[];
-  }) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: { tokens:  string[] }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
 
     this.serviceName = "key";
-    this.requiredFields = [RevokeKeyAccess.LOCATOR_KEYS];
+    this.requiredFields = [RevokeKeyAccess.LOCATOR_TOKENS];
 
     this.supplyAsync = (maybePayload) => {
       try {
         this.sdk.validateInput(maybePayload, this.requiredFields);
         const accessToken = this.sdk.validateAccessToken();
-        const locatorKeys = maybePayload[RevokeKeyAccess.LOCATOR_KEYS];
+        const locatorTokens = maybePayload[RevokeKeyAccess.LOCATOR_TOKENS];
 
         const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };
 
+        const payload = {[RevokeKeyAccess.LOCATOR_TOKENS]:locatorTokens}
+
         return this.sdk
           .call(
             this.sdk.VALIDATION_SERVER_URL,
-            this.serviceName,
+            this.serviceName ,
             CallMethod.DELETE,
             additionalHeaderProperties,
-            { tokens: locatorKeys },
+            payload,
             true
           )
           .then((response: ServerResponse) => {

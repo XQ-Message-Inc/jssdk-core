@@ -68,7 +68,7 @@ describe("Testing manual key management", () => {
   it(`should successfully generate and fetch key packet`, async () =>
     expect(
       await authorizeUser(testEmail).then((userResponse) => {
-        switch (userResponse.status) {
+        switch (userResponse?.status) {
           case ServerResponse.OK: {
             return generatePacket().then((keyResponse) => {
               if (!keyResponse) {
@@ -85,7 +85,7 @@ describe("Testing manual key management", () => {
               }
             });
           }
-          case ServerResponse.ERROR: {
+          default: {
             return false;
           }
         }

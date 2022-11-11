@@ -67,7 +67,9 @@ export default class FetchKey extends XQModule {
             switch (response.status) {
               case ServerResponse.OK: {
                 let key = response.payload;
-                if (key.startsWith(".")) key = key.substr(2);
+                if (key.startsWith(".")) {
+                  key = key.substr(2);
+                }
                 return new ServerResponse(ServerResponse.OK, 200, key);
               }
               case ServerResponse.ERROR: {

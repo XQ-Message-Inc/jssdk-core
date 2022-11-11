@@ -18,7 +18,7 @@ export default class UpdateSettings extends XQModule {
   serviceName: string;
 
   /** The field name which represents the boolean indicating whether the user receive notifications or not */
-  static NEWSLETTER: "newsLetter" = "newsLetter";
+  static NEWSLETTER: "newsletter" = "newsletter";
 
   /** The field name which the boolean indicating whether the user receive newsletters or not. This is only valid for new users, and is ignored if the user already exists */
   static NOTIFICATIONS: "notifications" = "notifications";
@@ -26,7 +26,7 @@ export default class UpdateSettings extends XQModule {
   /**
    *
    * @param {Map} maybePayload - the container for the request parameters supplied to this method.
-   * @param {boolean} maybePayload.newsLetter - the boolean indicating whether the user receive newsletters or not. This is only valid for new users, and is ignored if the user already exists
+   * @param {boolean} maybePayload.newsletter - the boolean indicating whether the user receive newsletters or not. This is only valid for new users, and is ignored if the user already exists
    * @param {NotificationEnum.options} maybePayload.notifications - the boolean indicating whether the user receive notifications or not
    * @returns {Promise<ServerResponse<{}>>}
    */
@@ -39,7 +39,7 @@ export default class UpdateSettings extends XQModule {
     super(sdk);
 
     this.serviceName = "settings";
-    this.requiredFields = [];
+    this.requiredFields = [UpdateSettings.NEWSLETTER, UpdateSettings.NOTIFICATIONS];
 
     this.supplyAsync = (maybePayload) => {
       try {

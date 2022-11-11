@@ -8,7 +8,7 @@ import { XQServices } from "../../XQServicesEnum";
 import handleException from "../../exceptions/handleException";
 
 /**
- * Log into Dashboard Application<br>
+ * Log into Dashboard Application using the xq access token <br>
  * This requires you to previously have been authorized via <br>
  *   * {@link Authorize}
  *   * {@link ValidatePacket}

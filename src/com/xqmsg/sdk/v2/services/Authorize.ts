@@ -123,6 +123,8 @@ export default class Authorize extends XQModule {
               case ServerResponse.OK: {
                 const preAuthToken = response.payload;
                 self.cache.putXQPreAuthToken(preAuthToken);
+                self.cache.putActiveProfile(user);
+
                 return response;
               }
               case ServerResponse.ERROR: {
