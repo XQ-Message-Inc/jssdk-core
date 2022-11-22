@@ -30,10 +30,10 @@ export default class CombineAuthorizations extends XQModule {
   serviceName: string;
 
   /** The field name representing the merged token */
-  static MERGED_TOKEN: "token" = "token";
+  static TOKEN: "token" = "token";
 
-  /** The field name representing the number of tokens that were successfully merged into the token */
-  static MERGE_COUNT: "merged" = "merged";
+  /** The field name representing an array of invalid tokens */
+  static INVALID: "invalid" = "invalid";
 
   /** The field name representing the list of tokens to merge */
   static TOKENS: "tokens" = "tokens";

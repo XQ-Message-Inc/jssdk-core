@@ -20,7 +20,8 @@ export default class DashboardLogin extends XQModule {
   /** Specified name of the service */
   serviceName: string;
 
-  /** The field name representing the service name */
+  /** The field name represe
+   * nting the service name */
   static LOGIN: "login" = "login";
 
   /** The field name representing the authenticated pwd */

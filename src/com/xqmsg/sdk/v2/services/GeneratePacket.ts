@@ -18,6 +18,10 @@ export interface IGeneratePacketParams {
 /**
  * A service which is utilized to generate an encrypted packet containing the encryption key that you want to
  * protect along with a list of the identities that are allowed to access it and how long it is allowed to be used.
+ * Internally, 2 service calls are performed:
+ *  1 generate the packet
+ *  2 after validation, add it to the server,
+ *
  * @class [GeneratePacket]
  */
 
@@ -67,6 +71,7 @@ export default class GeneratePacket extends XQModule {
       GeneratePacket.KEY,
       GeneratePacket.RECIPIENTS,
       GeneratePacket.EXPIRES_HOURS,
+      GeneratePacket.TYPE,
     ];
 
     this.supplyAsync = (maybePayload) => {

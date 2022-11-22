@@ -42,9 +42,7 @@ export default class RevokeUserAccess extends XQModule {
 
     this.serviceName = "revoke";
     this.requiredFields = [
-      RevokeUserAccess.RECIPIENTS,
-      RevokeUserAccess.LOCATOR_KEY,
-    ];
+      RevokeUserAccess.RECIPIENTS];
 
     this.supplyAsync = (maybePayload) => {
       try {
@@ -53,13 +51,11 @@ export default class RevokeUserAccess extends XQModule {
 
         const locatorKey = maybePayload[RevokeUserAccess.LOCATOR_KEY];
 
-        const flattenedRecipientList =
-          maybePayload[RevokeUserAccess.RECIPIENTS].join(",");
+        const recipients =  maybePayload[RevokeUserAccess.RECIPIENTS];
 
         const payload = {
-          ...maybePayload,
-          [RevokeUserAccess.RECIPIENTS]: flattenedRecipientList,
-        };
+          [RevokeUserAccess.RECIPIENTS]:recipients,
+        }
 
         const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,

@@ -39,6 +39,7 @@ import AddBusiness from "./com/xqmsg/sdk/v2/services/dashboard/AddBusiness";
 import AddContact from "./com/xqmsg/sdk/v2/services/dashboard/AddContact";
 import AddUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/AddUserGroup";
 import DashboardLogin from "./com/xqmsg/sdk/v2/services/dashboard/DashboardLogin";
+import DashboardLoginVerify from "./com/xqmsg/sdk/v2/services/dashboard/DashboardLoginVerify";
 import DisableContact from "./com/xqmsg/sdk/v2/services/dashboard/DisableContact";
 import FindUserGroups from "./com/xqmsg/sdk/v2/services/dashboard/FindUserGroups";
 import GetApplications from "./com/xqmsg/sdk/v2/services/dashboard/GetApplications";
@@ -74,6 +75,7 @@ export {
   CombineAuthorizations,
   CommunicationsEnum,
   DashboardLogin,
+  DashboardLoginVerify,
   Decrypt,
   DeleteAuthorization,
   DeleteSubscriber,

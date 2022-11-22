@@ -51,12 +51,10 @@ export default class GrantUserAccess extends XQModule {
         this.sdk.validateInput(maybePayload, this.requiredFields);
         const accessToken = this.sdk.validateAccessToken();
 
-        const flattenedRecipientList =
-          maybePayload[GrantUserAccess.RECIPIENTS].join(",");
+        const recipientList = maybePayload[GrantUserAccess.RECIPIENTS];
 
         const payload = {
-          ...maybePayload,
-          [GrantUserAccess.RECIPIENTS]: flattenedRecipientList,
+          [GrantUserAccess.RECIPIENTS]: recipientList,
         };
 
         const additionalHeaderProperties = {

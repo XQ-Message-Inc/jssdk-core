@@ -15,7 +15,7 @@ interface IFileEncryptParams {
   recipients: string[];
   expires: number;
   dor: boolean;
-  type?: CommunicationsEnum;
+  // type?: CommunicationsEnum;
   meta?: Record<string, unknown>;
 }
 
@@ -56,7 +56,7 @@ export default class FileEncrypt extends XQModule {
   static TEXT: "text" = "text";
 
   /** The field name representing the type of communication that the user is encrypting (ex. File, Email, Chat, etc.) */
-  static TYPE: "type" = "type";
+  // static TYPE: "type" = "type";
 
   /** The field name representing the arbitrary metadata the user would like to attach to the log of the encrypted payload */
   static META: "meta" = "meta";
@@ -95,8 +95,6 @@ export default class FileEncrypt extends XQModule {
         const recipients = maybePayload[FileEncrypt.RECIPIENTS];
         const sourceFile = maybePayload[FileEncrypt.SOURCE_FILE];
 
-        const type =
-          maybePayload[FileEncrypt.TYPE] ?? CommunicationsEnum.UNKNOWN;
         const meta = maybePayload[FileEncrypt.META] ?? null;
 
         return new FetchQuantumEntropy(sdk)
@@ -120,7 +118,7 @@ export default class FileEncrypt extends XQModule {
                     [FileEncrypt.DELETE_ON_RECEIPT]: deleteOnReceipt
                       ? deleteOnReceipt
                       : false,
-                    [GeneratePacket.TYPE]: type,
+                    [GeneratePacket.TYPE]: CommunicationsEnum.FILE,
                     [GeneratePacket.META]: meta,
                   })
                   .then((response) => {

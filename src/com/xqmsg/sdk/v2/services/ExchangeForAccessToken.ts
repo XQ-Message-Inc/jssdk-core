@@ -8,6 +8,8 @@ import { XQServices } from "../XQServicesEnum";
 
 import handleException from "../exceptions/handleException";
 
+
+
 /**
  *  A service which is utilized to exchange a temporary access token with a real access token used in all secured XQ Message interactions
  *  @class [ExchangeForAccessToken]
@@ -20,7 +22,7 @@ export default class ExchangeForAccessToken extends XQModule {
    *
    * @returns {Promise<ServerResponse<{payload:String}>>}
    */
-  supplyAsync: (maybePayload: null) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload:null) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -29,7 +31,7 @@ export default class ExchangeForAccessToken extends XQModule {
 
     this.supplyAsync = (maybePayload) => {
       try {
-        this.sdk.validateInput(maybePayload, this.requiredFields);
+        this.sdk.validateInput({}, this.requiredFields);
 
         const self = this;
 

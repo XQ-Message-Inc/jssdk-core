@@ -19,7 +19,7 @@ export default class GetCurrentUser extends XQModule {
   /** Specified name of the service */
   serviceName: string;
 
-  /** The field name repreesnting the service name */
+  /** The field name representing the service name */
   static CONTACT: "contact" = "contact";
 
   /**
