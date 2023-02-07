@@ -1,8 +1,16 @@
 import {
-  AESAlgorithm,
+  AuthorizeAlias,
+  Decrypt,
+  Encrypt,
+  EncryptionAlgorithm,
+  ServerResponse,
+} from "../src";
+
+import {
+  GCMAlgorithm,
   IDecryptParams,
   IEncryptParams,
-  OTPv2Algorithm,
+  OTPAlgorithm,
   ensureCredentialsPresent,
   sdk,
   testEmail,
@@ -10,13 +18,6 @@ import {
   testToSucceedEncryptionPayload,
 } from "./utils/setupFiles";
 
-import {
-  AuthorizeAlias,
-  Decrypt,
-  Encrypt,
-  EncryptionAlgorithm,
-  ServerResponse,
-} from "../src";
 
 describe("Testing `Decrypt` service", () => {
   // Step 1. Authorize User
@@ -107,12 +108,12 @@ describe("Testing `Decrypt` service", () => {
 
   it(`should successfully encrypt the given text via AES algorithm`, async () =>
     expect(
-      await testDecrypt(testToSucceedEncryptionPayload, AESAlgorithm)
+      await testDecrypt(testToSucceedEncryptionPayload, GCMAlgorithm)
     ).toEqual(true));
 
-  it(`should successfully encrypt the given text via OTPv2 algorithm`, async () =>
+  it(`should successfully encrypt the given text via OTP algorithm`, async () =>
     expect(
-      await testDecrypt(testToSucceedEncryptionPayload, OTPv2Algorithm)
+      await testDecrypt(testToSucceedEncryptionPayload, OTPAlgorithm)
     ).toEqual(true));
 
   it(`should fail to encrypt the given text via AES algorithm`, async () => {
@@ -120,18 +121,18 @@ describe("Testing `Decrypt` service", () => {
     console.error = jest.fn();
 
     expect(
-      await testDecrypt(testToFailEncryptionPayload, AESAlgorithm)
+      await testDecrypt(testToFailEncryptionPayload, GCMAlgorithm)
     ).toEqual(false);
 
     console.error = originalError;
   });
 
-  it(`should fail to encrypt the given text via OTPv2 algorithm`, async () => {
+  it(`should fail to encrypt the given text via OTP algorithm`, async () => {
     const originalError = console.error;
     console.error = jest.fn();
 
     expect(
-      await testDecrypt(testToFailEncryptionPayload, AESAlgorithm)
+      await testDecrypt(testToFailEncryptionPayload, GCMAlgorithm)
     ).toEqual(false);
 
     console.error = originalError;

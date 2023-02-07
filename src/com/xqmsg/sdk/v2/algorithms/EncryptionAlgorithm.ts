@@ -3,8 +3,8 @@ import XQSDK from "../XQSDK";
 
 /**
  * Super class for Encryption Algorithms supported by XQ Message:
- * * AESEncryption
- * * OTPv2Encryption
+ * * GCMEncryption
+ * * OTPEncryption
  *
  * @class [EncryptionAlgorithm]
  */

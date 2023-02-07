@@ -142,8 +142,7 @@ export default class Encrypt extends XQModule {
                             [Encrypt.ENCRYPTED_TEXT]: encryptedText,
                           });
                         }
-
-                        case ServerResponse.ERROR: {
+                        default: {
                           return handleException(response, XQServices.Encrypt);
                         }
                       }

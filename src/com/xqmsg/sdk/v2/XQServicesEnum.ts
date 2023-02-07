@@ -53,6 +53,8 @@ export enum XQServices {
 }
 
 export enum XQEncryptionAlgorithms {
-  AESEncryption = "AESEncryption",
-  OTPv2Encryption = "OTPv2Encryption",
+  GCMEncryption = "GCMEncryption",
+  OTPEncryption = "OTPEncryption",
+  CTREncryption = "CTREncryption",
+  NTVEncryption = "NTVEncryption",
 }

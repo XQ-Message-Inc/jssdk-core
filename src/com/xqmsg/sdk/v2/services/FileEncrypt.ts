@@ -10,12 +10,19 @@ import { XQServices } from "../XQServicesEnum";
 
 import handleException from "../exceptions/handleException";
 
+/**
+ * @typedef {IFileEncryptParams}
+ * @property {File} sourceFile
+ * @property {[string]} recipients
+ * @property {number} expires
+ * @property {boolean} [dor]
+ * @property {Record<string, unknown>} [meta]
+ */
 interface IFileEncryptParams {
   sourceFile: File;
   recipients: string[];
   expires: number;
-  dor: boolean;
-  // type?: CommunicationsEnum;
+  dor?: boolean;
   meta?: Record<string, unknown>;
 }
 
@@ -65,7 +72,7 @@ export default class FileEncrypt extends XQModule {
    * @param {Map} maybePayload - the container for the request parameters supplied to this method.
    * @param {File} maybePayload.sourceFile - The file to be encrypted.
    * @param {[String]} maybePayload.recipients  - List of emails of users intended to have read access to the encrypted content.
-   * @param {Long} maybePayload.expires - Life span of the encrypted content, measured in hours.
+   * @param {Number} maybePayload.expires - Life span of the encrypted content, measured in hours.
    * @param {Boolean} [maybePayload.dor=false] - Should the content be deleted after opening.
    * @param {String} maybePayload.type - an optional string value which specifies the type of communication the user is encrypting. Defaults to `unknown`
    * @param {Map} maybePayload.meta - an optional map value which can contain any arbitrary metadata the user wants
@@ -90,7 +97,8 @@ export default class FileEncrypt extends XQModule {
 
         const algorithm = this.algorithm;
         const sdk = this.sdk;
-        const deleteOnReceipt = maybePayload[FileEncrypt.DELETE_ON_RECEIPT];
+        const deleteOnReceipt =
+          maybePayload[FileEncrypt.DELETE_ON_RECEIPT] ?? false;
         const expiration = maybePayload[FileEncrypt.EXPIRES_HOURS];
         const recipients = maybePayload[FileEncrypt.RECIPIENTS];
         const sourceFile = maybePayload[FileEncrypt.SOURCE_FILE];
@@ -115,9 +123,7 @@ export default class FileEncrypt extends XQModule {
                     [FileEncrypt.KEY]: algorithm.prefix + expandedKey,
                     [FileEncrypt.RECIPIENTS]: recipients,
                     [FileEncrypt.EXPIRES_HOURS]: expiration,
-                    [FileEncrypt.DELETE_ON_RECEIPT]: deleteOnReceipt
-                      ? deleteOnReceipt
-                      : false,
+                    [FileEncrypt.DELETE_ON_RECEIPT]: deleteOnReceipt,
                     [GeneratePacket.TYPE]: CommunicationsEnum.FILE,
                     [GeneratePacket.META]: meta,
                   })
@@ -125,37 +131,34 @@ export default class FileEncrypt extends XQModule {
                     switch (response.status) {
                       case ServerResponse.OK: {
                         const locatorToken = response.payload;
-                        return algorithm
-                          .encryptFile(sourceFile, expandedKey, locatorToken)
-                          .then((response: ServerResponse) => {
-                            switch (response.status) {
-                              case ServerResponse.OK: {
-                                return response;
-                              }
-
-                              default: {
-                                throw response;
-                              }
-                            }
-                          });
+                        return algorithm.encryptFile(
+                          sourceFile,
+                          expandedKey,
+                          locatorToken
+                        );
                       }
                       default: {
-                        throw response;
+                        return Promise.resolve(
+                          handleException(response, XQServices.FileEncrypt)
+                        );
                       }
                     }
                   });
               }
               case ServerResponse.ERROR: {
-                return handleException(response, XQServices.FileEncrypt);
-              }
-              default: {
-                return handleException(response, XQServices.FileEncrypt);
+                return Promise.resolve(
+                  handleException(response, XQServices.FileEncrypt)
+                );
               }
             }
+
+            return Promise.resolve(
+              handleException(response, XQServices.FileEncrypt)
+            );
           });
       } catch (exception) {
-        return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.FileEncrypt))
+        return Promise.resolve(
+          handleException(exception, XQServices.FileEncrypt)
         );
       }
     };

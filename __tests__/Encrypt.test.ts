@@ -1,7 +1,7 @@
 import {
   AESAlgorithm,
   IEncryptParams,
-  OTPv2Algorithm,
+  OTPAlgorithm,
   ensureCredentialsPresent,
   sdk,
   testToSucceedEncryptionPayload,
@@ -84,8 +84,8 @@ describe("Testing `Encrypt` service", () => {
     expect(
       await testEncrypt(testToSucceedEncryptionPayload, AESAlgorithm)
     ).toEqual(true));
-  it(`should successfully encrypt the given text via OTPv2 algorithm`, async () =>
+  it(`should successfully encrypt the given text via OTP algorithm`, async () =>
     expect(
-      await testEncrypt(testToSucceedEncryptionPayload, OTPv2Algorithm)
+      await testEncrypt(testToSucceedEncryptionPayload, OTPAlgorithm)
     ).toEqual(true));
 });

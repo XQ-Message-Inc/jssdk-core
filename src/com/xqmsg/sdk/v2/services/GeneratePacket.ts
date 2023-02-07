@@ -91,19 +91,20 @@ export default class GeneratePacket extends XQModule {
           [GeneratePacket.RECIPIENTS]: flattenedRecipientList,
         };
 
-        return this.sdk
-          .call(
-            this.sdk.SUBSCRIPTION_SERVER_URL,
-            this.serviceName,
-            CallMethod.POST,
-            additionalHeaderProperties,
-            payload,
-            true
-          )
-          .then((response: ServerResponse) => {
-            switch (response.status) {
-              case ServerResponse.OK: {
-                return this.sdk.call(
+        const c = this.sdk.call(
+          this.sdk.SUBSCRIPTION_SERVER_URL,
+          this.serviceName,
+          CallMethod.POST,
+          additionalHeaderProperties,
+          payload,
+          true
+        );
+
+        const x = c.then((response: ServerResponse) => {
+          switch (response.status) {
+            case ServerResponse.OK: {
+              return this.sdk
+                .call(
                   this.sdk.VALIDATION_SERVER_URL,
                   this.serviceName,
                   CallMethod.POST,
@@ -113,13 +114,27 @@ export default class GeneratePacket extends XQModule {
                   },
                   { data: response.payload },
                   true
-                );
-              }
-              case ServerResponse.ERROR: {
-                return handleException(response, XQServices.GeneratePacket);
-              }
+                )
+                .then((response: ServerResponse) => {
+                  switch (response.status) {
+                    case ServerResponse.OK: {
+                      return response;
+                    }
+                    default: {
+                      return handleException(
+                        response,
+                        XQServices.GeneratePacket
+                      );
+                    }
+                  }
+                });
             }
-          });
+            case ServerResponse.ERROR: {
+              return handleException(response, XQServices.GeneratePacket);
+            }
+          }
+        });
+        return x;
       } catch (exception) {
         return new Promise((resolve) =>
           resolve(handleException(exception, XQServices.GeneratePacket))
