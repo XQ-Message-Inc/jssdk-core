@@ -1,5 +1,5 @@
 // noinspection JSAnnotator,JSUnusedGlobalSymbols,JSUnresolvedVariable
-/*eslint-disable no-undef*/
+/*eslint-disable*/
 
 // Web Crypto API
 import CryptoJS from "crypto-js";
@@ -13,87 +13,82 @@ function getPluginIdByPlatform() {
 }
 
 export const XQWebCrypto = {
-  derivationFn: "PBKDF2",
+
+  derivationFn: 'PBKDF2',
   version: 1,
   maxBuffer: 32000000, // max 32mb slices.
 
   base64Encode: function (arrayBuffer) {
-    let base64 = "";
-    const encodings =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    var base64 = ''
+    var encodings = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
 
-    const bytes = new Uint8Array(arrayBuffer);
-    const byteLength = bytes.byteLength;
-    const byteRemainder = byteLength % 3;
-    const mainLength = byteLength - byteRemainder;
+    var bytes = new Uint8Array(arrayBuffer)
+    var byteLength = bytes.byteLength
+    var byteRemainder = byteLength % 3
+    var mainLength = byteLength - byteRemainder
 
-    let a, b, c, d;
-    let chunk;
+    var a, b, c, d
+    var chunk
 
     // Main loop deals with bytes in chunks of 3
-    for (let i = 0; i < mainLength; i = i + 3) {
+    for (var i = 0; i < mainLength; i = i + 3) {
       // Combine the three bytes into a single integer
-      chunk = (bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2];
+      chunk = (bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2]
 
       // Use bitmasks to extract 6-bit segments from the triplet
-      a = (chunk & 16515072) >> 18; // 16515072 = (2^6 - 1) << 18
-      b = (chunk & 258048) >> 12; // 258048   = (2^6 - 1) << 12
-      c = (chunk & 4032) >> 6; // 4032     = (2^6 - 1) << 6
-      d = chunk & 63; // 63       = 2^6 - 1
+      a = (chunk & 16515072) >> 18 // 16515072 = (2^6 - 1) << 18
+      b = (chunk & 258048) >> 12 // 258048   = (2^6 - 1) << 12
+      c = (chunk & 4032) >> 6 // 4032     = (2^6 - 1) << 6
+      d = chunk & 63               // 63       = 2^6 - 1
 
       // Convert the raw binary segments to the appropriate ASCII encoding
-      base64 += encodings[a] + encodings[b] + encodings[c] + encodings[d];
+      base64 += encodings[a] + encodings[b] + encodings[c] + encodings[d]
     }
 
     // Deal with the remaining bytes and padding
     if (byteRemainder === 1) {
-      chunk = bytes[mainLength];
+      chunk = bytes[mainLength]
 
-      a = (chunk & 252) >> 2; // 252 = (2^6 - 1) << 2
+      a = (chunk & 252) >> 2 // 252 = (2^6 - 1) << 2
 
       // Set the 4 least significant bits to zero
-      b = (chunk & 3) << 4; // 3   = 2^2 - 1
+      b = (chunk & 3) << 4 // 3   = 2^2 - 1
 
-      base64 += encodings[a] + encodings[b] + "==";
+      base64 += encodings[a] + encodings[b] + '=='
     } else if (byteRemainder === 2) {
-      chunk = (bytes[mainLength] << 8) | bytes[mainLength + 1];
+      chunk = (bytes[mainLength] << 8) | bytes[mainLength + 1]
 
-      a = (chunk & 64512) >> 10; // 64512 = (2^6 - 1) << 10
-      b = (chunk & 1008) >> 4; // 1008  = (2^6 - 1) << 4
+      a = (chunk & 64512) >> 10 // 64512 = (2^6 - 1) << 10
+      b = (chunk & 1008) >> 4 // 1008  = (2^6 - 1) << 4
 
       // Set the 2 least significant bits to zero
-      c = (chunk & 15) << 2; // 15    = 2^4 - 1
+      c = (chunk & 15) << 2 // 15    = 2^4 - 1
 
-      base64 += encodings[a] + encodings[b] + encodings[c] + "=";
+      base64 += encodings[a] + encodings[b] + encodings[c] + '='
     }
 
-    return base64;
+    return base64
   },
 
+
   base64Decode: function (str) {
-    return new Uint8Array(
-      atob(str)
-        .split("")
-        .map((c) => c.charCodeAt(0))
-    );
+    return new Uint8Array(atob(str).split('').map(c => c.charCodeAt(0)));
   },
 
   createFileHeader: async function (filename, token, algorithm) {
-    const tokenSize = 43;
-    const tokenBytes = new TextEncoder().encode(token);
 
-    // Get the encrypted filename bytes ( string or Uint8Array )
-    const nameBytes =
-      typeof filename === "string"
-        ? new TextEncoder().encode(filename)
-        : filename;
+    var tokenSize = 43;
+    var tokenBytes = new TextEncoder().encode(token);
+
+    // Get the encrypted filename bytes ( string or Uint8array )
+    var nameBytes = (typeof filename === 'string') ? new TextEncoder().encode(filename) : filename;
 
     // Get the encrypted filename length
-    const nameSize = nameBytes.length;
-    let tail = 0;
+    var nameSize = nameBytes.length;
+    var tail = 0;
 
     //  Version Bytes (4), Token Length, Name Length (4), Name
-    const buffer = new Uint8Array(4 + tokenSize + 4 + nameSize + 1);
+    var buffer = new Uint8Array(4 + tokenSize + 4 + nameSize + 1);
 
     // Write the version number + token size (43)
     buffer.set(new Uint32Array([tokenSize + this.version]), tail);
@@ -117,18 +112,17 @@ export const XQWebCrypto = {
   },
 
   getFileHeader: async function (data) {
-    const view = data;
-    let tail = 0;
-    const tokenSize = 43;
-    const result = { version: this.version, length: 0 };
+
+    var view = data;
+    var tail = 0;
+    var tokenSize = 43;
+    var result = {version: this.version, length: 0};
 
     // Read the version.
-    const v = Uint32Array.from(view.slice(tail, tail + 4))[0] ?? 0;
-    result.version = v - tokenSize;
+    var v = Uint32Array.from(view.slice(tail, tail + 4))[0] ?? 0;
+    result.version = (v - tokenSize);
     if (result.version !== this.version && v !== tokenSize) {
-      console.warn(
-        "Cannot decrypt due to incompatible version: " + result.version
-      );
+      console.warn('Cannot decrypt due to incompatible version: ' + result.version);
       return result; // Incompatible version.
     }
 
@@ -136,7 +130,7 @@ export const XQWebCrypto = {
     result.token = new TextDecoder().decode(view.slice(tail, tail + tokenSize));
     tail += tokenSize;
 
-    const nameSize = Uint32Array.from(view.slice(tail, tail + 4))[0];
+    var nameSize = Uint32Array.from(view.slice(tail, tail + 4))[0];
     tail += 4;
 
     if (nameSize > 0) {
@@ -146,7 +140,7 @@ export const XQWebCrypto = {
       result.filename = "";
     }
     if (result.version > 0) {
-      // Skip over the scheme (only used in native SDK for now)
+      // Skip over the scheme (only used in native SDK for noww)
       //var scheme = view.slice(tail, tail + 1);
       //console.info("File Scheme: " + XQWebCrypto.auto.algorithmForScheme(scheme.toString()).algorithm);
       tail += 1;
@@ -156,78 +150,45 @@ export const XQWebCrypto = {
   },
 
   _getIV: function (ivLength, hash) {
-    const randomData = XQWebCrypto.base64Encode(
-      window.crypto.getRandomValues(new Uint8Array(ivLength))
-    );
-    return this._pbkdf2(
-      randomData,
-      new TextEncoder("utf-8").encode(new Date().getTime().toString()),
-      1,
-      ivLength,
-      hash
-    );
+    const randomData = XQWebCrypto.base64Encode(window.crypto.getRandomValues(new Uint8Array(ivLength)));
+    return this._pbkdf2(randomData, new TextEncoder('utf-8').encode(new Date().getTime().toString()),
+      1, ivLength, hash);
   },
 
-  _pbkdf2: async function (message, salt, iterations, keyLen, algorithm) {
-    const msgUint8Array = new TextEncoder("utf-8").encode(message);
-    const key = await crypto.subtle.importKey(
-      "raw",
-      msgUint8Array,
-      {
-        name: this.derivationFn,
-      },
-      false,
-      ["deriveBits"]
-    );
 
-    const buffer = await crypto.subtle.deriveBits(
-      {
-        name: this.derivationFn,
-        salt: salt,
-        iterations: iterations,
-        hash: algorithm,
-      },
-      key,
-      keyLen * 8
-    );
+  _pbkdf2: async function (message, salt, iterations, keyLen, algorithm) {
+    const msgUint8Array = new TextEncoder('utf-8').encode(message);
+    const key = await crypto.subtle.importKey('raw', msgUint8Array, {
+      name: this.derivationFn
+    }, false, ['deriveBits']);
+
+    const buffer = await crypto.subtle.deriveBits({
+      name: this.derivationFn,
+      salt: salt,
+      iterations: iterations,
+      hash: algorithm
+    }, key, keyLen * 8);
     return new Uint8Array(buffer);
   },
 
-  _encryptBlock: async function (
-    iterations,
-    salt,
-    keyLength,
-    ivLength,
-    hash,
-    algorithm,
-    data,
-    password,
-    raw,
-    prefix
-  ) {
-    if (password[0] === ".") password = password.slice(2);
+  _encryptBlock: async function (iterations, salt, keyLength, ivLength, hash, algorithm, data, password, raw, prefix) {
 
-    const hashKey = await this._pbkdf2(
-      password,
-      salt,
-      iterations,
-      keyLength,
-      hash
-    );
+    if (password[0] === '.') password = password.slice(2);
+
+    const hashKey = await this._pbkdf2(password, salt, iterations, keyLength, hash);
 
     const key = await window.crypto.subtle.importKey(
-      "raw",
-      hashKey,
-      {
-        name: algorithm,
+      'raw',
+      hashKey, {
+        name: algorithm
       },
       false,
-      ["encrypt"]
+      ['encrypt']
     );
 
-    const src = { name: algorithm };
+    var src = {name: algorithm};
 
-    if (algorithm === "AES-CTR") {
+    if (algorithm === 'AES-CTR') {
       src.counter = window.crypto.getRandomValues(new Uint8Array(ivLength));
       src.counter.fill(0, 8); // Reset counter before encryption.
       src.iv = src.counter;
@@ -237,82 +198,66 @@ export const XQWebCrypto = {
       src.tag = 128;
     }
 
-    const encrypted = await window.crypto.subtle.encrypt(
-      src,
+    const encrypted = await window.crypto.subtle.encrypt(src,
       key,
-      raw === true ? data : new TextEncoder("utf-8").encode(data)
+      (raw === true) ? data : new TextEncoder('utf-8').encode(data)
     );
 
-    if (algorithm === "AES-CTR") {
+    if (algorithm === 'AES-CTR') {
       window.crypto.getRandomValues(src.iv.subarray(8, 16));
     }
 
     if (prefix) {
-      const len = prefix.length + src.iv.length + encrypted.byteLength;
-      const buf = new Uint8Array(len);
+      var len = prefix.length + src.iv.length + encrypted.byteLength;
+      var buf = new Uint8Array(len);
       buf.set(prefix, 0);
       buf.set(src.iv, prefix.length);
       buf.set(new Uint8Array(encrypted), prefix.length + src.iv.length);
       if (!raw) {
-        return XQWebCrypto.base64Encode(buf);
+        return XQWebCrypto.base64Encode(buf)
       } else return buf;
     } else {
-      /**@type number[]*/
-      const result = Array.from(src.iv).concat(
-        Array.from(new Uint8Array(encrypted))
-      );
+      const result = Array.from(src.iv).concat(Array.from(new Uint8Array(encrypted)));
       if (!raw) {
-        return XQWebCrypto.base64Encode(new Uint8Array(result));
+        return XQWebCrypto.base64Encode(new Uint8Array(result))
       } else return new Uint8Array(result);
     }
   },
 
-  _decryptBlock: async function (
-    iterations,
-    keyLength,
-    ivLength,
-    saltLength,
-    hash,
-    algorithm,
-    ciphertext,
-    password,
-    raw
-  ) {
-    if (password[0] === ".") password = password.slice(2);
 
-    let salt;
-    const decoder = new TextDecoder("utf-8");
-    const decodedData = raw ? ciphertext : this.base64Decode(ciphertext);
-    const prefix = decoder.decode(decodedData.slice(0, 8));
+  _decryptBlock: async function (iterations, keyLength, ivLength,
+                                 saltLength, hash, algorithm, ciphertext, password, raw) {
 
-    if (prefix === "Salted__") {
+    if (password[0] === '.') password = password.slice(2);
+
+    var salt;
+    const decoder = new TextDecoder('utf-8');
+    var decodedData = (raw) ? ciphertext : this.base64Decode(ciphertext);
+    var prefix = decoder.decode(decodedData.slice(0, 8));
+
+    if (prefix === 'Salted__') {
       salt = decodedData.slice(8, 8 + saltLength);
     }
 
-    const ciphertextBuffer = raw
-      ? ciphertext.slice(8 + saltLength)
-      : decodedData.slice(8 + saltLength);
+    const ciphertextBuffer = raw ? ciphertext.slice(8 + saltLength) : decodedData.slice(8 + saltLength);
 
-    const hashKey =
-      iterations === 1 && algorithm === "AES-CBC"
-        ? new TextEncoder("utf-8").encode(password)
-        : await this._pbkdf2(password, salt, iterations, keyLength, hash);
+    const hashKey = (iterations === 1 && algorithm === 'AES-CBC') ? new TextEncoder('utf-8').encode(password)
+      : await this._pbkdf2(password, salt, iterations, keyLength, hash);
     console.log("DECRYPTION HASH KDF: ", hashKey);
     const key = await window.crypto.subtle.importKey(
-      "raw",
-      hashKey,
-      {
-        name: algorithm,
+      'raw',
+      hashKey, {
+        name: algorithm
       },
       false,
-      ["decrypt"]
+      ['decrypt']
     );
 
-    const src = {
-      name: algorithm,
+    var src = {
+      name: algorithm
     };
 
-    if (algorithm === "AES-CTR") {
+    if (algorithm === 'AES-CTR') {
       src.counter = new Uint8Array(ciphertextBuffer.slice(0, ivLength));
       src.counter.fill(0, 8);
       src.length = 64;
@@ -320,8 +265,7 @@ export const XQWebCrypto = {
       src.iv = new Uint8Array(ciphertextBuffer.slice(0, ivLength));
     }
 
-    const decrypted = await window.crypto.subtle.decrypt(
-      src,
+    const decrypted = await window.crypto.subtle.decrypt(src,
       key,
       new Uint8Array(ciphertextBuffer.slice(ivLength))
     );
@@ -333,14 +277,7 @@ export const XQWebCrypto = {
     }
   },
 
-  _encryptFile: async function (
-    algo,
-    filename,
-    byteContent,
-    token,
-    password,
-    onComplete
-  ) {
+  _encryptFile: async function (algo, filename, byteContent, token, password, onComplete) {
     filename = filename ? new TextEncoder().encode(filename) : null;
     if (filename) {
       try {
@@ -350,68 +287,47 @@ export const XQWebCrypto = {
         return;
       }
     }
-    XQWebCrypto.createFileHeader(filename, token, algo)
-      .then(function (header) {
-        algo
-          .encrypt(byteContent, password, true, header)
-          .then(function (encrypted) {
-            onComplete(true, encrypted);
-          })
-          .catch(function (err) {
-            onComplete(false, err.message ?? err);
-          });
-      })
-      .catch(function (err) {
+    XQWebCrypto.createFileHeader(filename, token, algo).then(function (header) {
+      algo.encrypt(byteContent, password, true, header).then(function (encrypted) {
+        onComplete(true, encrypted);
+      }).catch(function (err) {
         onComplete(false, err.message ?? err);
       });
+    }).catch(function (err) {
+      onComplete(false, err.message ?? err);
+    });
   },
 
-  _decryptFile: async function (
-    algo,
-    byteContent,
-    onFetchPassword,
-    onComplete
-  ) {
-    const data = new Uint8Array(byteContent);
-    return XQWebCrypto.getFileHeader(data)
-      .then(function (header) {
-        const buf = data.slice(header.length);
-        onFetchPassword(header.token, async function (password) {
-          if (header.filename) {
-            try {
-              header.filename = await algo.decrypt(
-                header.filename,
-                password,
-                true
-              );
-              header.filename = new TextDecoder("utf-8").decode(
-                header.filename
-              );
-            } catch (err) {
-              onComplete(false, err.message ?? err);
-              return;
-            }
+  _decryptFile: async function (algo, byteContent, onFetchPassword, onComplete) {
+    var data = new Uint8Array(byteContent);
+    return XQWebCrypto.getFileHeader(data).then(function (header) {
+      var buf = data.slice(header.length);
+      onFetchPassword(header.token, async function (password) {
+        if (header.filename) {
+          try {
+            header.filename = await algo.decrypt(header.filename, password, true);
+            header.filename = new TextDecoder("utf-8").decode(header.filename);
+          } catch (err) {
+            onComplete(false, err.message ?? err);
+            return;
           }
-          algo.decrypt(buf, password, true).then(function (decrypted) {
+        }
+        algo.decrypt(buf, password, true).then(
+          function (decrypted) {
             onComplete(true, header.filename, decrypted);
           });
-        });
-      })
-      .catch(function (err) {
-        onComplete(false, err.message ?? err);
       });
+    }).catch(function (err) {
+      onComplete(false, err.message ?? err);
+    });
   },
 
   decryptFile: async function (byteContent, onFetchPassword, onComplete) {
-    return XQWebCrypto._decryptFile(
-      this,
-      byteContent,
-      onFetchPassword,
-      onComplete
-    );
+    return XQWebCrypto._decryptFile(this, byteContent, onFetchPassword, onComplete);
   },
 
   addHeaderSalt: function (header, saltSize) {
+
     const salt = window.crypto.getRandomValues(new Uint8Array(saltSize));
     const saltCode = new TextEncoder().encode("Salted__");
 
@@ -420,229 +336,124 @@ export const XQWebCrypto = {
       header.set(saltCode, 0);
       header.set(salt, 8);
     } else {
-      const expanded = new Uint8Array(8 + saltSize + header.length);
+      var expanded = new Uint8Array(8 + saltSize + header.length);
       expanded.set(header, 0);
       expanded.set(saltCode, header.length);
       expanded.set(salt, header.length + 8);
       header = expanded;
     }
 
-    console.info("Set salt of " + saltSize + " bytes");
+    console.info('Set salt of ' + saltSize + ' bytes');
     console.info(salt);
-    return { header: header, salt: salt };
+    return {header: header, salt: salt};
   },
 
   gcm: {
-    algorithm: "AES-GCM",
-    hash: "SHA-256",
+    algorithm: 'AES-GCM',
+    hash: 'SHA-256',
     iterations: 1024,
     ivLength: 12,
     keyLength: 32,
     saltLength: 16,
-    scheme: "1",
+    scheme: '1',
     encrypt: async function (data, password, raw = false, header = null) {
       const c = XQWebCrypto.addHeaderSalt(header, this.saltLength);
-      return XQWebCrypto._encryptBlock(
-        this.iterations,
-        c.salt,
-        this.keyLength,
-        this.ivLength,
-        this.hash,
-        this.algorithm,
-        data,
-        password,
-        raw,
-        c.header
-      );
+      return XQWebCrypto._encryptBlock(this.iterations, c.salt, this.keyLength, this.ivLength,
+        this.hash, this.algorithm, data, password, raw, c.header);
     },
     decrypt: async function (ciphertext, password, raw = true) {
-      return XQWebCrypto._decryptBlock(
-        this.iterations,
-        this.keyLength,
-        this.ivLength,
-        this.saltLength,
-        this.hash,
-        this.algorithm,
-        ciphertext,
-        password,
-        raw
-      );
+      return XQWebCrypto._decryptBlock(this.iterations, this.keyLength, this.ivLength,
+        this.saltLength, this.hash, this.algorithm, ciphertext, password, raw)
     },
-    encryptFile: async function (
-      filename,
-      token,
-      password,
-      byteContent,
-      onComplete
-    ) {
-      return XQWebCrypto._encryptFile(
-        this,
-        filename,
-        byteContent,
-        token,
-        password,
-        onComplete
-      );
+    encryptFile: async function (filename, token, password, byteContent, onComplete) {
+      return XQWebCrypto._encryptFile(this, filename, byteContent, token,
+        password, onComplete);
     },
     decryptFile: async function (byteContent, onFetchPassword, onComplete) {
-      return XQWebCrypto._decryptFile(
-        this,
-        byteContent,
-        onFetchPassword,
-        onComplete
-      ).catch(function (err) {
-        onComplete(false, err.message ?? err);
-      });
-    },
+      return XQWebCrypto._decryptFile(this, byteContent, onFetchPassword, onComplete)
+        .catch(function (err) {
+          onComplete(false, err.message ?? err)
+        });
+
+    }
   },
-  // Counter mode encryption.
+  // Counter mode encrpytion.
   ctr: {
-    algorithm: "AES-CTR",
-    hash: "SHA-256",
+    algorithm: 'AES-CTR',
+    hash: 'SHA-256',
     iterations: 2048,
     ivLength: 16,
     keyLength: 32,
     saltLength: 16,
-    scheme: "2",
+    scheme: '2',
     encrypt: async function (data, password, raw = false, header = null) {
       const c = XQWebCrypto.addHeaderSalt(header, this.saltLength);
-      return XQWebCrypto._encryptBlock(
-        this.iterations,
-        c.salt,
-        this.keyLength,
-        this.ivLength,
-        this.hash,
-        this.algorithm,
-        data,
-        password,
-        raw,
-        c.header
-      );
+      return XQWebCrypto._encryptBlock(this.iterations, c.salt, this.keyLength, this.ivLength,
+        this.hash, this.algorithm, data, password, raw, c.header);
     },
     decrypt: async function (ciphertext, password, raw = true) {
-      return XQWebCrypto._decryptBlock(
-        this.iterations,
-        this.keyLength,
-        this.ivLength,
-        this.saltLength,
-        this.hash,
-        this.algorithm,
-        ciphertext,
-        password,
-        raw
-      );
+      return XQWebCrypto._decryptBlock(this.iterations, this.keyLength, this.ivLength,
+        this.saltLength, this.hash, this.algorithm, ciphertext, password, raw);
     },
-    encryptFile: async function (
-      filename,
-      token,
-      password,
-      byteContent,
-      onComplete
-    ) {
-      return XQWebCrypto._encryptFile(
-        this,
-        filename,
-        byteContent,
-        token,
-        password,
-        onComplete
-      );
+    encryptFile: async function (filename, token, password, byteContent, onComplete) {
+      return XQWebCrypto._encryptFile(this, filename, byteContent, token,
+        password, onComplete);
     },
     decryptFile: async function (byteContent, onFetchPassword, onComplete) {
-      return XQWebCrypto._decryptFile(
-        this,
-        byteContent,
-        onFetchPassword,
-        onComplete
-      );
-    },
+      return XQWebCrypto._decryptFile(this, byteContent, onFetchPassword, onComplete);
+    }
   },
+
   stream: {
-    algorithm: "AES-CTR",
-    hash: "SHA-256",
+    algorithm: 'AES-CTR',
+    hash: 'SHA-256',
     iterations: 1024,
     ivLength: 0,
     keyLength: 32,
     saltLength: 0,
-    scheme: "C",
+    scheme: 'C',
     encrypt: async function (data, password, raw = false, header = null) {
       const c = XQWebCrypto.addHeaderSalt(header, this.saltLength);
-      return XQWebCrypto._encryptBlock(
-        this.iterations,
-        c.salt,
-        this.keyLength,
-        this.ivLength,
-        this.hash,
-        this.algorithm,
-        data,
-        password,
-        raw,
-        c.header
-      );
+      return XQWebCrypto._encryptBlock(this.iterations, c.salt, this.keyLength, this.ivLength,
+        this.hash, this.algorithm, data, password, raw, c.header);
     },
     decrypt: async function (ciphertext, password, raw = true) {
-      return XQWebCrypto._decryptBlock(
-        this.iterations,
-        this.keyLength,
-        this.ivLength,
-        this.saltLength,
-        this.hash,
-        this.algorithm,
-        ciphertext,
-        password,
-        raw
-      );
+      return XQWebCrypto._decryptBlock(this.iterations, this.keyLength, this.ivLength,
+        this.saltLength, this.hash, this.algorithm, ciphertext, password, raw);
     },
-    encryptFile: async function (
-      filename,
-      token,
-      password,
-      byteContent,
-      onComplete
-    ) {
-      return XQWebCrypto._encryptFile(
-        this,
-        filename,
-        byteContent,
-        token,
-        password,
-        onComplete
-      );
+    encryptFile: async function (filename, token, password, byteContent, onComplete) {
+      return XQWebCrypto._encryptFile(this, filename, byteContent, token,
+        password, onComplete);
     },
     decryptFile: async function (byteContent, onFetchPassword, onComplete) {
-      return XQWebCrypto._decryptFile(
-        this,
-        byteContent,
-        onFetchPassword,
-        onComplete
-      );
-    },
+      return XQWebCrypto._decryptFile(this, byteContent, onFetchPassword, onComplete);
+    }
   },
 
   fallback: {
-    algorithm: "AES-CBC",
-    hash: "MD5",
+    algorithm: 'AES-CBC',
+    hash: 'MD5',
     iterations: 1,
     ivLength: 8,
     keyLength: 32,
     saltLength: 8,
-    scheme: "A",
+    scheme: 'A',
     encrypt: async function (data, password, raw = false, header = null) {
-      if (password[0] === ".") password = password.slice(2);
-      let decoded;
+      if (password[0] === '.') password = password.slice(2);
+      var decoded;
+      var cipher = new Cipher(password);
       if (!raw) {
-        const cipher = new CryptoJS.Cipher(password);
+
         decoded = cipher.encrypt(data).toString();
       } else {
-        const cipher = new CryptoJS.Cipher(password);
-        const encoded = XQWebCrypto.base64Encode(data);
-        const encrypted = cipher.encrypt(encoded);
+        var encoded = XQWebCrypto.base64Encode(data);
+        var encrypted = cipher.encrypt(encoded);
         decoded = new TextEncoder().encode(encrypted);
       }
 
       if (header) {
-        const len = header.length + decoded.length;
-        const buf = new Uint8Array(len);
+        var len = header.length + decoded.length;
+        var buf = new Uint8Array(len);
         buf.set(header, 0);
         buf.set(decoded, header.length);
         if (!raw) {
@@ -653,137 +464,90 @@ export const XQWebCrypto = {
       }
     },
     decrypt: async function (ciphertext, password, raw = false) {
-      if (password[0] === ".") password = password.slice(2);
+      if (password[0] === '.') password = password.slice(2);
+      var cipher = new Cipher(password);
       if (!raw) {
         // noinspection JSUnresolvedFunction
-        const cipher = new CryptoJS.Cipher(password);
         return cipher.decrypt(ciphertext);
       } else {
-        const cipher = new CryptoJS.Cipher(password);
-        const str = new TextDecoder().decode(ciphertext);
-        const decrypted = cipher.decrypt(str);
+        var str = new TextDecoder().decode(ciphertext);
+        var decrypted = cipher.decrypt(str);
         return XQWebCrypto.base64Decode(decrypted);
       }
     },
-    encryptFile: async function (
-      filename,
-      token,
-      password,
-      byteContent,
-      onComplete
-    ) {
-      return XQWebCrypto._encryptFile(
-        this,
-        filename,
-        byteContent,
-        token,
-        password,
-        onComplete
-      );
+    encryptFile: async function (filename, token, password, byteContent, onComplete) {
+      return XQWebCrypto._encryptFile(this, filename, byteContent, token,
+        password, onComplete);
     },
     decryptFile: async function (byteContent, onFetchPassword, onComplete) {
-      return XQWebCrypto._decryptFile(
-        this,
-        byteContent,
-        onFetchPassword,
-        onComplete
-      );
-    },
+      return XQWebCrypto._decryptFile(this, byteContent, onFetchPassword, onComplete);
+    }
   },
   cbc: {
-    algorithm: "AES-CBC",
-    hash: "SHA-256",
+    algorithm: 'AES-CBC',
+    hash: 'SHA-256',
     iterations: 1024,
     ivLength: 16,
     keyLength: 32,
     saltLength: 16,
-    scheme: "3",
+    scheme: '3',
     encrypt: async function (data, password, raw = false, header = null) {
       const c = XQWebCrypto.addHeaderSalt(header, this.saltLength);
-      return XQWebCrypto._encryptBlock(
-        this.iterations,
-        c.salt,
-        this.keyLength,
-        this.ivLength,
-        this.hash,
-        this.algorithm,
-        data,
-        password,
-        raw,
-        c.header
-      );
+      return XQWebCrypto._encryptBlock(this.iterations, c.salt, this.keyLength, this.ivLength,
+        this.hash, this.algorithm, data, password, raw, c.header);
     },
     decrypt: async function (ciphertext, password, raw = false) {
-      return XQWebCrypto._decryptBlock(
-        this.iterations,
-        this.keyLength,
-        this.ivLength,
-        this.saltLength,
-        this.hash,
-        this.algorithm,
-        ciphertext,
-        password,
-        raw
-      );
+      return XQWebCrypto._decryptBlock(this.iterations, this.keyLength, this.ivLength,
+        this.saltLength, this.hash, this.algorithm, ciphertext, password, raw);
     },
-    encryptFile: async function (
-      filename,
-      token,
-      password,
-      byteContent,
-      onComplete
-    ) {
-      return XQWebCrypto._encryptFile(
-        this,
-        filename,
-        byteContent,
-        token,
-        password,
-        onComplete
-      );
+    encryptFile: async function (filename, token, password, byteContent, onComplete) {
+      return XQWebCrypto._encryptFile(this, filename, byteContent, token,
+        password, onComplete);
     },
     decryptFile: async function (byteContent, onFetchPassword, onComplete) {
-      return XQWebCrypto._decryptFile(
-        this,
-        byteContent,
-        onFetchPassword,
-        onComplete
-      );
-    },
+      return XQWebCrypto._decryptFile(this, byteContent, onFetchPassword, onComplete);
+    }
+
   },
   native: {
-    algorithm: "AES-CTR",
-    hash: "SHA-256",
+    algorithm: 'AES-CTR',
+    hash: 'SHA-256',
     iterations: 2048,
     ivLength: 16,
     keyLength: 32,
     saltLength: 16,
-    scheme: "5",
+    scheme: '5',
+    chromeMissing: "Native encryption is not supported on this platform",
+    pluginMissing: "Installation of the FIPS helper is required for native encryption",
     pluginId: getPluginIdByPlatform(),
     actions: {
       StatusAction: 0,
       EncryptAction: 1,
-      DecryptAction: 2,
+      DecryptAction: 2
     },
 
     encrypt: async function (data, password, raw = false, prefix = null) {
-      if (
-        !window.chrome.runtime ||
-        !chrome.runtime ||
-        !chrome.runtime.sendMessage
-      ) {
-        return Promise.reject("Chrome runtime not available");
+
+      try {
+        if (!window['chrome']) {
+          return Promise.reject(chromeMissing);
+        }
+        if (!chrome.runtime || !chrome.runtime.sendMessage) {
+          return Promise.reject(pluginMissing);
+        }
+      } catch (e) {
+        return Promise.reject(chromeMissing + ": " + e.message);
       }
+
 
       // Ensure that the native plugin is available
       try {
-        const status = await XQWebCrypto.native.status();
+        var status = await XQWebCrypto.native.status()
 
         if (status !== "OK") {
-          return Promise.reject(
-            "The native plugin returned an invalid status: " + status
-          );
+          return Promise.reject("The native plugin returned an invalid status: " + status);
         }
+
       } catch (e) {
         console.error(e);
         return Promise.reject("There was an error loading the native plugin");
@@ -796,23 +560,24 @@ export const XQWebCrypto = {
       }
 
       return new Promise((resolve, reject) => {
-        const port = chrome.runtime.connect(XQWebCrypto.native.pluginId);
+
+        let port = chrome.runtime.connect(XQWebCrypto.native.pluginId);
 
         if (!port) {
           reject("Failed to connect to native plugin");
         }
 
         port.onDisconnect.addListener(function () {
-          reject("Native port was disconnected abnormally.");
+          reject("Native port was disconnected abormally.");
         });
 
         port.onMessage.addListener(function (response, port) {
-          console.info("received data on port: ", response);
+          console.info('received data on port: ', response);
           try {
             if (response.length) {
               console.info("New response length: ", response.length);
               port.expectedLength = response.length;
-              port.dataBuffer = "";
+              port.dataBuffer = '';
             } else if (response.part) {
               console.info("New response part: ", response.part);
               port.dataBuffer += response.part;
@@ -822,8 +587,8 @@ export const XQWebCrypto = {
                 if (raw) {
                   port.dataBuffer = XQWebCrypto.base64Decode(port.dataBuffer);
                   if (prefix) {
-                    const len = prefix.length + port.dataBuffer.length;
-                    const buf = new Uint8Array(len);
+                    var len = prefix.length + port.dataBuffer.length;
+                    var buf = new Uint8Array(len);
                     buf.set(prefix, 0);
                     buf.set(port.dataBuffer, prefix.length);
                     resolve(buf);
@@ -838,6 +603,7 @@ export const XQWebCrypto = {
               if (response.error) {
                 reject(response.error);
               } else reject();
+
             }
           } catch (e) {
             port.disconnect();
@@ -848,50 +614,44 @@ export const XQWebCrypto = {
         });
 
         // Post all the message parts.
-        let current = 0;
-        let remaining = data.length;
+        var current = 0;
+        var remaining = data.length;
 
         port.postMessage({
-          action: XQWebCrypto.native.actions.EncryptAction,
-          pwd: password,
-          length: remaining,
-          raw: raw ? 1 : 0,
-          type: "native",
-        });
+            action: XQWebCrypto.native.actions.EncryptAction,
+            pwd: password,
+            length: remaining,
+            raw: raw ? 1 : 0,
+            type: 'native'
+          }
+        );
 
         while (remaining > 0 && port) {
-          const sliceLength =
-            remaining >= XQWebCrypto.maxBuffer
-              ? XQWebCrypto.maxBuffer
-              : remaining;
-          port.postMessage({
-            type: "part",
-            data: data.slice(current, current + sliceLength),
-          });
+          var sliceLength = (remaining >= XQWebCrypto.maxBuffer) ? XQWebCrypto.maxBuffer : remaining;
+          port.postMessage({type: "part", data: data.slice(current, current + sliceLength)});
           data.slice(current, current + sliceLength);
           current += sliceLength;
           remaining = data.length - current;
         }
+
       });
     },
     decrypt: async function (ciphertext, password, raw = false) {
-      if (
-        !window.chrome.runtime ||
-        !chrome.runtime ||
-        !chrome.runtime.sendMessage
-      ) {
-        console.warn(
-          "Native plugin not available. Attempt local CTR decryption."
-        );
+
+      try {
+        if (!window['chrome'] || !chrome.runtime || !chrome.runtime.sendMessage) {
+          console.warn('Native plugin not available. Attempt local CTR decryption.');
+          return XQWebCrypto.ctr.decrypt(ciphertext, password, raw);
+        }
+      } catch (e) {
+        console.warn('Native plugin not available. Attempt local CTR decryption.');
         return XQWebCrypto.ctr.decrypt(ciphertext, password, raw);
       }
 
       // Ensure that the native plugin is available
       const nativeStatus = await XQWebCrypto.native.status();
       if (nativeStatus !== "OK") {
-        console.warn(
-          "Native plugin not available. Attempt local CTR decryption."
-        );
+        console.warn('Native plugin not available. Attempt local CTR decryption.');
         return XQWebCrypto.ctr.decrypt(ciphertext, password, raw);
       }
 
@@ -900,29 +660,28 @@ export const XQWebCrypto = {
       }
 
       return new Promise((resolve, reject) => {
-        const port = chrome.runtime.connect(XQWebCrypto.native.pluginId);
+
+        let port = chrome.runtime.connect(XQWebCrypto.native.pluginId);
 
         if (!port) {
           reject("Failed to connect to native plugin");
         }
 
         port.onDisconnect.addListener(function () {
-          reject("Native port was disconnected abnormally.");
+          reject("Native port was disconnected abormally.");
         });
 
         port.onMessage.addListener(function (response) {
+
           try {
             if (response.length) {
               console.info("New response length: ", response.length);
               port.expectedLength = response.length;
-              port.dataBuffer = "";
+              port.dataBuffer = '';
             } else if (response.part) {
               port.dataBuffer += response.part;
               if (port.dataBuffer.length >= port.expectedLength) {
-                console.info(
-                  "All incoming data successfully buffered: ",
-                  port.dataBuffer
-                );
+                console.info("All incoming data successfully buffered: ", port.dataBuffer);
                 port.disconnect();
                 try {
                   if (raw) {
@@ -931,6 +690,7 @@ export const XQWebCrypto = {
                 } catch (e) {
                   reject(e.message);
                 }
+
               }
             } else {
               console.error("Native call returned with an error", response);
@@ -938,6 +698,7 @@ export const XQWebCrypto = {
               if (response.error) {
                 reject(atob(response.error));
               } else reject();
+
             }
           } catch (e) {
             port.disconnect();
@@ -946,100 +707,77 @@ export const XQWebCrypto = {
         });
 
         // Post all the message parts.
-        let current = 0;
-        let remaining = ciphertext.length;
+        var current = 0;
+        var remaining = ciphertext.length;
 
         port.postMessage({
-          action: XQWebCrypto.native.actions.DecryptAction,
-          pwd: password,
-          length: remaining,
-          type: "native",
-        });
+            action: XQWebCrypto.native.actions.DecryptAction,
+            pwd: password,
+            length: remaining,
+            type: 'native'
+          }
+        );
 
         while (remaining > 0 && port) {
-          const sliceLength =
-            remaining >= XQWebCrypto.maxBuffer
-              ? XQWebCrypto.maxBuffer
-              : remaining;
-          port.postMessage({
-            type: "part",
-            data: ciphertext.slice(current, current + sliceLength),
-          });
+          var sliceLength = (remaining >= XQWebCrypto.maxBuffer) ? XQWebCrypto.maxBuffer : remaining;
+          port.postMessage({type: "part", data: ciphertext.slice(current, current + sliceLength)});
           ciphertext.slice(current, current + sliceLength);
           current += sliceLength;
           remaining = ciphertext.length - current;
         }
+
       });
     },
-    encryptFile: async function (
-      filename,
-      token,
-      password,
-      byteContent,
-      onComplete
-    ) {
-      return XQWebCrypto._encryptFile(
-        XQWebCrypto.native,
-        filename,
-        byteContent,
-        token,
-        password,
-        onComplete
-      );
+    encryptFile: async function (filename, token, password, byteContent, onComplete) {
+      return XQWebCrypto._encryptFile(XQWebCrypto.native, filename, byteContent, token,
+        password, onComplete);
     },
     decryptFile: async function (byteContent, onFetchPassword, onComplete) {
-      return XQWebCrypto._decryptFile(
-        XQWebCrypto.native,
-        byteContent,
-        onFetchPassword,
-        onComplete
-      );
+      return XQWebCrypto._decryptFile(XQWebCrypto.native, byteContent, onFetchPassword, onComplete);
     },
     status: function () {
       return new Promise((resolve) => {
+        if (!window['chrome']) {
+          return resolve(XQWebCrypto.native.chromeMissing);
+        }
+        if (!chrome.runtime || !chrome.runtime.sendMessage) {
+          return resolve(XQWebCrypto.native.pluginMissing);
+        }
         // Check whether this is a valid platform.
-        if (!chrome || !chrome.runtime || !chrome.runtime.sendMessage)
-          resolve("BadPlatform");
-        // Attempt to send the message
-        else
-          chrome.runtime.sendMessage(
-            XQWebCrypto.native.pluginId,
-            {
-              action: 0,
-              type: "status",
-            },
-            async function (response) {
-              if (response && response.status) {
-                resolve(response.status);
-              } else {
-                resolve("Unavailable");
-              }
-            }
-          );
+        chrome.runtime.sendMessage(XQWebCrypto.native.pluginId, {
+          action: 0,
+          type: 'status'
+        }, async function (response) {
+          if (response && response.status) {
+            resolve(response.status);
+          } else {
+            resolve("Unavailable");
+          }
+        });
       });
-    },
+    }
+
   },
   otp: {
-    algorithm: "OTP",
-    scheme: "B",
-    fileScheme: "X",
+    algorithm: 'OTP',
+    scheme: 'B',
+    fileScheme: 'X',
     encrypt: async function (data, password, raw = false, header = null) {
-      if (password[0] === ".") password = password.slice(2);
 
-      const encoder = new TextEncoder("utf8");
-      const keyBytes = encoder.encode(password);
-      const payloadBytes = raw
-        ? new Uint8Array(data)
-        : encoder.encode(encodeURIComponent(data));
-      let j = [];
+      if (password[0] === '.') password = password.slice(2);
 
-      for (let idx = 0; idx < payloadBytes.length; ++idx) {
-        const mi = idx % keyBytes.length;
+      var encoder = new TextEncoder("utf8");
+      var keyBytes = encoder.encode(password);
+      var payloadBytes = (raw) ? new Uint8Array(data) : encoder.encode(data);
+      var j = [];
+
+      for (var idx = 0; idx < payloadBytes.length; ++idx) {
+        var mi = idx % keyBytes.length;
         j.push(payloadBytes[idx] ^ keyBytes[mi]);
       }
 
       if (header) {
-        const mergedArray = new Uint8Array(header.length + j.length);
+        var mergedArray = new Uint8Array(header.length + j.length);
         mergedArray.set(header);
         mergedArray.set(j, header.length);
         j = mergedArray;
@@ -1047,24 +785,23 @@ export const XQWebCrypto = {
 
       if (raw) return j;
 
-      const decoder = new TextDecoder("utf8");
-      const dt = decoder.decode(new Uint8Array(j));
+      var decoder = new TextDecoder('utf8');
+      var dt = decoder.decode(new Uint8Array(j));
 
       return btoa(dt);
     },
 
     decrypt: async function (ciphertext, password, raw = true) {
-      if (password[0] === ".") password = password.slice(2);
 
-      const encoder = new TextEncoder();
-      const keyBytes = encoder.encode(password);
-      const payloadBytes = raw
-        ? new Uint8Array(ciphertext)
-        : XQWebCrypto.base64Decode(ciphertext);
-      const j = [];
+      if (password[0] === '.') password = password.slice(2);
 
-      for (let idx = 0; idx < payloadBytes.length; ++idx) {
-        const mi = idx % keyBytes.length;
+      var encoder = new TextEncoder();
+      var keyBytes = encoder.encode(password);
+      var payloadBytes = (raw) ? new Uint8Array(ciphertext) : XQWebCrypto.base64Decode(ciphertext);
+      var j = [];
+
+      for (var idx = 0; idx < payloadBytes.length; ++idx) {
+        var mi = idx % keyBytes.length;
         j.push(payloadBytes[idx] ^ keyBytes[mi]);
       }
 
@@ -1072,40 +809,24 @@ export const XQWebCrypto = {
         return j;
       }
 
-      const encoded = new TextDecoder("utf8").decode(new Uint8Array(j));
+      var encoded = new TextDecoder("utf8").decode(new Uint8Array(j));
       try {
-        return decodeURIComponent(encoded);
+        return (encoded);
       } catch (e) {
         return encoded;
       }
     },
 
-    encryptFile: async function (
-      filename,
-      token,
-      password,
-      byteContent,
-      onComplete
-    ) {
-      return XQWebCrypto._encryptFile(
-        this,
-        filename,
-        byteContent,
-        token,
-        password,
-        onComplete
-      );
+    encryptFile: async function (filename, token, password, byteContent, onComplete) {
+      return XQWebCrypto._encryptFile(this, filename, byteContent, token,
+        password, onComplete);
     },
     decryptFile: async function (byteContent, onFetchPassword, onComplete) {
-      return XQWebCrypto._decryptFile(
-        this,
-        byteContent,
-        onFetchPassword,
-        onComplete
-      ).catch(function (err) {
-        onComplete(false, err.message ?? err);
-      });
-    },
+      return XQWebCrypto._decryptFile(this, byteContent, onFetchPassword, onComplete)
+        .catch(function (err) {
+          onComplete(false, err.message ?? err)
+        });
+    }
   },
   auto: {
     algorithmForScheme: function (scheme) {
@@ -1151,110 +872,83 @@ export const XQWebCrypto = {
       }
     },
     encrypt: async function (data, password, raw = false) {
-      let algo = XQWebCrypto.fallback;
-      if (password[0] === ".") {
-        const scheme = password[1];
+      var algo = XQWebCrypto.fallback;
+      if (password[0] === '.') {
+        var scheme = password[1];
         algo = XQWebCrypto.auto.algorithmForScheme(scheme);
-        if (!algo)
-          return Promise.reject(new Error("Invalid scheme: " + scheme));
+        if (!algo) return Promise.reject(new Error("Invalid scheme: " + scheme));
       } else {
-        password = "." + algo.scheme + password;
+        password = '.' + algo.scheme + password;
       }
       return algo.encrypt(data, password, raw);
     },
     decrypt: async function (ciphertext, password, raw = false) {
-      let algo = XQWebCrypto.fallback;
-      if (password[0] === ".") {
-        const scheme = password[1];
+      var algo = XQWebCrypto.fallback;
+      if (password[0] === '.') {
+        var scheme = password[1];
         algo = XQWebCrypto.auto.algorithmForScheme(scheme);
-        if (!algo)
-          return Promise.reject(new Error("Invalid scheme: " + scheme));
+        if (!algo) return Promise.reject(new Error("Invalid scheme: " + scheme));
       } else {
-        password = "." + algo.scheme + password;
+        password = '.' + algo.scheme + password;
       }
       return algo.decrypt(ciphertext, password, raw);
     },
-    encryptFile: async function (
-      filename,
-      token,
-      password,
-      byteContent,
-      onComplete
-    ) {
-      let algo = XQWebCrypto.fallback;
-      if (password[0] === ".") {
-        const scheme = password[1];
+    encryptFile: async function (filename, token, password, byteContent, onComplete) {
+      var algo = XQWebCrypto.fallback;
+      if (password[0] === '.') {
+        var scheme = password[1];
         algo = XQWebCrypto.auto.algorithmForScheme(scheme);
         if (!algo) return onComplete(false, "Invalid scheme: " + scheme);
       } else {
-        password = "." + algo.scheme + password;
+        password = '.' + algo.scheme + password;
       }
-      return algo.encryptFile(
-        filename,
-        token,
-        password,
-        byteContent,
-        onComplete
-      );
+      return algo.encryptFile(filename, token, password, byteContent, onComplete);
     },
-    /**
-     * @param {*} byteContent
-     * @param {(token: string, onFetched: (key: string) => void) => void} onFetchPassword
-     * @param {(status: string, filename: string, rawContent: Uint8Array) => void} onComplete
-     */
     decryptFile: async function (byteContent, onFetchPassword, onComplete) {
-      const data = new Uint8Array(byteContent);
-      return XQWebCrypto.getFileHeader(data)
-        .then(function (header) {
-          const buf = data.slice(header.length);
-          onFetchPassword(header.token, async function (password, error) {
-            if (error) {
-              return onComplete(false, error);
-            }
-            let algo = XQWebCrypto.fallback;
-            if (password[0] === ".") {
-              const scheme = password[1];
-              algo = XQWebCrypto.auto.algorithmForScheme(scheme);
-              if (!algo) return onComplete(false, "Invalid scheme: " + scheme);
-            } else {
-              password = "." + algo.scheme + password;
-            }
-            if (header.filename) {
-              try {
-                header.filename = await algo
-                  .decrypt(header.filename, password, true)
-                  .then(function (filename) {
-                    const encodedName = decodeURIComponent(
-                      new TextDecoder("utf8").decode(new Uint8Array(filename))
-                    );
-                    algo
-                      .decrypt(buf, password, true)
-                      .then((decrypted) => {
-                        onComplete(true, encodedName, decrypted);
-                      })
-                      .catch(function (reason) {
-                        console.error(reason);
-                        onComplete(
-                          false,
-                          "Failed to decrypt data for " + header.filename
-                        );
-                      });
-                  })
-                  .catch(function (reason) {
+      var data = new Uint8Array(byteContent);
+      return XQWebCrypto.getFileHeader(data).then(function (header) {
+        var buf = data.slice(header.length);
+        onFetchPassword(header.token, async function (password, error) {
+          if (error) {
+            return onComplete(false, error);
+          }
+          var algo = XQWebCrypto.fallback;
+          if (password[0] === '.') {
+            var scheme = password[1];
+            algo = XQWebCrypto.auto.algorithmForScheme(scheme);
+            if (!algo) return onComplete(false, "Invalid scheme: " + scheme);
+          } else {
+            password = '.' + algo.scheme + password;
+          }
+          if (header.filename) {
+            try {
+              header.filename = await algo.decrypt(header.filename, password, true)
+                .then(function (filename) {
+                  var encodedName = decodeURIComponent(
+                    new TextDecoder("utf8").decode(new Uint8Array(filename))
+                  );
+                  algo.decrypt(buf, password, true).then(
+                    function (decrypted) {
+                      onComplete(true, encodedName, decrypted);
+                    }).catch(function (reason) {
                     console.error(reason);
-                    onComplete(false, "Failed to decrypt file properties");
+                    onComplete(false, "Failed to decrypt data for " + header.filename);
                   });
-              } catch (err) {
-                onComplete(false, err.message ?? err);
-              }
-            } else {
-              onComplete(false, "Failed to get filename data");
+                }).catch(function (reason) {
+                  console.error(reason);
+                  onComplete(false, "Failed to decrypt file properties");
+                });
+
+            } catch (err) {
+              onComplete(false, err.message ?? err);
             }
-          });
-        })
-        .catch(function (err) {
-          onComplete(false, err.message ?? err);
+          } else {
+            onComplete(false, "Failed to get filename data");
+          }
         });
-    },
-  },
+      }).catch(function (err) {
+        onComplete(false, err.message ?? err);
+      });
+    }
+  }
 };
