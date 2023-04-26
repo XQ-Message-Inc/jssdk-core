@@ -142,8 +142,7 @@ export default class Encrypt extends XQModule {
                             [Encrypt.ENCRYPTED_TEXT]: encryptedText,
                           });
                         }
-
-                        case ServerResponse.ERROR: {
+                        default: {
                           return handleException(response, XQServices.Encrypt);
                         }
                       }
@@ -156,24 +155,19 @@ export default class Encrypt extends XQModule {
             });
         };
 
+        // allow the user to utilize a pre-existing encryption key, if available
+        if (encryptionKey) {
+          return encryptText(encryptionKey, true);
+        }
+
         // allow the user to utilize a pre-existing locator key, if available
         if (locatorKey) {
-          // allow the user to utilize a pre-existing encryption key, if available
-          if (encryptionKey) {
-            return encryptText(encryptionKey, true);
-          }
-
           return new FetchKey(sdk)
             .supplyAsync({ locatorKey })
             .then((fetchKeyResponse: ServerResponse) => {
               const encryptionKey = fetchKeyResponse.payload;
               return encryptText(encryptionKey, true);
             });
-        }
-
-        // allow the user to utilize a pre-existing encryption key, if available
-        if (encryptionKey) {
-          return encryptText(encryptionKey, true);
         }
 
         return new FetchQuantumEntropy(sdk)

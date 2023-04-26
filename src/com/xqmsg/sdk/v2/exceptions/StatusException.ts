@@ -1,18 +1,12 @@
-export default class StatusException {
-  code: number;
-  reason: string;
-  notImplemented: () => StatusException;
+import XQException from "./XQException";
+
+export default class StatusException extends XQException{
 
   /**
    * @param {Number} code
    * @param {String} reason
    */
   constructor(code: number, reason: string) {
-    this.code = code;
-    this.reason = reason;
-
-    this.notImplemented = () => {
-      return new StatusException(501, "501 Not Implemented");
-    };
+    super(code, reason);
   }
 }

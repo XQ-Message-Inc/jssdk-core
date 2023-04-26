@@ -50,9 +50,9 @@ export const testToFailEncryptionPayload = {
 };
 
 // Algorithms
-export const AESAlgorithm = sdk.getAlgorithm("AES");
+export const GCMAlgorithm = sdk.getAlgorithm("GCM");
 
-export const OTPv2Algorithm = sdk.getAlgorithm("OTPv2");
+export const OTPAlgorithm = sdk.getAlgorithm("OTP");
 
 // Types
 export interface IEncryptParams {

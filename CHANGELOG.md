@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.9.1] - 2023-04-24
+
+### Modification
+- Updated `/web-crypto/webcrypto.js`
+
 ## [1.9.0] - 2022-08-01
 
 ### Addition
@@ -127,12 +132,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.1.2] - 2021-11-29
 ## Modified
-- update `Encrypt` and `OTPv2Encryption` methods to allow users to bypass the key expansion method for user-generated keys.
+- update `Encrypt` and `OTPEncryption` methods to allow users to bypass the key expansion method for user-generated keys.
 
 ## [1.1.1] - 2021-11-19
 ## Added
 - Allow dynamic server URL configuration. Added new param to constructor of `XQSDK`, `serverConfig`, which allows the user to specific the `DASHBOARD_SERVER_URL`, `KEY_SERVER_URL`, `SUBSCRIPTION_SERVER_URL`, `VALIDATION_SERVER_URL` for their application.
-- Inline documentation for `universalBtoa` and `universalAtob` in `OTPv2Encryption.ts`
+- Inline documentation for `universalBtoa` and `universalAtob` in `OTPEncryption.ts`
 
 ## [1.1.0] - 2021-11-15
 
@@ -156,10 +161,10 @@ Utilizing `memory-cache` in lieu of `localStorage` required a few syntactic upda
 
 ### Modification
 - return type of `FileEncrypt.supplyAsync` from `void` --> `Promise<ServerResponse>`
-- return type of `locateFn`, the second parameter of `OTPv2Encryption.decryptFile`, a callback used to fetch the locator key of a given source file. From `string` --> `Promise<string>`
-- return type of `OTPv2Encryption.decryptFile` from `void` --> `Promise<unknown>`
-- refactor `OTPv2Encryption.parseFileForDecrypt` method, same results.
-- return type of `locateFn`, the second parameter of `EncryptionAlgorithm.decryptFile`, a callback used to fetch the locator key of a given source file. From `Record<string, string>` --> `Promise<string>`. The superclass' method should match the `OTPv2Encryption` variant method.
+- return type of `locateFn`, the second parameter of `OTPEncryption.decryptFile`, a callback used to fetch the locator key of a given source file. From `string` --> `Promise<string>`
+- return type of `OTPEncryption.decryptFile` from `void` --> `Promise<unknown>`
+- refactor `OTPEncryption.parseFileForDecrypt` method, same results.
+- return type of `locateFn`, the second parameter of `EncryptionAlgorithm.decryptFile`, a callback used to fetch the locator key of a given source file. From `Record<string, string>` --> `Promise<string>`. The superclass' method should match the `OTPEncryption` variant method.
 
 ## [1.0.26] - 2021-11-09
 
@@ -168,7 +173,7 @@ Utilizing `memory-cache` in lieu of `localStorage` required a few syntactic upda
 - `FileDecrypt` - update the type of the algorithm parameter of the `FileDecrypt` constructor to the `EncryptionAlgorithm` super class, rather than an omitted/stripped down version of the type. Also update return type from `void` --> `Promise<ServerResponse>` which is the correct return type.
 
 
-Constructor param type - The second argument of the FileDecrypt constructor expects an EncryptionAlgorithm, essentially a class for either OTPv2 or AES. I for some reason set it to a stripped down local type expecting one method.
+Constructor param type - The second argument of the FileDecrypt constructor expects an EncryptionAlgorithm, essentially a class for either OTP or AES. I for some reason set it to a stripped down local type expecting one method.
 Return value type - the return value was set to a type called void, which all it means is that nothing of note is returned, typically a console log or something along those lines. I set the type to expect a ServerResponse which is the correct return type.
 
 ## [1.0.25] - 2021-10-29
@@ -179,7 +184,7 @@ Return value type - the return value was set to a type called void, which all it
 
 ### Modification
 
-- naming of the `OPTV2` variable back to standardized `OTPv2`
+- naming of the `OPTV2` variable back to standardized `OTP`
 
 ## [1.0.24] - 2021-10-28
 

@@ -1,13 +1,12 @@
-export default class ValidationException {
-  code: number;
-  reason: string;
+import XQException from "./XQException";
+
+export default class ValidationException  extends XQException{
 
   /**
    * @param {Number} code
    * @param {String} reason
    */
   constructor(code: number, reason: string) {
-    this.code = code;
-    this.reason = reason;
+    super(code, reason);
   }
 }

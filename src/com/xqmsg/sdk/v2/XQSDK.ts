@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/indent */
 /* eslint-disable no-redeclare */
-import AESEncryption from "./algorithms/AESEncryption";
+import CTREncryption from "./algorithms/CTREncryption";
 import CallMethod from "./CallMethod";
 import Destination from "./Destination";
 import EncryptionAlgorithm from "./algorithms/EncryptionAlgorithm";
-import OTPv2Encryption from "./algorithms/OTPv2Encryption";
+import GCMEncryption from "./algorithms/GCMEncryption";
+import NTVEncryption from "./algorithms/NTVEncryption";
+import OTPEncryption from "./algorithms/OTPEncryption";
 import ServerResponse from "./ServerResponse";
 import StatusException from "./exceptions/StatusException";
 import ValidationException from "./exceptions/ValidationException";
@@ -22,11 +24,17 @@ const SUBSCRIPTION_SERVER_URL = "https://subscription.xqmsg.net/v2";
 const VALIDATION_SERVER_URL = "https://validation.xqmsg.net/v2";
 
 interface XQSDKProps {
-  /** A string representing the AES encryption algorithm */
-  AES_ALGORITHM: string;
+  /** A string representing the AES 256 GCM encryption algorithm */
+  GCM_ALGORITHM: string;
+
+  /** A string representing the AES 256 CTR encryption algorithm */
+  CTR_ALGORITHM: string;
+
+  /** A string representing the Natively produced AES encryption algorithm */
+  NTV_ALGORITHM: string;
 
   /** A object which contains encryption algorithm instances */
-  ALGORITHMS: Record<string, OTPv2Encryption | AESEncryption>;
+  ALGORITHMS: Record<string, OTPEncryption | CTREncryption | GCMEncryption | NTVEncryption>;
 
   /** A string representing the Dashboard API key*/
   DASHBOARD_API_KEY: string;
@@ -38,7 +46,7 @@ interface XQSDKProps {
   KEY_SERVER_URL: string;
 
   /** A string representing the OTP encryption algorithm */
-  OTPv2_ALGORITHM: string;
+  OTP_ALGORITHM: string;
 
   /** A string representing the subscription server URL*/
   SUBSCRIPTION_SERVER_URL: string;
@@ -90,7 +98,7 @@ interface XQSDKProps {
   /**
    *
    * @param {XQSDK#String}key
-   * @returns {OTPv2Encryption}
+   * @returns {OTPEncryption}
    */
   getAlgorithm: (key: string) => EncryptionAlgorithm;
 
@@ -204,8 +212,10 @@ class XQSDK {
     this.DASHBOARD_API_KEY = config.application.DASHBOARD_API_KEY;
 
     this.cache = new XQSimpleCache(memoryCache);
-    this.OTPv2_ALGORITHM = "OTPv2";
-    this.AES_ALGORITHM = "AES";
+    this.OTP_ALGORITHM = "OTP";
+    this.GCM_ALGORITHM = "GCM";
+    this.CTR_ALGORITHM = "CTR";
+    this.NTV_ALGORITHM = "NTV";
 
     this.SUBSCRIPTION_SERVER_URL = config.application.SUBSCRIPTION_SERVER_URL;
     this.DASHBOARD_SERVER_URL = config.application.DASHBOARD_SERVER_URL;
@@ -213,8 +223,10 @@ class XQSDK {
     this.KEY_SERVER_URL = config.application.KEY_SERVER_URL;
 
     this.ALGORITHMS = {};
-    this.ALGORITHMS[this.OTPv2_ALGORITHM] = new OTPv2Encryption(this);
-    this.ALGORITHMS[this.AES_ALGORITHM] = new AESEncryption(this);
+    this.ALGORITHMS[this.OTP_ALGORITHM] = new OTPEncryption(this);
+    this.ALGORITHMS[this.GCM_ALGORITHM] = new GCMEncryption(this);
+    this.ALGORITHMS[this.CTR_ALGORITHM] = new CTREncryption(this);
+    this.ALGORITHMS[this.NTV_ALGORITHM] = new NTVEncryption(this);
 
     this.call = function (
       baseUrl,
@@ -449,7 +461,7 @@ class XQSDK {
       if (missing.length > 0) {
         const msg = "missing [" + missing + "] !";
         console.error(msg);
-        throw msg;
+        throw new ValidationException(500, `Missing input parameters: [${missing}]`);
       }
       return maybeArgs;
     };
