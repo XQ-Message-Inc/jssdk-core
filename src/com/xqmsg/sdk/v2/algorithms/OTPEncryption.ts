@@ -140,14 +140,13 @@ export default class OTPEncryption extends EncryptionAlgorithm {
         const self = this;
         self.sdk.validateAccessToken();
         const prefixedKey = `${this.filePrefix}${expandedKey}`;
-        return new Response(file).arrayBuffer().then((fileArrayBuffer) => {
-          return new Promise<ServerResponse>((resolve) => {
-            XQWebCrypto.auto.encryptFile(
-              file.name,
-              locatorKey,
-              prefixedKey,
-              new Uint8Array(fileArrayBuffer),
-              (success: boolean, rawContentOrError: Uint8Array|string) => {
+        return new Promise<ServerResponse>((resolve) => {
+          XQWebCrypto.auto.encryptFile(
+            file.name,
+            locatorKey,
+            prefixedKey,
+            file,
+            (success: boolean, rawContentOrError: Uint8Array|string) => {
                 if (success) {
                   const rawContent = rawContentOrError as Uint8Array
                   // Send the processed data to the user.
@@ -176,7 +175,6 @@ export default class OTPEncryption extends EncryptionAlgorithm {
               }
             );
           });
-        });
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(

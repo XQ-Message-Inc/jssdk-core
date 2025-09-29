@@ -26,10 +26,11 @@ export default class CodeValidator extends XQModule {
   /**
    * @param {Map} maybePayload - the container for the request parameters supplied to this method.
    * @param {String} maybePayload.pin - the two-factor pin used to validate the `Authorize` service request
+   * @param {number} [maybePayload.teamId] - the team ID to exchange the pre-auth token for
    *
    * @returns {Promise<ServerResponse<{payload:String}>>} a `ServerResponse` containing the access token
    */
-  supplyAsync: (maybePayload: { pin: string }) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: { pin: string; teamId?: number }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -47,19 +48,21 @@ export default class CodeValidator extends XQModule {
           Authorization: "Bearer " + preAuthToken,
         };
 
+        const codeValidationPayload = { [CodeValidator.PIN]: maybePayload.pin };
+
         return this.sdk
           .call(
             this.sdk.SUBSCRIPTION_SERVER_URL,
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
-            maybePayload,
+            codeValidationPayload,
             true
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
-                return new ExchangeForAccessToken(self.sdk).supplyAsync(null);
+                return new ExchangeForAccessToken(self.sdk).supplyAsync(maybePayload.teamId);
               }
               case ServerResponse.ERROR: {
                 return handleException(response, XQServices.CodeValidator);

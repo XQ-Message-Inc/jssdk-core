@@ -287,6 +287,11 @@ export const XQWebCrypto = {
     },
 
     _encryptFile: async function (algo, filename, byteContent, token, password, onComplete) {
+        
+        if (byteContent instanceof File) {
+            return XQWebCrypto._encryptFileStreaming(algo, filename, byteContent, token, password, onComplete);
+        }
+        
         filename = filename ? new TextEncoder().encode(filename) : null;
         if (filename) {
             try {
@@ -305,6 +310,41 @@ export const XQWebCrypto = {
         }).catch(function (err) {
             onComplete(false, err.message ?? err);
         });
+    },
+
+    _encryptFileStreaming: async function (algo, filename, file, token, password, onComplete) {
+        try {
+    
+            var encodedFilename = filename ? new TextEncoder().encode(filename) : null;
+            if (encodedFilename) {
+                try {
+                    encodedFilename = await algo.encrypt(encodedFilename, password, true, null);
+                } catch (err) {
+                    onComplete(false, err.message ?? err);
+                    return;
+                }
+            }
+
+            const header = await XQWebCrypto.createFileHeader(encodedFilename, token, algo);
+            
+            // only use streaming for OTP algorithm for now
+            if (algo.algorithm !== 'OTP') {
+                const fileArrayBuffer = await new Response(file).arrayBuffer();
+                algo.encrypt(new Uint8Array(fileArrayBuffer), password, true, header).then(function (encrypted) {
+                    onComplete(true, encrypted);
+                }).catch(function (err) {
+                    onComplete(false, err.message ?? err);
+                });
+                return;
+            }
+
+            // streaming encryption for OTP
+            const result = await XQWebCrypto.otp.encryptFileStreaming(file, password, header);
+            onComplete(true, result);
+
+        } catch (err) {
+            onComplete(false, err.message ?? err);
+        }
     },
 
     _decryptFile: async function (algo, byteContent, onFetchPassword, onComplete) {
@@ -832,6 +872,51 @@ export const XQWebCrypto = {
                 .catch(function (err) {
                     onComplete(false, err.message ?? err)
                 });
+        },
+        
+        encryptFileStreaming: async function (file, password, header) {
+            const chunkSize = 1024 * 1024;
+            const reader = file.stream().getReader();
+            const encryptedChunks = [];
+            let keyOffset = 0;
+            encryptedChunks.push(header);
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const encryptedChunk = await this.encryptChunk(value, password, keyOffset);
+                encryptedChunks.push(encryptedChunk);
+                
+                keyOffset = (keyOffset + value.length) % (password.length - 2); // -2 for prefix
+            }
+
+            const totalLength = encryptedChunks.reduce((sum, chunk) => sum + chunk.length, 0);
+            const finalResult = new Uint8Array(totalLength);
+            let offset = 0;
+            
+            for (const chunk of encryptedChunks) {
+                finalResult.set(chunk, offset);
+                offset += chunk.length;
+            }
+
+            return finalResult;
+        },
+
+        encryptChunk: async function (chunk, password, keyOffset) {
+            if (password[0] === '.') password = password.slice(2);
+            
+            var encoder = new TextEncoder("utf8");
+            var keyBytes = encoder.encode(password);
+            var payloadBytes = new Uint8Array(chunk);
+            var encrypted = new Uint8Array(payloadBytes.length);
+
+            for (var idx = 0; idx < payloadBytes.length; idx++) {
+                var keyIdx = (keyOffset + idx) % keyBytes.length;
+                encrypted[idx] = payloadBytes[idx] ^ keyBytes[keyIdx];
+            }
+
+            return encrypted;
         }
     },
     auto: {

@@ -18,18 +18,18 @@ export default class ExchangeForAccessToken extends XQModule {
   serviceName: string;
   requiredFields: string[];
   /**
-   * @param {Map} [maybePayload=null] - Container for the request parameters supplied to this method.
+   * @param {number} [teamId] - The specific Team ID to exchange the pre-auth token for authorization
    *
    * @returns {Promise<ServerResponse<{payload:String}>>}
    */
-  supplyAsync: (maybePayload:null) => Promise<ServerResponse>;
+  supplyAsync: (teamId?: number) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
     this.serviceName = "exchange";
     this.requiredFields = [];
 
-    this.supplyAsync = (maybePayload) => {
+    this.supplyAsync = (teamId) => {
       try {
         this.sdk.validateInput({}, this.requiredFields);
 
@@ -41,13 +41,15 @@ export default class ExchangeForAccessToken extends XQModule {
           Authorization: "Bearer " + preAuthToken,
         };
 
+        const payload = teamId !== undefined ? { b: teamId.toString() } : null;
+        
         return this.sdk
           .call(
             this.sdk.SUBSCRIPTION_SERVER_URL,
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
-            maybePayload,
+            payload,
             true
           )
           .then((response: ServerResponse) => {
