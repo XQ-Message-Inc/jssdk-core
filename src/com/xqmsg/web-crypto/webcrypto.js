@@ -348,6 +348,11 @@ export const XQWebCrypto = {
     },
 
     _decryptFile: async function (algo, byteContent, onFetchPassword, onComplete) {
+
+        if (byteContent instanceof File) {
+            return XQWebCrypto._decryptFileStreaming(algo, byteContent, onFetchPassword, onComplete);
+        }
+
         var data = new Uint8Array(byteContent);
         return XQWebCrypto.getFileHeader(data).then(function (header) {
             var buf = data.slice(header.length);
@@ -369,6 +374,54 @@ export const XQWebCrypto = {
         }).catch(function (err) {
             onComplete(false, err.message ?? err);
         });
+    },
+
+    _decryptFileStreaming: async function (algo, file, onFetchPassword, onComplete) {
+        try {
+            const headerSlice = file.slice(0, 1024);
+            const headerBytes = await new Response(headerSlice).arrayBuffer();
+            const headerData = new Uint8Array(headerBytes);
+            
+            const header = await XQWebCrypto.getFileHeader(headerData);
+            
+            onFetchPassword(header.token, async function (password) {
+                try {
+                    if (header.filename) {
+                        try {
+                            header.filename = await algo.decrypt(header.filename, password, true);
+                            header.filename = new TextDecoder("utf-8").decode(header.filename);
+                        } catch (err) {
+                            onComplete(false, err.message ?? err);
+                            return;
+                        }
+                    }
+
+                    // Only use streaming for OTP algorithm for now
+                    if (algo.algorithm !== 'OTP') {
+
+                        const fileArrayBuffer = await new Response(file).arrayBuffer();
+                        const data = new Uint8Array(fileArrayBuffer);
+                        const buf = data.slice(header.length);
+                        
+                        algo.decrypt(buf, password, true).then(function (decrypted) {
+                            onComplete(true, header.filename, decrypted);
+                        }).catch(function (err) {
+                            onComplete(false, err.message ?? err);
+                        });
+                        return;
+                    }
+
+                    const result = await XQWebCrypto.otp.decryptFileStreaming(file, password, header);
+                    onComplete(true, header.filename, result);
+
+                } catch (err) {
+                    onComplete(false, err.message ?? err);
+                }
+            });
+            
+        } catch (err) {
+            onComplete(false, err.message ?? err);
+        }
     },
 
     decryptFile: async function (byteContent, onFetchPassword, onComplete) {
@@ -867,6 +920,7 @@ export const XQWebCrypto = {
             return XQWebCrypto._encryptFile(this, filename, byteContent, token,
                 password, onComplete);
         },
+
         decryptFile: async function (byteContent, onFetchPassword, onComplete) {
             return XQWebCrypto._decryptFile(this, byteContent, onFetchPassword, onComplete)
                 .catch(function (err) {
@@ -917,6 +971,57 @@ export const XQWebCrypto = {
             }
 
             return encrypted;
+        },
+
+        decryptFileStreaming: async function (file, password, header) {
+            const chunkSize = 1024 * 1024;
+            const fileSize = file.size;
+            const contentStart = header.length;
+            const contentSize = fileSize - contentStart;
+            
+            const decryptedChunks = [];
+            let keyOffset = 0;
+            let processedBytes = 0;
+
+            while (processedBytes < contentSize) {
+                const chunkStart = contentStart + processedBytes;
+                const chunkEnd = Math.min(chunkStart + chunkSize, fileSize);
+                const chunkSlice = file.slice(chunkStart, chunkEnd);
+                const chunkBytes = await new Response(chunkSlice).arrayBuffer();
+                const decryptedChunk = await this.decryptChunk(new Uint8Array(chunkBytes), password, keyOffset);
+                decryptedChunks.push(decryptedChunk);
+                
+                keyOffset = (keyOffset + chunkBytes.byteLength) % (password.length - 2);
+                processedBytes += chunkBytes.byteLength;
+            }
+
+            const totalLength = decryptedChunks.reduce((sum, chunk) => sum + chunk.length, 0);
+            const finalResult = new Uint8Array(totalLength);
+            let offset = 0;
+            
+            for (const chunk of decryptedChunks) {
+                finalResult.set(chunk, offset);
+                offset += chunk.length;
+            }
+
+            return finalResult;
+        },
+
+        decryptChunk: async function (chunk, password, keyOffset) {
+
+            if (password[0] === '.') password = password.slice(2);
+            
+            var encoder = new TextEncoder("utf8");
+            var keyBytes = encoder.encode(password);
+            var payloadBytes = new Uint8Array(chunk);
+            var decrypted = new Uint8Array(payloadBytes.length);
+
+            for (var idx = 0; idx < payloadBytes.length; idx++) {
+                var keyIdx = (keyOffset + idx) % keyBytes.length;
+                decrypted[idx] = payloadBytes[idx] ^ keyBytes[keyIdx];
+            }
+
+            return decrypted;
         }
     },
     auto: {

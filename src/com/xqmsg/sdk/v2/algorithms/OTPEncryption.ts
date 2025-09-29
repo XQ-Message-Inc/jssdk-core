@@ -237,13 +237,10 @@ export default class OTPEncryption extends EncryptionAlgorithm {
         const prefixedKey = await locateFn(locator).then((key) => {
           return `${this.filePrefix}${key}`;
         });
-        const fileDataArrayBuffer = await new Response(
-          sourceFile
-        ).arrayBuffer();
 
         return new Promise<ServerResponse>((resolve) => {
           XQWebCrypto.auto.decryptFile(
-            fileDataArrayBuffer,
+            sourceFile,
             function (token: string, onFetched: (key: string) => void) {
               onFetched(prefixedKey);
             },
@@ -265,13 +262,13 @@ export default class OTPEncryption extends EncryptionAlgorithm {
     };
 
     this.parseFileForDecrypt = async (file) => {
-      // Fetch the length of the token and the actual token. Wrapping in the "Response"
-      // class because Safari does not support Blob.arrayBuffer
-      const fileDataBytes = await new Response(file).arrayBuffer();
+      // Only read the header portion
+      const headerSlice = file.slice(0, 1024);
+      const headerBytes = await new Response(headerSlice).arrayBuffer();
 
       let start = 0;
       let end = 4;
-      const locatorSize = new Uint32Array(fileDataBytes.slice(start, end))[0];
+      const locatorSize = new Uint32Array(headerBytes.slice(start, end))[0];
       if (locatorSize > 256) {
         throw new Error(
           "Unable to parse file, check that the file is valid and not damaged"
@@ -280,11 +277,11 @@ export default class OTPEncryption extends EncryptionAlgorithm {
       start = end;
       end = start + locatorSize - 1;
       const locator = new TextDecoder().decode(
-        new Uint8Array(fileDataBytes.slice(start, end))
+        new Uint8Array(headerBytes.slice(start, end))
       );
       start = end;
       end = start + 4;
-      const fileNameSize = new Uint32Array(fileDataBytes.slice(start, end))[0];
+      const fileNameSize = new Uint32Array(headerBytes.slice(start, end))[0];
       if (fileNameSize < 2 || fileNameSize > 2000) {
         throw new Error(
           "Unable to parse file, check that the file is valid and not damaged"
@@ -292,9 +289,9 @@ export default class OTPEncryption extends EncryptionAlgorithm {
       }
       start = end;
       end = start + fileNameSize - 1;
-      const nameEncrypted = new Uint8Array(fileDataBytes.slice(start, end));
+      const nameEncrypted = new Uint8Array(headerBytes.slice(start, end));
       start = end;
-      const contentEncrypted = fileDataBytes.slice(start);
+      const contentEncrypted = headerBytes.slice(start);
       return {
         locator,
         nameEncrypted,
