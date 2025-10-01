@@ -327,20 +327,25 @@ export const XQWebCrypto = {
 
             const header = await XQWebCrypto.createFileHeader(encodedFilename, token, algo);
             
-            // only use streaming for OTP algorithm for now
-            if (algo.algorithm !== 'OTP') {
+            // Use streaming for OTP, GCM, and CTR algorithms
+            if (algo.algorithm === 'OTP') {
+                const result = await XQWebCrypto.otp.encryptFileStreaming(file, password, header);
+                onComplete(true, result);
+            } else if (algo.algorithm === 'AES-GCM') {
+                const result = await XQWebCrypto.gcm.encryptFileStreaming(file, password, header);
+                onComplete(true, result);
+            } else if (algo.algorithm === 'AES-CTR') {
+                const result = await XQWebCrypto.ctr.encryptFileStreaming(file, password, header);
+                onComplete(true, result);
+            } else {
+                // Fallback to non-streaming for other algorithms
                 const fileArrayBuffer = await new Response(file).arrayBuffer();
                 algo.encrypt(new Uint8Array(fileArrayBuffer), password, true, header).then(function (encrypted) {
                     onComplete(true, encrypted);
                 }).catch(function (err) {
                     onComplete(false, err.message ?? err);
                 });
-                return;
             }
-
-            // streaming encryption for OTP
-            const result = await XQWebCrypto.otp.encryptFileStreaming(file, password, header);
-            onComplete(true, result);
 
         } catch (err) {
             onComplete(false, err.message ?? err);
@@ -396,9 +401,18 @@ export const XQWebCrypto = {
                         }
                     }
 
-                    // Only use streaming for OTP algorithm for now
-                    if (algo.algorithm !== 'OTP') {
-
+                    // Use streaming for OTP, GCM, and CTR algorithms
+                    if (algo.algorithm === 'OTP') {
+                        const result = await XQWebCrypto.otp.decryptFileStreaming(file, password, header);
+                        onComplete(true, header.filename, result);
+                    } else if (algo.algorithm === 'AES-GCM') {
+                        const result = await XQWebCrypto.gcm.decryptFileStreaming(file, password, header);
+                        onComplete(true, header.filename, result);
+                    } else if (algo.algorithm === 'AES-CTR') {
+                        const result = await XQWebCrypto.ctr.decryptFileStreaming(file, password, header);
+                        onComplete(true, header.filename, result);
+                    } else {
+                        // Fallback to non-streaming for other algorithms
                         const fileArrayBuffer = await new Response(file).arrayBuffer();
                         const data = new Uint8Array(fileArrayBuffer);
                         const buf = data.slice(header.length);
@@ -408,11 +422,7 @@ export const XQWebCrypto = {
                         }).catch(function (err) {
                             onComplete(false, err.message ?? err);
                         });
-                        return;
                     }
-
-                    const result = await XQWebCrypto.otp.decryptFileStreaming(file, password, header);
-                    onComplete(true, header.filename, result);
 
                 } catch (err) {
                     onComplete(false, err.message ?? err);
@@ -477,6 +487,134 @@ export const XQWebCrypto = {
                     onComplete(false, err.message ?? err)
                 });
 
+        },
+        
+        encryptFileStreaming: async function (file, password, header) {
+            const chunkSize = 1024 * 1024;
+            const reader = file.stream().getReader();
+            const encryptedChunks = [];
+            const chunkLengths = [];
+
+            encryptedChunks.push(header);
+            
+            // Derive the key once using PBKDF2
+            if (password[0] === '.') password = password.slice(2);
+            const salt = header.slice(header.length - this.saltLength, header.length);
+            const derivedKey = await XQWebCrypto._pbkdf2(password, salt, this.iterations, this.keyLength, this.hash);
+            const cryptoKey = await window.crypto.subtle.importKey('raw', derivedKey, { name: this.algorithm }, false, ['encrypt']);
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const encryptedChunk = await this.encryptChunk(value, cryptoKey);
+                chunkLengths.push(encryptedChunk.length);
+                encryptedChunks.push(encryptedChunk);
+            }
+
+            const chunkMetadata = new Uint8Array(4 + (chunkLengths.length * 4));
+            const metadataView = new DataView(chunkMetadata.buffer);
+            metadataView.setUint32(0, chunkLengths.length, true);
+            for (let i = 0; i < chunkLengths.length; i++) {
+                metadataView.setUint32(4 + (i * 4), chunkLengths[i], true);
+            }
+            encryptedChunks.splice(1, 0, chunkMetadata);
+
+            const totalLength = encryptedChunks.reduce((sum, chunk) => sum + chunk.length, 0);
+            const finalResult = new Uint8Array(totalLength);
+            let offset = 0;
+            
+            for (const chunk of encryptedChunks) {
+                finalResult.set(chunk, offset);
+                offset += chunk.length;
+            }
+
+            return finalResult;
+        },
+
+        encryptChunk: async function (chunk, cryptoKey) {
+            const iv = window.crypto.getRandomValues(new Uint8Array(this.ivLength));
+            const encrypted = await window.crypto.subtle.encrypt(
+                { name: this.algorithm, iv: iv },
+                cryptoKey,
+                chunk
+            );
+            
+            const result = new Uint8Array(iv.length + encrypted.byteLength);
+            result.set(iv, 0);
+            result.set(new Uint8Array(encrypted), iv.length);
+            
+            return result;
+        },
+
+        decryptFileStreaming: async function (file, password, header) {
+            const contentStart = header.length;
+            
+            // Derive the key once using PBKDF2
+            if (password[0] === '.') password = password.slice(2);
+            // Extract salt from the header
+            const headerSlice = file.slice(0, contentStart);
+            const headerBytes = await new Response(headerSlice).arrayBuffer();
+            const headerData = new Uint8Array(headerBytes);
+            const salt = headerData.slice(headerData.length - this.saltLength, headerData.length);
+            
+            const derivedKey = await XQWebCrypto._pbkdf2(password, salt, this.iterations, this.keyLength, this.hash);
+            const cryptoKey = await window.crypto.subtle.importKey('raw', derivedKey, { name: this.algorithm }, false, ['decrypt']);
+            
+            const metadataSlice = file.slice(contentStart, contentStart + 4);
+            const metadataBytes = await new Response(metadataSlice).arrayBuffer();
+            const metadataView = new DataView(metadataBytes);
+            const chunkCount = metadataView.getUint32(0, true);
+
+            const lengthsSlice = file.slice(contentStart + 4, contentStart + 4 + (chunkCount * 4));
+            const lengthsBytes = await new Response(lengthsSlice).arrayBuffer();
+            const lengthsView = new DataView(lengthsBytes);
+            const chunkLengths = [];
+            for (let i = 0; i < chunkCount; i++) {
+                chunkLengths.push(lengthsView.getUint32(i * 4, true));
+            }
+
+            const decryptedChunks = [];
+            let currentPosition = contentStart + 4 + (chunkCount * 4);
+            
+            for (const chunkLength of chunkLengths) {
+                const chunkSlice = file.slice(currentPosition, currentPosition + chunkLength);
+                const chunkBytes = await new Response(chunkSlice).arrayBuffer();
+                const chunkData = new Uint8Array(chunkBytes);
+                
+                try {
+                    const decryptedChunk = await this.decryptChunk(chunkData, cryptoKey);
+                    decryptedChunks.push(decryptedChunk);
+                    currentPosition += chunkLength;
+                } catch (error) {
+                    throw new Error(`Authentication failed at chunk: ${error.message}`);
+                }
+            }
+            
+            // Combine all decrypted chunks
+            const totalLength = decryptedChunks.reduce((sum, chunk) => sum + chunk.length, 0);
+            const finalResult = new Uint8Array(totalLength);
+            let offset = 0;
+            
+            for (const chunk of decryptedChunks) {
+                finalResult.set(chunk, offset);
+                offset += chunk.length;
+            }
+            
+            return finalResult;
+        },
+
+        decryptChunk: async function (chunk, cryptoKey) {
+            const iv = chunk.slice(0, this.ivLength);
+            const encryptedData = chunk.slice(this.ivLength);
+            
+            const decrypted = await window.crypto.subtle.decrypt(
+                { name: this.algorithm, iv: iv },
+                cryptoKey,
+                encryptedData
+            );
+            
+            return new Uint8Array(decrypted);
         }
     },
     // Counter mode encrpytion.
@@ -503,6 +641,124 @@ export const XQWebCrypto = {
         },
         decryptFile: async function (byteContent, onFetchPassword, onComplete) {
             return XQWebCrypto._decryptFile(this, byteContent, onFetchPassword, onComplete);
+        },
+        
+        encryptFileStreaming: async function (file, password, header) {
+            const chunkSize = 1024 * 1024;
+            const reader = file.stream().getReader();
+            const encryptedChunks = [];
+            encryptedChunks.push(header);
+            
+            // Derive the key once using PBKDF2
+            if (password[0] === '.') password = password.slice(2);
+            const salt = header.slice(header.length - this.saltLength, header.length);
+            const derivedKey = await XQWebCrypto._pbkdf2(password, salt, this.iterations, this.keyLength, this.hash);
+            const cryptoKey = await window.crypto.subtle.importKey('raw', derivedKey, { name: this.algorithm }, false, ['encrypt']);
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const encryptedChunk = await this.encryptChunk(value, cryptoKey);
+                encryptedChunks.push(encryptedChunk);
+            }
+
+            const totalLength = encryptedChunks.reduce((sum, chunk) => sum + chunk.length, 0);
+            const finalResult = new Uint8Array(totalLength);
+            let offset = 0;
+            
+            for (const chunk of encryptedChunks) {
+                finalResult.set(chunk, offset);
+                offset += chunk.length;
+            }
+
+            return finalResult;
+        },
+
+        encryptChunk: async function (chunk, cryptoKey) {
+            const counter = window.crypto.getRandomValues(new Uint8Array(this.ivLength));
+            counter.fill(0, 8);
+            
+            const encrypted = await window.crypto.subtle.encrypt(
+                { name: this.algorithm, counter: counter, length: 64 },
+                cryptoKey,
+                chunk
+            );
+            
+            window.crypto.getRandomValues(counter.subarray(8, 16));
+
+            const result = new Uint8Array(counter.length + encrypted.byteLength);
+            result.set(counter, 0);
+            result.set(new Uint8Array(encrypted), counter.length);
+            
+            return result;
+        },
+
+        decryptFileStreaming: async function (file, password, header) {
+            const chunkSize = 1024 * 1024;
+            const fileSize = file.size;
+            const contentStart = header.length;
+            
+            // Derive the key once using PBKDF2
+            if (password[0] === '.') password = password.slice(2);
+            const headerSlice = file.slice(0, contentStart);
+            const headerBytes = await new Response(headerSlice).arrayBuffer();
+            const headerData = new Uint8Array(headerBytes);
+            const salt = headerData.slice(headerData.length - this.saltLength, headerData.length);
+            
+            const derivedKey = await XQWebCrypto._pbkdf2(password, salt, this.iterations, this.keyLength, this.hash);
+            const cryptoKey = await window.crypto.subtle.importKey('raw', derivedKey, { name: this.algorithm }, false, ['decrypt']);
+            
+            const decryptedChunks = [];
+            const actualContentStart = contentStart;
+            const actualContentEnd = fileSize;
+            
+            let currentPosition = actualContentStart;
+
+            while (currentPosition < actualContentEnd) {
+                const encryptedChunkSize = this.ivLength + chunkSize;
+                const chunkEnd = Math.min(currentPosition + encryptedChunkSize, actualContentEnd);
+                const chunkSlice = file.slice(currentPosition, chunkEnd);
+                const chunkBytes = await new Response(chunkSlice).arrayBuffer();
+                const chunkData = new Uint8Array(chunkBytes);
+
+                if (chunkData.length < this.ivLength + 1) {
+                    break;
+                }
+                
+                try {
+                    const decryptedChunk = await this.decryptChunk(chunkData, cryptoKey);
+                    decryptedChunks.push(decryptedChunk);
+                    currentPosition += chunkData.length;
+                } catch (error) {
+                    throw new Error(`Decryption failed at position ${currentPosition}: ${error.message}`);
+                }
+            }
+
+            const totalLength = decryptedChunks.reduce((sum, chunk) => sum + chunk.length, 0);
+            const finalResult = new Uint8Array(totalLength);
+            let offset = 0;
+            
+            for (const chunk of decryptedChunks) {
+                finalResult.set(chunk, offset);
+                offset += chunk.length;
+            }
+
+            return finalResult;
+        },
+
+        decryptChunk: async function (chunk, cryptoKey) {
+            const counter = chunk.slice(0, this.ivLength);
+            const encryptedData = chunk.slice(this.ivLength);
+            counter.fill(0, 8);
+            
+            const decrypted = await window.crypto.subtle.decrypt(
+                { name: this.algorithm, counter: counter, length: 64 },
+                cryptoKey,
+                encryptedData
+            );
+            
+            return new Uint8Array(decrypted);
         }
     },
 
@@ -905,7 +1161,7 @@ export const XQWebCrypto = {
             }
 
             if (raw) {
-                return j;
+                return new Uint8Array(j);
             }
 
             var encoded = new TextDecoder("utf8").decode(new Uint8Array(j));

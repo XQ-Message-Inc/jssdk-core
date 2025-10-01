@@ -150,7 +150,7 @@ export default class OTPEncryption extends EncryptionAlgorithm {
                 if (success) {
                   const rawContent = rawContentOrError as Uint8Array
                   // Send the processed data to the user.
-                  const blob = new Blob([rawContent], {
+                  const blob = new Blob([Uint8Array.from(rawContent)], {
                     type: "application/octet-stream",
                   });
                   resolve(
@@ -239,18 +239,28 @@ export default class OTPEncryption extends EncryptionAlgorithm {
         });
 
         return new Promise<ServerResponse>((resolve) => {
-          XQWebCrypto.auto.decryptFile(
+          XQWebCrypto.otp.decryptFile(
             sourceFile,
             function (token: string, onFetched: (key: string) => void) {
               onFetched(prefixedKey);
             },
             function (
-              status: string,
-              filename: string,
-              rawContent: Uint8Array
+              success: boolean,
+              filenameOrError: string,
+              rawContent?: Uint8Array
             ) {
-              const file = new File([Uint8Array.from(rawContent)], filename);
-              return resolve(new ServerResponse(ServerResponse.OK, 200, file));
+              if (success && rawContent) {
+                const file = new File([Uint8Array.from(rawContent)], filenameOrError);
+                return resolve(new ServerResponse(ServerResponse.OK, 200, file));
+              } else {
+                return resolve(
+                  new ServerResponse(
+                    ServerResponse.ERROR,
+                    500,
+                    `Failed to decrypt file: ${filenameOrError}`
+                  )
+                );
+              }
             }
           );
         });
@@ -295,7 +305,7 @@ export default class OTPEncryption extends EncryptionAlgorithm {
       return {
         locator,
         nameEncrypted,
-        contentEncrypted,
+        contentEncrypted: new ArrayBuffer(0), // Empty placeholder for type compatibility
       };
     };
   }
