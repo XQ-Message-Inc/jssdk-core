@@ -520,16 +520,8 @@ export const XQWebCrypto = {
             }
             encryptedChunks.splice(1, 0, chunkMetadata);
 
-            const totalLength = encryptedChunks.reduce((sum, chunk) => sum + chunk.length, 0);
-            const finalResult = new Uint8Array(totalLength);
-            let offset = 0;
-            
-            for (const chunk of encryptedChunks) {
-                finalResult.set(chunk, offset);
-                offset += chunk.length;
-            }
-
-            return finalResult;
+            // Return a Blob instead of Uint8Array to avoid 2GB limit
+            return new Blob(encryptedChunks, { type: 'application/octet-stream' });
         },
 
         encryptChunk: async function (chunk, cryptoKey) {
@@ -663,16 +655,8 @@ export const XQWebCrypto = {
                 encryptedChunks.push(encryptedChunk);
             }
 
-            const totalLength = encryptedChunks.reduce((sum, chunk) => sum + chunk.length, 0);
-            const finalResult = new Uint8Array(totalLength);
-            let offset = 0;
-            
-            for (const chunk of encryptedChunks) {
-                finalResult.set(chunk, offset);
-                offset += chunk.length;
-            }
-
-            return finalResult;
+            // Return a Blob instead of Uint8Array to avoid 2GB limit
+            return new Blob(encryptedChunks, { type: 'application/octet-stream' });
         },
 
         encryptChunk: async function (chunk, cryptoKey) {
@@ -1201,16 +1185,8 @@ export const XQWebCrypto = {
                 keyOffset = (keyOffset + value.length) % (password.length - 2); // -2 for prefix
             }
 
-            const totalLength = encryptedChunks.reduce((sum, chunk) => sum + chunk.length, 0);
-            const finalResult = new Uint8Array(totalLength);
-            let offset = 0;
-            
-            for (const chunk of encryptedChunks) {
-                finalResult.set(chunk, offset);
-                offset += chunk.length;
-            }
-
-            return finalResult;
+            // Return a Blob instead of Uint8Array to avoid 2GB limit
+            return new Blob(encryptedChunks, { type: 'application/octet-stream' });
         },
 
         encryptChunk: async function (chunk, password, keyOffset) {

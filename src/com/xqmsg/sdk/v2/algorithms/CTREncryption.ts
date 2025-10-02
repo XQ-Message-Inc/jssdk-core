@@ -150,13 +150,9 @@ export default class CTREncryption extends EncryptionAlgorithm {
             locatorKey,
             prefixedKey,
             file,
-            (success: boolean, rawContentOrError: Uint8Array|string) => {
+            (success: boolean, rawContentOrError: Blob|string) => {
                 if (success) {
-                  const rawContent = rawContentOrError as Uint8Array
-                  // Send the processed data to the user.
-                  const blob = new Blob([Uint8Array.from(rawContent)], {
-                    type: "application/octet-stream",
-                  });
+                  const blob = rawContentOrError as Blob
                   resolve(
                     new ServerResponse(
                       ServerResponse.OK,
