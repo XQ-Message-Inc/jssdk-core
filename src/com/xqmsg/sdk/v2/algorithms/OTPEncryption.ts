@@ -243,10 +243,10 @@ export default class OTPEncryption extends EncryptionAlgorithm {
             function (
               success: boolean,
               filenameOrError: string,
-              rawContent?: Uint8Array
+              rawContent?: Blob
             ) {
               if (success && rawContent) {
-                const file = new File([Uint8Array.from(rawContent)], filenameOrError);
+                const file = new File([rawContent], filenameOrError);
                 return resolve(new ServerResponse(ServerResponse.OK, 200, file));
               } else {
                 return resolve(

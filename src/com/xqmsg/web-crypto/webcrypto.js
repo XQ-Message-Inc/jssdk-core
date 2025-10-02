@@ -583,17 +583,8 @@ export const XQWebCrypto = {
                 }
             }
             
-            // Combine all decrypted chunks
-            const totalLength = decryptedChunks.reduce((sum, chunk) => sum + chunk.length, 0);
-            const finalResult = new Uint8Array(totalLength);
-            let offset = 0;
-            
-            for (const chunk of decryptedChunks) {
-                finalResult.set(chunk, offset);
-                offset += chunk.length;
-            }
-            
-            return finalResult;
+            // Return a Blob instead of Uint8Array to avoid 2GB limit
+            return new Blob(decryptedChunks, { type: 'application/octet-stream' });
         },
 
         decryptChunk: async function (chunk, cryptoKey) {
@@ -719,16 +710,8 @@ export const XQWebCrypto = {
                 }
             }
 
-            const totalLength = decryptedChunks.reduce((sum, chunk) => sum + chunk.length, 0);
-            const finalResult = new Uint8Array(totalLength);
-            let offset = 0;
-            
-            for (const chunk of decryptedChunks) {
-                finalResult.set(chunk, offset);
-                offset += chunk.length;
-            }
-
-            return finalResult;
+            // Return a Blob instead of Uint8Array to avoid 2GB limit
+            return new Blob(decryptedChunks, { type: 'application/octet-stream' });
         },
 
         decryptChunk: async function (chunk, cryptoKey) {
@@ -1229,14 +1212,8 @@ export const XQWebCrypto = {
 
             const totalLength = decryptedChunks.reduce((sum, chunk) => sum + chunk.length, 0);
             const finalResult = new Uint8Array(totalLength);
-            let offset = 0;
-            
-            for (const chunk of decryptedChunks) {
-                finalResult.set(chunk, offset);
-                offset += chunk.length;
-            }
-
-            return finalResult;
+            // Return a Blob instead of Uint8Array to avoid 2GB limit
+            return new Blob(decryptedChunks, { type: 'application/octet-stream' });
         },
 
         decryptChunk: async function (chunk, password, keyOffset) {
