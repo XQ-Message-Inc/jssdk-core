@@ -517,7 +517,6 @@ export const XQWebCrypto = {
         
         encryptFileStreaming: async function (file, password, header) {
             const chunkSize = 1024 * 1024;
-            const reader = file.stream().getReader();
             const encryptedChunks = [];
             const batchedBlobs = [];
             const batchSize = 1000;
@@ -536,12 +535,18 @@ export const XQWebCrypto = {
             const derivedKey = await XQWebCrypto._pbkdf2(password, bodySalt, this.iterations, this.keyLength, this.hash);
             const cryptoKey = await window.crypto.subtle.importKey('raw', derivedKey, { name: this.algorithm }, false, ['encrypt']);
 
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
+            const fileSize = file.size;
+            let offset = 0;
+
+            while (offset < fileSize) {
+                const end = Math.min(offset + chunkSize, fileSize);
+                const chunk = file.slice(offset, end);
+                const arrayBuffer = await new Response(chunk).arrayBuffer();
+                const value = new Uint8Array(arrayBuffer);
 
                 const encryptedChunk = await this.encryptChunk(value, cryptoKey);
                 encryptedChunks.push(encryptedChunk);
+                offset = end;
                 
                 // Batch: create intermediate Blob when we hit batchSize
                 if (encryptedChunks.length >= batchSize) {
@@ -1084,7 +1089,7 @@ export const XQWebCrypto = {
         },
         
         encryptFileStreaming: async function (file, password, header) {
-            const reader = file.stream().getReader();
+            const chunkSize = 1024 * 1024;
             const encryptedChunks = [];
             const batchedBlobs = [];
             const batchSize = 1000;
@@ -1093,13 +1098,20 @@ export const XQWebCrypto = {
             // Add header to the first batch
             batchedBlobs.push(new Blob([header], { type: 'application/octet-stream' }));
 
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
+            const fileSize = file.size;
+            let offset = 0;
+
+            while (offset < fileSize) {
+                const end = Math.min(offset + chunkSize, fileSize);
+                const chunk = file.slice(offset, end);
+                const arrayBuffer = await new Response(chunk).arrayBuffer();
+                const value = new Uint8Array(arrayBuffer);
+
                 const encryptedChunk = await this.encryptChunk(value, password, keyOffset);
                 encryptedChunks.push(encryptedChunk);
                 
-                keyOffset = (keyOffset + value.length) % (password.length - 2); // -2 for prefix
+                keyOffset = (keyOffset + value.length) % (password.length - 2);
+                offset = end;
                 
                 // Batch: create intermediate Blob when we hit batchSize
                 if (encryptedChunks.length >= batchSize) {
