@@ -487,117 +487,6 @@ export const XQWebCrypto = {
                     onComplete(false, err.message ?? err)
                 });
 
-        },
-        
-        encryptFileStreaming: async function (file, password, header) {
-            const chunkSize = 1024 * 1024;
-            const reader = file.stream().getReader();
-            const encryptedChunks = [];
-            const chunkLengths = [];
-
-            encryptedChunks.push(header);
-            
-            // Derive the key once using PBKDF2
-            if (password[0] === '.') password = password.slice(2);
-            const salt = header.slice(header.length - this.saltLength, header.length);
-            const derivedKey = await XQWebCrypto._pbkdf2(password, salt, this.iterations, this.keyLength, this.hash);
-            const cryptoKey = await window.crypto.subtle.importKey('raw', derivedKey, { name: this.algorithm }, false, ['encrypt']);
-
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-
-                const encryptedChunk = await this.encryptChunk(value, cryptoKey);
-                chunkLengths.push(encryptedChunk.length);
-                encryptedChunks.push(encryptedChunk);
-            }
-
-            const chunkMetadata = new Uint8Array(4 + (chunkLengths.length * 4));
-            const metadataView = new DataView(chunkMetadata.buffer);
-            metadataView.setUint32(0, chunkLengths.length, true);
-            for (let i = 0; i < chunkLengths.length; i++) {
-                metadataView.setUint32(4 + (i * 4), chunkLengths[i], true);
-            }
-            encryptedChunks.splice(1, 0, chunkMetadata);
-
-            // Return a Blob instead of Uint8Array to avoid 2GB limit
-            return new Blob(encryptedChunks, { type: 'application/octet-stream' });
-        },
-
-        encryptChunk: async function (chunk, cryptoKey) {
-            const iv = window.crypto.getRandomValues(new Uint8Array(this.ivLength));
-            const encrypted = await window.crypto.subtle.encrypt(
-                { name: this.algorithm, iv: iv },
-                cryptoKey,
-                chunk
-            );
-            
-            const result = new Uint8Array(iv.length + encrypted.byteLength);
-            result.set(iv, 0);
-            result.set(new Uint8Array(encrypted), iv.length);
-            
-            return result;
-        },
-
-        decryptFileStreaming: async function (file, password, header) {
-            const contentStart = header.length;
-            
-            // Derive the key once using PBKDF2
-            if (password[0] === '.') password = password.slice(2);
-            // Extract salt from the header
-            const headerSlice = file.slice(0, contentStart);
-            const headerBytes = await new Response(headerSlice).arrayBuffer();
-            const headerData = new Uint8Array(headerBytes);
-            const salt = headerData.slice(headerData.length - this.saltLength, headerData.length);
-            
-            const derivedKey = await XQWebCrypto._pbkdf2(password, salt, this.iterations, this.keyLength, this.hash);
-            const cryptoKey = await window.crypto.subtle.importKey('raw', derivedKey, { name: this.algorithm }, false, ['decrypt']);
-            
-            const metadataSlice = file.slice(contentStart, contentStart + 4);
-            const metadataBytes = await new Response(metadataSlice).arrayBuffer();
-            const metadataView = new DataView(metadataBytes);
-            const chunkCount = metadataView.getUint32(0, true);
-
-            const lengthsSlice = file.slice(contentStart + 4, contentStart + 4 + (chunkCount * 4));
-            const lengthsBytes = await new Response(lengthsSlice).arrayBuffer();
-            const lengthsView = new DataView(lengthsBytes);
-            const chunkLengths = [];
-            for (let i = 0; i < chunkCount; i++) {
-                chunkLengths.push(lengthsView.getUint32(i * 4, true));
-            }
-
-            const decryptedChunks = [];
-            let currentPosition = contentStart + 4 + (chunkCount * 4);
-            
-            for (const chunkLength of chunkLengths) {
-                const chunkSlice = file.slice(currentPosition, currentPosition + chunkLength);
-                const chunkBytes = await new Response(chunkSlice).arrayBuffer();
-                const chunkData = new Uint8Array(chunkBytes);
-                
-                try {
-                    const decryptedChunk = await this.decryptChunk(chunkData, cryptoKey);
-                    decryptedChunks.push(decryptedChunk);
-                    currentPosition += chunkLength;
-                } catch (error) {
-                    throw new Error(`Authentication failed at chunk: ${error.message}`);
-                }
-            }
-            
-            // Return a Blob instead of Uint8Array to avoid 2GB limit
-            return new Blob(decryptedChunks, { type: 'application/octet-stream' });
-        },
-
-        decryptChunk: async function (chunk, cryptoKey) {
-            const iv = chunk.slice(0, this.ivLength);
-            const encryptedData = chunk.slice(this.ivLength);
-            
-            const decrypted = await window.crypto.subtle.decrypt(
-                { name: this.algorithm, iv: iv },
-                cryptoKey,
-                encryptedData
-            );
-            
-            return new Uint8Array(decrypted);
         }
     },
     // Counter mode encrpytion.
@@ -630,12 +519,21 @@ export const XQWebCrypto = {
             const chunkSize = 1024 * 1024;
             const reader = file.stream().getReader();
             const encryptedChunks = [];
-            encryptedChunks.push(header);
+            const batchedBlobs = [];
+            const batchSize = 1000;
             
-            // Derive the key once using PBKDF2
+            const bodySalt = window.crypto.getRandomValues(new Uint8Array(this.saltLength));
+            const saltedHeader = new Uint8Array(header.length + 8 + this.saltLength);
+            saltedHeader.set(header, 0);
+            saltedHeader.set(new TextEncoder().encode("Salted__"), header.length);
+            saltedHeader.set(bodySalt, header.length + 8);
+            
+            // Add header to the first batch
+            batchedBlobs.push(new Blob([saltedHeader], { type: 'application/octet-stream' }));
+            
+            // Derive the key once using PBKDF2 with the body's salt
             if (password[0] === '.') password = password.slice(2);
-            const salt = header.slice(header.length - this.saltLength, header.length);
-            const derivedKey = await XQWebCrypto._pbkdf2(password, salt, this.iterations, this.keyLength, this.hash);
+            const derivedKey = await XQWebCrypto._pbkdf2(password, bodySalt, this.iterations, this.keyLength, this.hash);
             const cryptoKey = await window.crypto.subtle.importKey('raw', derivedKey, { name: this.algorithm }, false, ['encrypt']);
 
             while (true) {
@@ -644,10 +542,23 @@ export const XQWebCrypto = {
 
                 const encryptedChunk = await this.encryptChunk(value, cryptoKey);
                 encryptedChunks.push(encryptedChunk);
+                
+                // Batch: create intermediate Blob when we hit batchSize
+                if (encryptedChunks.length >= batchSize) {
+                    const intermediateBlob = new Blob(encryptedChunks, { type: 'application/octet-stream' });
+                    batchedBlobs.push(intermediateBlob);
+                    encryptedChunks.length = 0;
+                }
+            }
+            
+            // Handle remaining chunks
+            if (encryptedChunks.length > 0) {
+                const intermediateBlob = new Blob(encryptedChunks, { type: 'application/octet-stream' });
+                batchedBlobs.push(intermediateBlob);
             }
 
-            // Return a Blob instead of Uint8Array to avoid 2GB limit
-            return new Blob(encryptedChunks, { type: 'application/octet-stream' });
+            // Final Blob from all intermediate Blobs
+            return new Blob(batchedBlobs, { type: 'application/octet-stream' });
         },
 
         encryptChunk: async function (chunk, cryptoKey) {
@@ -674,20 +585,28 @@ export const XQWebCrypto = {
             const fileSize = file.size;
             const contentStart = header.length;
             
-            // Derive the key once using PBKDF2
             if (password[0] === '.') password = password.slice(2);
-            const headerSlice = file.slice(0, contentStart);
-            const headerBytes = await new Response(headerSlice).arrayBuffer();
-            const headerData = new Uint8Array(headerBytes);
-            const salt = headerData.slice(headerData.length - this.saltLength, headerData.length);
+            const saltHeaderSlice = file.slice(contentStart, contentStart + 8 + this.saltLength);
+            const saltHeaderBytes = await new Response(saltHeaderSlice).arrayBuffer();
+            const saltHeaderData = new Uint8Array(saltHeaderBytes);
             
-            const derivedKey = await XQWebCrypto._pbkdf2(password, salt, this.iterations, this.keyLength, this.hash);
+            // Verify "Salted__" prefix
+            const prefix = new TextDecoder().decode(saltHeaderData.slice(0, 8));
+            if (prefix !== "Salted__") {
+                throw new Error("Invalid file format: missing salt header");
+            }
+            
+            // Extract the body's salt
+            const bodySalt = saltHeaderData.slice(8, 8 + this.saltLength);
+            
+            const derivedKey = await XQWebCrypto._pbkdf2(password, bodySalt, this.iterations, this.keyLength, this.hash);
             const cryptoKey = await window.crypto.subtle.importKey('raw', derivedKey, { name: this.algorithm }, false, ['decrypt']);
             
             const decryptedChunks = [];
-            const actualContentStart = contentStart;
+            const batchedBlobs = [];
+            const batchSize = 1000;
+            const actualContentStart = contentStart + 8 + this.saltLength;
             const actualContentEnd = fileSize;
-            
             let currentPosition = actualContentStart;
 
             while (currentPosition < actualContentEnd) {
@@ -705,13 +624,26 @@ export const XQWebCrypto = {
                     const decryptedChunk = await this.decryptChunk(chunkData, cryptoKey);
                     decryptedChunks.push(decryptedChunk);
                     currentPosition += chunkData.length;
+                    
+                    // Batch: create intermediate Blob when we hit batchSize
+                    if (decryptedChunks.length >= batchSize) {
+                        const intermediateBlob = new Blob(decryptedChunks, { type: 'application/octet-stream' });
+                        batchedBlobs.push(intermediateBlob);
+                        decryptedChunks.length = 0;
+                    }
                 } catch (error) {
                     throw new Error(`Decryption failed at position ${currentPosition}: ${error.message}`);
                 }
             }
 
-            // Return a Blob instead of Uint8Array to avoid 2GB limit
-            return new Blob(decryptedChunks, { type: 'application/octet-stream' });
+            // Handle remaining chunks
+            if (decryptedChunks.length > 0) {
+                const intermediateBlob = new Blob(decryptedChunks, { type: 'application/octet-stream' });
+                batchedBlobs.push(intermediateBlob);
+            }
+
+            // Final Blob from all intermediate Blobs
+            return new Blob(batchedBlobs, { type: 'application/octet-stream' });
         },
 
         decryptChunk: async function (chunk, cryptoKey) {
@@ -1152,24 +1084,39 @@ export const XQWebCrypto = {
         },
         
         encryptFileStreaming: async function (file, password, header) {
-            const chunkSize = 1024 * 1024;
             const reader = file.stream().getReader();
             const encryptedChunks = [];
+            const batchedBlobs = [];
+            const batchSize = 1000;
             let keyOffset = 0;
-            encryptedChunks.push(header);
+
+            // Add header to the first batch
+            batchedBlobs.push(new Blob([header], { type: 'application/octet-stream' }));
 
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
-
                 const encryptedChunk = await this.encryptChunk(value, password, keyOffset);
                 encryptedChunks.push(encryptedChunk);
                 
                 keyOffset = (keyOffset + value.length) % (password.length - 2); // -2 for prefix
+                
+                // Batch: create intermediate Blob when we hit batchSize
+                if (encryptedChunks.length >= batchSize) {
+                    const intermediateBlob = new Blob(encryptedChunks, { type: 'application/octet-stream' });
+                    batchedBlobs.push(intermediateBlob);
+                    encryptedChunks.length = 0;
+                }
+            }
+            
+            // Handle remaining chunks
+            if (encryptedChunks.length > 0) {
+                const intermediateBlob = new Blob(encryptedChunks, { type: 'application/octet-stream' });
+                batchedBlobs.push(intermediateBlob);
             }
 
-            // Return a Blob instead of Uint8Array to avoid 2GB limit
-            return new Blob(encryptedChunks, { type: 'application/octet-stream' });
+            // Final Blob from all intermediate Blobs
+            return new Blob(batchedBlobs, { type: 'application/octet-stream' });
         },
 
         encryptChunk: async function (chunk, password, keyOffset) {
@@ -1195,6 +1142,8 @@ export const XQWebCrypto = {
             const contentSize = fileSize - contentStart;
             
             const decryptedChunks = [];
+            const batchedBlobs = [];
+            const batchSize = 1000; 
             let keyOffset = 0;
             let processedBytes = 0;
 
@@ -1208,12 +1157,23 @@ export const XQWebCrypto = {
                 
                 keyOffset = (keyOffset + chunkBytes.byteLength) % (password.length - 2);
                 processedBytes += chunkBytes.byteLength;
+                
+                // Batch: create intermediate Blob when we hit batchSize
+                if (decryptedChunks.length >= batchSize) {
+                    const intermediateBlob = new Blob(decryptedChunks, { type: 'application/octet-stream' });
+                    batchedBlobs.push(intermediateBlob);
+                    decryptedChunks.length = 0;
+                }
             }
 
-            const totalLength = decryptedChunks.reduce((sum, chunk) => sum + chunk.length, 0);
-            const finalResult = new Uint8Array(totalLength);
-            // Return a Blob instead of Uint8Array to avoid 2GB limit
-            return new Blob(decryptedChunks, { type: 'application/octet-stream' });
+            // Handle remaining chunks
+            if (decryptedChunks.length > 0) {
+                const intermediateBlob = new Blob(decryptedChunks, { type: 'application/octet-stream' });
+                batchedBlobs.push(intermediateBlob);
+            }
+
+            // Final Blob from all intermediate Blobs
+            return new Blob(batchedBlobs, { type: 'application/octet-stream' });
         },
 
         decryptChunk: async function (chunk, password, keyOffset) {

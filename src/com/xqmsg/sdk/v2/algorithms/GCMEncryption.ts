@@ -144,15 +144,20 @@ export default class GCMEncryption extends EncryptionAlgorithm {
         const self = this;
         self.sdk.validateAccessToken();
         const prefixedKey = `${this.filePrefix}${expandedKey}`;
-        return new Promise<ServerResponse>((resolve) => {
-          XQWebCrypto.auto.encryptFile(
-            file.name,
-            locatorKey,
-            prefixedKey,
-            file,
-            (success: boolean, rawContentOrError: Blob|string) => {
+        return new Response(file).arrayBuffer().then((fileArrayBuffer) => {
+          return new Promise<ServerResponse>((resolve) => {
+            XQWebCrypto.auto.encryptFile(
+              file.name,
+              locatorKey,
+              prefixedKey,
+              new Uint8Array(fileArrayBuffer),
+              (success: boolean, rawContentOrError: Uint8Array|string) => {
                 if (success) {
-                  const blob = rawContentOrError as Blob
+                  const rawContent = rawContentOrError as Uint8Array
+                  // Send the processed data to the user.
+                  const blob = new Blob([rawContent], {
+                    type: "application/octet-stream",
+                  });
                   resolve(
                     new ServerResponse(
                       ServerResponse.OK,
@@ -175,6 +180,7 @@ export default class GCMEncryption extends EncryptionAlgorithm {
               }
             );
           });
+        });
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
@@ -240,30 +246,23 @@ export default class GCMEncryption extends EncryptionAlgorithm {
         const prefixedKey = await locateFn(locator).then((key) => {
           return `${this.filePrefix}${key}`;
         });
+        const fileDataArrayBuffer = await new Response(
+          sourceFile
+        ).arrayBuffer();
 
         return new Promise<ServerResponse>((resolve) => {
-          XQWebCrypto.gcm.decryptFile(
-            sourceFile,
+          XQWebCrypto.auto.decryptFile(
+            fileDataArrayBuffer,
             function (token: string, onFetched: (key: string) => void) {
               onFetched(prefixedKey);
             },
             function (
-              success: boolean,
-              filenameOrError: string,
-              rawContent?: Blob
+              status: string,
+              filename: string,
+              rawContent: Uint8Array
             ) {
-              if (success && rawContent) {
-                const file = new File([rawContent], filenameOrError);
-                return resolve(new ServerResponse(ServerResponse.OK, 200, file));
-              } else {
-                return resolve(
-                  new ServerResponse(
-                    ServerResponse.ERROR,
-                    500,
-                    `Failed to decrypt file: ${filenameOrError}`
-                  )
-                );
-              }
+              const file = new File([Uint8Array.from(rawContent)], filename);
+              return resolve(new ServerResponse(ServerResponse.OK, 200, file));
             }
           );
         });
@@ -275,9 +274,9 @@ export default class GCMEncryption extends EncryptionAlgorithm {
     };
     
     this.parseFileForDecrypt = async (file) => {
-      // Only read the header portion of the file instead of loading the entire file into memory
-      const headerSlice = file.slice(0, 1024);
-      const fileDataBytes = await new Response(headerSlice).arrayBuffer();
+      // Fetch the length of the token and the actual token. Wrapping in the "Response"
+      // class because Safari does not support Blob.arrayBuffer
+      const fileDataBytes = await new Response(file).arrayBuffer();
 
       let start = 0;
       let end = 4;
@@ -303,10 +302,12 @@ export default class GCMEncryption extends EncryptionAlgorithm {
       start = end;
       end = start + fileNameSize - 1;
       const nameEncrypted = new Uint8Array(fileDataBytes.slice(start, end));
+      start = end;
+      const contentEncrypted = fileDataBytes.slice(start);
       return {
         locator,
         nameEncrypted,
-        contentEncrypted: new ArrayBuffer(0),
+        contentEncrypted,
       };
     };
   }
