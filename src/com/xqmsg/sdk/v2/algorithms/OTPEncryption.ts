@@ -140,20 +140,15 @@ export default class OTPEncryption extends EncryptionAlgorithm {
         const self = this;
         self.sdk.validateAccessToken();
         const prefixedKey = `${this.filePrefix}${expandedKey}`;
-        return new Response(file).arrayBuffer().then((fileArrayBuffer) => {
-          return new Promise<ServerResponse>((resolve) => {
-            XQWebCrypto.auto.encryptFile(
-              file.name,
-              locatorKey,
-              prefixedKey,
-              new Uint8Array(fileArrayBuffer),
-              (success: boolean, rawContentOrError: Uint8Array|string) => {
+        return new Promise<ServerResponse>((resolve) => {
+          XQWebCrypto.auto.encryptFile(
+            file.name,
+            locatorKey,
+            prefixedKey,
+            file,
+            (success: boolean, rawContentOrError: Blob|string) => {
                 if (success) {
-                  const rawContent = rawContentOrError as Uint8Array
-                  // Send the processed data to the user.
-                  const blob = new Blob([rawContent], {
-                    type: "application/octet-stream",
-                  });
+                  const blob = rawContentOrError as Blob
                   resolve(
                     new ServerResponse(
                       ServerResponse.OK,
@@ -176,7 +171,6 @@ export default class OTPEncryption extends EncryptionAlgorithm {
               }
             );
           });
-        });
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
@@ -239,23 +233,30 @@ export default class OTPEncryption extends EncryptionAlgorithm {
         const prefixedKey = await locateFn(locator).then((key) => {
           return `${this.filePrefix}${key}`;
         });
-        const fileDataArrayBuffer = await new Response(
-          sourceFile
-        ).arrayBuffer();
 
         return new Promise<ServerResponse>((resolve) => {
-          XQWebCrypto.auto.decryptFile(
-            fileDataArrayBuffer,
+          XQWebCrypto.otp.decryptFile(
+            sourceFile,
             function (token: string, onFetched: (key: string) => void) {
               onFetched(prefixedKey);
             },
             function (
-              status: string,
-              filename: string,
-              rawContent: Uint8Array
+              success: boolean,
+              filenameOrError: string,
+              rawContent?: Blob
             ) {
-              const file = new File([Uint8Array.from(rawContent)], filename);
-              return resolve(new ServerResponse(ServerResponse.OK, 200, file));
+              if (success && rawContent) {
+                const file = new File([rawContent], filenameOrError);
+                return resolve(new ServerResponse(ServerResponse.OK, 200, file));
+              } else {
+                return resolve(
+                  new ServerResponse(
+                    ServerResponse.ERROR,
+                    500,
+                    `Failed to decrypt file: ${filenameOrError}`
+                  )
+                );
+              }
             }
           );
         });
@@ -267,13 +268,13 @@ export default class OTPEncryption extends EncryptionAlgorithm {
     };
 
     this.parseFileForDecrypt = async (file) => {
-      // Fetch the length of the token and the actual token. Wrapping in the "Response"
-      // class because Safari does not support Blob.arrayBuffer
-      const fileDataBytes = await new Response(file).arrayBuffer();
+      // Only read the header portion
+      const headerSlice = file.slice(0, 1024);
+      const headerBytes = await new Response(headerSlice).arrayBuffer();
 
       let start = 0;
       let end = 4;
-      const locatorSize = new Uint32Array(fileDataBytes.slice(start, end))[0];
+      const locatorSize = new Uint32Array(headerBytes.slice(start, end))[0];
       if (locatorSize > 256) {
         throw new Error(
           "Unable to parse file, check that the file is valid and not damaged"
@@ -282,11 +283,11 @@ export default class OTPEncryption extends EncryptionAlgorithm {
       start = end;
       end = start + locatorSize - 1;
       const locator = new TextDecoder().decode(
-        new Uint8Array(fileDataBytes.slice(start, end))
+        new Uint8Array(headerBytes.slice(start, end))
       );
       start = end;
       end = start + 4;
-      const fileNameSize = new Uint32Array(fileDataBytes.slice(start, end))[0];
+      const fileNameSize = new Uint32Array(headerBytes.slice(start, end))[0];
       if (fileNameSize < 2 || fileNameSize > 2000) {
         throw new Error(
           "Unable to parse file, check that the file is valid and not damaged"
@@ -294,13 +295,13 @@ export default class OTPEncryption extends EncryptionAlgorithm {
       }
       start = end;
       end = start + fileNameSize - 1;
-      const nameEncrypted = new Uint8Array(fileDataBytes.slice(start, end));
+      const nameEncrypted = new Uint8Array(headerBytes.slice(start, end));
       start = end;
-      const contentEncrypted = fileDataBytes.slice(start);
+      const contentEncrypted = headerBytes.slice(start);
       return {
         locator,
         nameEncrypted,
-        contentEncrypted,
+        contentEncrypted: new ArrayBuffer(0), // Empty placeholder for type compatibility
       };
     };
   }

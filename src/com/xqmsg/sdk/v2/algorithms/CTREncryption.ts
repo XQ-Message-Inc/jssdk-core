@@ -144,20 +144,15 @@ export default class CTREncryption extends EncryptionAlgorithm {
         const self = this;
         self.sdk.validateAccessToken();
         const prefixedKey = `${this.filePrefix}${expandedKey}`;
-        return new Response(file).arrayBuffer().then((fileArrayBuffer) => {
-          return new Promise<ServerResponse>((resolve) => {
-            XQWebCrypto.auto.encryptFile(
-              file.name,
-              locatorKey,
-              prefixedKey,
-              new Uint8Array(fileArrayBuffer),
-              (success: boolean, rawContentOrError: Uint8Array|string) => {
+        return new Promise<ServerResponse>((resolve) => {
+          XQWebCrypto.auto.encryptFile(
+            file.name,
+            locatorKey,
+            prefixedKey,
+            file,
+            (success: boolean, rawContentOrError: Blob|string) => {
                 if (success) {
-                  const rawContent = rawContentOrError as Uint8Array
-                  // Send the processed data to the user.
-                  const blob = new Blob([rawContent], {
-                    type: "application/octet-stream",
-                  });
+                  const blob = rawContentOrError as Blob
                   resolve(
                     new ServerResponse(
                       ServerResponse.OK,
@@ -180,7 +175,6 @@ export default class CTREncryption extends EncryptionAlgorithm {
               }
             );
           });
-        });
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
@@ -246,23 +240,30 @@ export default class CTREncryption extends EncryptionAlgorithm {
         const prefixedKey = await locateFn(locator).then((key) => {
           return `${this.filePrefix}${key}`;
         });
-        const fileDataArrayBuffer = await new Response(
-          sourceFile
-        ).arrayBuffer();
 
         return new Promise<ServerResponse>((resolve) => {
-          XQWebCrypto.auto.decryptFile(
-            fileDataArrayBuffer,
+          XQWebCrypto.ctr.decryptFile(
+            sourceFile,
             function (token: string, onFetched: (key: string) => void) {
               onFetched(prefixedKey);
             },
             function (
-              status: string,
-              filename: string,
-              rawContent: Uint8Array
+              success: boolean,
+              filenameOrError: string,
+              rawContent?: Blob
             ) {
-              const file = new File([Uint8Array.from(rawContent)], filename);
-              return resolve(new ServerResponse(ServerResponse.OK, 200, file));
+              if (success && rawContent) {
+                const file = new File([rawContent], filenameOrError);
+                return resolve(new ServerResponse(ServerResponse.OK, 200, file));
+              } else {
+                return resolve(
+                  new ServerResponse(
+                    ServerResponse.ERROR,
+                    500,
+                    `Failed to decrypt file: ${filenameOrError}`
+                  )
+                );
+              }
             }
           );
         });
@@ -274,9 +275,9 @@ export default class CTREncryption extends EncryptionAlgorithm {
     };
     
     this.parseFileForDecrypt = async (file) => {
-      // Fetch the length of the token and the actual token. Wrapping in the "Response"
-      // class because Safari does not support Blob.arrayBuffer
-      const fileDataBytes = await new Response(file).arrayBuffer();
+      // Only read the header portion of the file instead of loading the entire file into memory
+      const headerSlice = file.slice(0, 1024);
+      const fileDataBytes = await new Response(headerSlice).arrayBuffer();
 
       let start = 0;
       let end = 4;
