@@ -8,4 +8,6 @@ export default class Destination {
   static XQ: "XQ" = "XQ";
   /** A value representing the destination server for Dashboard API calls */
   static DASHBOARD: "DASHBOARD" = "DASHBOARD";
+  /** A value representing the destination server for Delta API v3 calls */
+  static DELTA: "DELTA" = "DELTA";
 }

@@ -62,6 +62,15 @@ import UpdateUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/UpdateUserGro
 import ValidateSession from "./com/xqmsg/sdk/v2/services/dashboard/ValidateSession";
 import VerifyAccount from "./com/xqmsg/sdk/v2/services/dashboard/VerifyAccount";
 
+/**
+ * Delta API v3 services
+ */
+import LoginLink from "./com/xqmsg/sdk/v2/services/delta/LoginLink";
+import LoginVerify from "./com/xqmsg/sdk/v2/services/delta/LoginVerify";
+import LoginExchange from "./com/xqmsg/sdk/v2/services/delta/LoginExchange";
+import GetRegisteredTeams from "./com/xqmsg/sdk/v2/services/delta/GetRegisteredTeams";
+import SwitchTeam from "./com/xqmsg/sdk/v2/services/delta/SwitchTeam";
+
 export {
   AddApplication,
   AddBusiness,
@@ -98,11 +107,15 @@ export {
   GetCurrentUser,
   GetEventLogs,
   GetEventTypes,
+  GetRegisteredTeams,
   GetSettings,
   GetSubscriberInfo,
   GetTrustedRanges,
   GetWorkspaces,
   GrantUserAccess,
+  LoginExchange,
+  LoginLink,
+  LoginVerify,
   NotificationEnum,
   RemoveApplication,
   RemoveContact,
@@ -111,6 +124,7 @@ export {
   RevokeUserAccess,
   RolesEnum,
   ServerResponse,
+  SwitchTeam,
   UpdateApplication,
   UpdateBusiness,
   UpdateSettings,

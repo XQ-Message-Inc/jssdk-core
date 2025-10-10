@@ -19,6 +19,7 @@ import memoryCache from "memory-cache";
 var XMLHttpRequest = require("xhr2");
 
 const DASHBOARD_SERVER_URL = "https://dashboard.xqmsg.net/v2";
+const DELTA_SERVER_URL = "https://delta.xqmsg.dev/v3";
 const KEY_SERVER_URL = "https://quantum.xqmsg.net/v2/";
 const SUBSCRIPTION_SERVER_URL = "https://subscription.xqmsg.net/v2";
 const VALIDATION_SERVER_URL = "https://validation.xqmsg.net/v2";
@@ -41,6 +42,12 @@ interface XQSDKProps {
 
   /** A string representing the Dashboard server URL */
   DASHBOARD_SERVER_URL: string;
+
+  /** A string representing the Delta API key */
+  DELTA_API_KEY: string;
+
+  /** A string representing the Delta server URL */
+  DELTA_SERVER_URL: string;
 
   /** A string representing the key server URL */
   KEY_SERVER_URL: string;
@@ -176,9 +183,10 @@ class XQSDK {
     "text/plain;charset=UTF-8";
 
   constructor(
-    credentials: { XQ_API_KEY: string; DASHBOARD_API_KEY: string },
+    credentials: { XQ_API_KEY: string; DASHBOARD_API_KEY: string; DELTA_API_KEY?: string },
     serverConfig?: {
       DASHBOARD_SERVER_URL?: string;
+      DELTA_SERVER_URL?: string;
       KEY_SERVER_URL?: string;
       SUBSCRIPTION_SERVER_URL?: string;
       VALIDATION_SERVER_URL?: string;
@@ -188,6 +196,7 @@ class XQSDK {
     const credentialConfiguration = {
       XQ_API_KEY: credentials.XQ_API_KEY,
       DASHBOARD_API_KEY: credentials.DASHBOARD_API_KEY,
+      DELTA_API_KEY: credentials.DELTA_API_KEY || "",
     };
 
     /** The parameterized server URLs */
@@ -196,6 +205,8 @@ class XQSDK {
         serverConfig?.SUBSCRIPTION_SERVER_URL || SUBSCRIPTION_SERVER_URL,
       DASHBOARD_SERVER_URL:
         serverConfig?.DASHBOARD_SERVER_URL || DASHBOARD_SERVER_URL,
+      DELTA_SERVER_URL:
+        serverConfig?.DELTA_SERVER_URL || DELTA_SERVER_URL,
       KEY_SERVER_URL: serverConfig?.KEY_SERVER_URL || KEY_SERVER_URL,
       VALIDATION_SERVER_URL:
         serverConfig?.VALIDATION_SERVER_URL || VALIDATION_SERVER_URL,
@@ -210,6 +221,7 @@ class XQSDK {
 
     this.XQ_API_KEY = config.application.XQ_API_KEY;
     this.DASHBOARD_API_KEY = config.application.DASHBOARD_API_KEY;
+    this.DELTA_API_KEY = config.application.DELTA_API_KEY;
 
     this.cache = new XQSimpleCache(memoryCache);
     this.OTP_ALGORITHM = "OTP";
@@ -219,6 +231,7 @@ class XQSDK {
 
     this.SUBSCRIPTION_SERVER_URL = config.application.SUBSCRIPTION_SERVER_URL;
     this.DASHBOARD_SERVER_URL = config.application.DASHBOARD_SERVER_URL;
+    this.DELTA_SERVER_URL = config.application.DELTA_SERVER_URL;
     this.VALIDATION_SERVER_URL = config.application.VALIDATION_SERVER_URL;
     this.KEY_SERVER_URL = config.application.KEY_SERVER_URL;
 
@@ -301,6 +314,14 @@ class XQSDK {
             }
             case Destination.DASHBOARD: {
               xhttp.setRequestHeader(XQSDK.API_KEY, self.DASHBOARD_API_KEY);
+              xhttp.setRequestHeader(
+                XQSDK.ACCESS_CONTROL_ALLOW_ORIGIN,
+                XQSDK.ANY
+              );
+              break;
+            }
+            case Destination.DELTA: {
+              xhttp.setRequestHeader(XQSDK.API_KEY, self.DELTA_API_KEY);
               xhttp.setRequestHeader(
                 XQSDK.ACCESS_CONTROL_ALLOW_ORIGIN,
                 XQSDK.ANY
