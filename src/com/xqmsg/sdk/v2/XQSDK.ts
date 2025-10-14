@@ -508,11 +508,25 @@ class XQSDK {
 
       switch (destination) {
         case Destination.XQ: {
-          accessToken = this.cache.getXQAccess(activeProfile, true);
+          // Try to get Delta access token (new auth flow)
+          // If not available, fall back to XQ access token (legacy flow)
+          try {
+            accessToken = this.cache.getDeltaAccess(activeProfile, false);
+          } catch (e) {
+            // Delta token not found, try XQ token
+          }
+          
+          if (!accessToken) {
+            accessToken = this.cache.getXQAccess(activeProfile, true);
+          }
           break;
         }
         case Destination.DASHBOARD: {
           accessToken = this.cache.getDashboardAccess(activeProfile, true);
+          break;
+        }
+        case Destination.DELTA: {
+          accessToken = this.cache.getDeltaAccess(activeProfile, true);
           break;
         }
       }
