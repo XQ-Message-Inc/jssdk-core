@@ -1,5 +1,3 @@
-import jwtDecode, { JwtPayload } from "jwt-decode";
-
 import CallMethod from "../../CallMethod";
 import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
@@ -96,31 +94,22 @@ export default class SwitchTeam extends XQModule {
                     ? responseData 
                     : responseData?.access_token || responseData?.accessToken;
 
-                const refreshCode = responseData?.refresh_code || responseData?.refreshCode;
-                const expiration = responseData?.expiration || responseData?.expires_in;
+                const refreshCode = responseData?.refresh_token;
+                const expiration = responseData?.expires_in;
 
                 if (accessToken) {
-                  // Decode the access token to get the profile/user info
-                  const decodedToken: JwtPayload = jwtDecode(accessToken);
-                  const profile = decodedToken.sub || "";
+                  // Delta API tokens are JWE (encrypted)
+                  const profile = self.cache.getActiveProfile() || "";
 
-                  // Store the team-specific access token
+                  if (!profile) {
+                    throw new Error("Active profile not found. Please complete the login flow first.");
+                  }
+                  
                   self.cache.putDeltaAccess(profile, accessToken);
+                  self.cache.putDeltaRefreshCode(profile, refreshCode);
 
-                  // Store the refresh code if provided
-                  if (refreshCode) {
-                    self.cache.putDeltaRefreshCode(profile, refreshCode);
-                  }
-
-                  // Store the expiration if provided
-                  if (expiration) {
-                    self.cache.putDeltaTokenExpiration(profile, expiration.toString());
-                  }
-
-                  // Update the active profile
+                  self.cache.putDeltaTokenExpiration(profile, expiration.toString());
                   self.cache.putActiveProfile(profile);
-
-                  // Clear the guest access token as it's no longer needed
                   self.cache.removeDeltaGuestAccess();
                 }
 
