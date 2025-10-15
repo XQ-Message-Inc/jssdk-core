@@ -1,11 +1,11 @@
-import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
-import ServerResponse from "../../ServerResponse";
+import CallMethod from "../../shared/CallMethod";
+import Destination from "../../shared/Destination";
+import ServerResponse from "../../shared/ServerResponse";
 import XQModule from "../XQModule";
-import XQSDK from "../../XQSDK";
-import { XQServices } from "../../XQServicesEnum";
+import XQSDKv3 from "../XQSDKv3";
+import { XQServices } from "../../shared/XQServicesEnum";
 
-import handleException from "../../exceptions/handleException";
+import handleException from "../../shared/exceptions/handleException";
 
 /**
  * A service which is utilized to switch to a specific team and obtain a team-specific access token.
@@ -35,7 +35,7 @@ export default class SwitchTeam extends XQModule {
     id: number | string;
   }) => Promise<ServerResponse>;
 
-  constructor(sdk: XQSDK) {
+  constructor(sdk: XQSDKv3) {
     super(sdk);
 
     this.serviceName = "teams/switch";
@@ -98,18 +98,31 @@ export default class SwitchTeam extends XQModule {
                 const expiration = responseData?.expires_in;
 
                 if (accessToken) {
-                  // Delta API tokens are JWE (encrypted)
-                  const profile = self.cache.getActiveProfile() || "";
+                  // Delta API tokens are JWE (encrypted) and cannot be decoded
+                  // Use the active profile from cache (email used during login)
+                  const profile = self.cache.getActiveProfile(false) || "";
 
                   if (!profile) {
                     throw new Error("Active profile not found. Please complete the login flow first.");
                   }
-                  
-                  self.cache.putDeltaAccess(profile, accessToken);
-                  self.cache.putDeltaRefreshCode(profile, refreshCode);
 
-                  self.cache.putDeltaTokenExpiration(profile, expiration.toString());
+                  // Store the team-specific access token
+                  self.cache.putDeltaAccess(profile, accessToken);
+
+                  // Store the refresh code if provided
+                  if (refreshCode) {
+                    self.cache.putDeltaRefreshCode(profile, refreshCode);
+                  }
+
+                  // Store the expiration if provided
+                  if (expiration) {
+                    self.cache.putDeltaTokenExpiration(profile, expiration.toString());
+                  }
+
+                  // Update the active profile (keep the same profile)
                   self.cache.putActiveProfile(profile);
+
+                  // Clear the guest access token as it's no longer needed
                   self.cache.removeDeltaGuestAccess();
                 }
 
@@ -117,6 +130,9 @@ export default class SwitchTeam extends XQModule {
               }
               case ServerResponse.ERROR: {
                 return handleException(response, XQServices.SwitchTeam);
+              }
+              default: {
+                return response;
               }
             }
           });

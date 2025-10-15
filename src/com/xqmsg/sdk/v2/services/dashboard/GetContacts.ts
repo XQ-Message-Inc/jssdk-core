@@ -1,12 +1,12 @@
-import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
-import ServerResponse from "../../ServerResponse";
+import CallMethod from "../../../shared/CallMethod";
+import Destination from "../../../shared/Destination";
+import ServerResponse from "../../../shared/ServerResponse";
 import { UserRole } from "../../types/dashboard";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
-import { XQServices } from "../../XQServicesEnum";
+import { XQServices } from "../../../shared/XQServicesEnum";
 
-import handleException from "../../exceptions/handleException";
+import handleException from "../../../shared/exceptions/handleException";
 
 /**
  * A service which is utilized to return all contacts of the current user

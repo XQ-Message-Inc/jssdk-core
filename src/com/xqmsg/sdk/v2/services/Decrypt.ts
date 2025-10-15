@@ -1,11 +1,11 @@
 import EncryptionAlgorithm from "../algorithms/EncryptionAlgorithm";
 import FetchKey from "./FetchKey";
-import ServerResponse from "../ServerResponse";
+import ServerResponse from "../../shared/ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-import { XQServices } from "../XQServicesEnum";
+import { XQServices } from "../../shared/XQServicesEnum";
 
-import handleException from "../exceptions/handleException";
+import handleException from "../../shared/exceptions/handleException";
 
 /**
  * A service which is utilized to decrypt encrypted textual data using the {@link EncryptionAlgorithm} provided.

@@ -1,11 +1,11 @@
 import EncryptionAlgorithm from "./EncryptionAlgorithm";
-import ServerResponse from "../ServerResponse";
+import ServerResponse from "../../shared/ServerResponse";
 // eslint-disable-next-line sort-imports
-import { XQEncryptionAlgorithms, XQServices } from "../XQServicesEnum";
+import { XQEncryptionAlgorithms, XQServices } from "../../shared/XQServicesEnum";
 import XQSDK from "../XQSDK";
 import { XQWebCrypto } from "../../../web-crypto/webcrypto";
 
-import handleException from "../exceptions/handleException";
+import handleException from "../../shared/exceptions/handleException";
 
 type ParsedFile = {
   locator: string;

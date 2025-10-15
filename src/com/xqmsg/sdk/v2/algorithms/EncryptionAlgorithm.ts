@@ -1,4 +1,4 @@
-import ServerResponse from "../ServerResponse";
+import ServerResponse from "../../shared/ServerResponse";
 import XQSDK from "../XQSDK";
 
 /**

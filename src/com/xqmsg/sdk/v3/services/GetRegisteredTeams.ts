@@ -1,11 +1,11 @@
-import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
-import ServerResponse from "../../ServerResponse";
+import CallMethod from "../../shared/CallMethod";
+import Destination from "../../shared/Destination";
+import ServerResponse from "../../shared/ServerResponse";
 import XQModule from "../XQModule";
-import XQSDK from "../../XQSDK";
-import { XQServices } from "../../XQServicesEnum";
+import XQSDKv3 from "../XQSDKv3";
+import { XQServices } from "../../shared/XQServicesEnum";
 
-import handleException from "../../exceptions/handleException";
+import handleException from "../../shared/exceptions/handleException";
 
 /**
  * A service which is utilized to retrieve the list of teams that the user is registered to.
@@ -27,7 +27,7 @@ export default class GetRegisteredTeams extends XQModule {
    */
   supplyAsync: (maybePayload?: {}) => Promise<ServerResponse>;
 
-  constructor(sdk: XQSDK) {
+  constructor(sdk: XQSDKv3) {
     super(sdk);
 
     this.serviceName = "teams/registered";
@@ -85,6 +85,9 @@ export default class GetRegisteredTeams extends XQModule {
               }
               case ServerResponse.ERROR: {
                 return handleException(response, XQServices.GetRegisteredTeams);
+              }
+              default: {
+                return response;
               }
             }
           });

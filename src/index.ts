@@ -26,7 +26,7 @@ import NotificationEnum from "./com/xqmsg/sdk/v2/NotificationEnum";
 import RevokeKeyAccess from "./com/xqmsg/sdk/v2/services/RevokeKeyAccess";
 import RevokeUserAccess from "./com/xqmsg/sdk/v2/services/RevokeUserAccess";
 import RolesEnum from "./com/xqmsg/sdk/v2/RolesEnum";
-import ServerResponse from "./com/xqmsg/sdk/v2/ServerResponse";
+import ServerResponse from "./com/xqmsg/sdk/shared/ServerResponse";
 import UpdateSettings from "./com/xqmsg/sdk/v2/services/UpdateSettings";
 import XQSDK from "./com/xqmsg/sdk/v2/XQSDK";
 import { CommunicationsEnum } from "./com/xqmsg/sdk/v2/CommunicationsEnum";
@@ -63,13 +63,14 @@ import ValidateSession from "./com/xqmsg/sdk/v2/services/dashboard/ValidateSessi
 import VerifyAccount from "./com/xqmsg/sdk/v2/services/dashboard/VerifyAccount";
 
 /**
- * Delta API v3 services
+ * Delta API v3 - New v3 SDK and services
  */
-import LoginLink from "./com/xqmsg/sdk/v2/services/delta/LoginLink";
-import LoginVerify from "./com/xqmsg/sdk/v2/services/delta/LoginVerify";
-import LoginExchange from "./com/xqmsg/sdk/v2/services/delta/LoginExchange";
-import GetRegisteredTeams from "./com/xqmsg/sdk/v2/services/delta/GetRegisteredTeams";
-import SwitchTeam from "./com/xqmsg/sdk/v2/services/delta/SwitchTeam";
+import XQSDKv3 from "./com/xqmsg/sdk/v3/XQSDKv3";
+import LoginLink from "./com/xqmsg/sdk/v3/services/LoginLink";
+import LoginVerify from "./com/xqmsg/sdk/v3/services/LoginVerify";
+import LoginExchange from "./com/xqmsg/sdk/v3/services/LoginExchange";
+import GetRegisteredTeams from "./com/xqmsg/sdk/v3/services/GetRegisteredTeams";
+import SwitchTeam from "./com/xqmsg/sdk/v3/services/SwitchTeam";
 
 export {
   AddApplication,
@@ -133,4 +134,5 @@ export {
   VerifyAccount,
   XQSDK,
   XQWebCrypto,
+  XQSDKv3,
 };

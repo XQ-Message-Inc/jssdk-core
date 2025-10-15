@@ -1,10 +1,10 @@
-import CallMethod from "../CallMethod";
-import ServerResponse from "../ServerResponse";
+import CallMethod from "../../shared/CallMethod";
+import ServerResponse from "../../shared/ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-import { XQServices } from "../XQServicesEnum";
+import { XQServices } from "../../shared/XQServicesEnum";
 
-import handleException from "../exceptions/handleException";
+import handleException from "../../shared/exceptions/handleException";
 
 /**
  * A service which is utilized to delete the user specified by the access token.

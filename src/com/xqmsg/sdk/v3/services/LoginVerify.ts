@@ -1,12 +1,12 @@
-import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
+import CallMethod from "../../shared/CallMethod";
+import Destination from "../../shared/Destination";
 import LoginExchange from "./LoginExchange";
-import ServerResponse from "../../ServerResponse";
+import ServerResponse from "../../shared/ServerResponse";
 import XQModule from "../XQModule";
-import XQSDK from "../../XQSDK";
-import { XQServices } from "../../XQServicesEnum";
+import XQSDKv3 from "../XQSDKv3";
+import { XQServices } from "../../shared/XQServicesEnum";
 
-import handleException from "../../exceptions/handleException";
+import handleException from "../../shared/exceptions/handleException";
 
 /**
  * A service which is utilized to verify the PIN code from the login link email.
@@ -39,7 +39,7 @@ export default class LoginVerify extends XQModule {
     pin: string;
   }) => Promise<ServerResponse>;
 
-  constructor(sdk: XQSDK) {
+  constructor(sdk: XQSDKv3) {
     super(sdk);
 
     this.serviceName = "login/verify";
@@ -82,6 +82,9 @@ export default class LoginVerify extends XQModule {
               }
               case ServerResponse.ERROR: {
                 return handleException(response, XQServices.LoginVerify);
+              }
+              default: {
+                return response;
               }
             }
           });
