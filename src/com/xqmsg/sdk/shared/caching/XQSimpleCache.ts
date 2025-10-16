@@ -51,6 +51,9 @@ export default class XQSimpleCache {
   /** A function which is used to request Delta API token expiration */
   getDeltaTokenExpiration: (user: string) => string | null;
 
+  /** A function which is used to retrieve the selected Delta API team identifier */
+  getDeltaTeamId: (user: string) => string | null;
+
   /** A function which is used to request general XQ access */
   getXQAccess: (user: string, required?: boolean) => StatusException | string;
 
@@ -81,6 +84,9 @@ export default class XQSimpleCache {
   /** A function used to create a Delta token expiration key for a given user */
   makeDeltaTokenExpirationKey: (user: string) => string;
 
+  /** A function used to create a Delta team identifier key for a given user */
+  makeDeltaTeamIdKey: (user: string) => string;
+
   /** A function used to create a exchange access key for a given user */
   makeExchangeKey: () => string;
 
@@ -108,6 +114,9 @@ export default class XQSimpleCache {
   /** A function used to store Delta API token expiration for a user in the `storage` object */
   putDeltaTokenExpiration: (user: string, expiration: string) => void;
 
+  /** A function used to store the selected Delta API team identifier */
+  putDeltaTeamId: (user: string, teamId: string) => void;
+
   /** A function used to store a user's profile in the `storage` object */
   putPreAuthProfile: (user: string) => void;
 
@@ -134,6 +143,9 @@ export default class XQSimpleCache {
 
   /** A function used to remove Delta API token expiration for a user from the `storage` object */
   removeDeltaTokenExpiration: (user: string) => void;
+
+  /** A function used to remove the selected Delta API team identifier */
+  removeDeltaTeamId: (user: string) => void;
 
   /** A function used to remove a user's profile by removing their associated key from the `storage` object */
   removeProfile: (user: string) => void;
@@ -282,6 +294,7 @@ export default class XQSimpleCache {
       const deltaAccessToken = this.getDeltaAccess(user);
       if (deltaAccessToken) {
         this.storage.del(this.makeDeltaAccessKey(user));
+        this.removeDeltaTeamId(user);
 
         return new ServerResponse(
           ServerResponse.ERROR,
@@ -320,6 +333,22 @@ export default class XQSimpleCache {
       const expiration = this.getDeltaTokenExpiration(user);
       if (expiration) {
         this.storage.del(this.makeDeltaTokenExpirationKey(user));
+      }
+    };
+
+    this.putDeltaTeamId = (user, teamId) => {
+      this.storage.put(this.makeDeltaTeamIdKey(user), teamId);
+    };
+
+    this.getDeltaTeamId = (user) => {
+      const teamId = this.storage.get(this.makeDeltaTeamIdKey(user)) || null;
+      return teamId;
+    };
+
+    this.removeDeltaTeamId = (user) => {
+      const teamId = this.getDeltaTeamId(user);
+      if (teamId) {
+        this.storage.del(this.makeDeltaTeamIdKey(user));
       }
     };
 
@@ -387,6 +416,7 @@ export default class XQSimpleCache {
       this.removeDeltaAccess(user);
       this.removeDeltaRefreshCode(user);
       this.removeDeltaTokenExpiration(user);
+      this.removeDeltaTeamId(user);
     };
 
     this.clearAllProfiles = () => {
@@ -402,6 +432,7 @@ export default class XQSimpleCache {
           this.removeDeltaAccess(user);
           this.removeDeltaRefreshCode(user);
           this.removeDeltaTokenExpiration(user);
+          this.removeDeltaTeamId(user);
         }
 
         break;
@@ -451,6 +482,10 @@ export default class XQSimpleCache {
 
     this.makeDeltaTokenExpirationKey = (validatedUser: string) => {
       return `${this.DELTA_PREFIX}-expiration-${validatedUser}`;
+    };
+
+    this.makeDeltaTeamIdKey = (validatedUser: string) => {
+      return `${this.DELTA_PREFIX}-team-${validatedUser}`;
     };
   }
 }

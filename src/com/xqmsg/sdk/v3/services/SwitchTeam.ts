@@ -109,6 +109,11 @@ export default class SwitchTeam extends XQModule {
                   // Store the team-specific access token
                   self.cache.putDeltaAccess(profile, accessToken);
 
+                  // Persist the selected team identifier for downstream requests
+                  if (teamId != null) {
+                    self.cache.putDeltaTeamId(profile, teamId.toString());
+                  }
+
                   // Store the refresh code if provided
                   if (refreshCode) {
                     self.cache.putDeltaRefreshCode(profile, refreshCode);

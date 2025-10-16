@@ -158,22 +158,29 @@ export default class XQSDKv3 {
           );
         }
 
-        if (maybeHeaderProperties) {
-          const entries = Object.entries(maybeHeaderProperties);
-          for (const [name, value] of entries) {
-            xhttp.setRequestHeader(name, value as string);
+        const headers: Record<string, string> = {
+          ...(maybeHeaderProperties || {}),
+        };
+
+        if (destination === Destination.DELTA && !headers["X-Team-ID"]) {
+          const activeProfile = self.cache.getActiveProfile(false);
+          if (activeProfile) {
+            const teamId = self.cache.getDeltaTeamId(activeProfile);
+            if (teamId) {
+              headers["X-Team-ID"] = teamId;
+            }
           }
-          if (!maybeHeaderProperties[XQSDKv3.CONTENT_TYPE]) {
-            xhttp.setRequestHeader(
-              XQSDKv3.CONTENT_TYPE,
-              XQSDKv3.APPLICATION_JSON
-            );
+        }
+
+        if (!headers[XQSDKv3.CONTENT_TYPE]) {
+          headers[XQSDKv3.CONTENT_TYPE] = XQSDKv3.APPLICATION_JSON;
+        }
+
+        const headerEntries = Object.entries(headers);
+        for (const [name, value] of headerEntries) {
+          if (value != null) {
+            xhttp.setRequestHeader(name, value);
           }
-        } else {
-          xhttp.setRequestHeader(
-            XQSDKv3.CONTENT_TYPE,
-            XQSDKv3.APPLICATION_JSON
-          );
         }
 
         xhttp.ontimeout = function () {
