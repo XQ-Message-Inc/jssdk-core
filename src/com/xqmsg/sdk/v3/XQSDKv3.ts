@@ -1,10 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import memoryCache from "memory-cache";
 
+import CTREncryption from "../shared/algorithms/CTREncryption";
+import EncryptionAlgorithm from "../shared/algorithms/EncryptionAlgorithm";
+import GCMEncryption from "../shared/algorithms/GCMEncryption";
+import NTVEncryption from "../shared/algorithms/NTVEncryption";
+import OTPEncryption from "../shared/algorithms/OTPEncryption";
 import CallMethod from "../shared/CallMethod";
 import Destination from "../shared/Destination";
 import ServerResponse from "../shared/ServerResponse";
+import StatusException from "../shared/exceptions/StatusException";
 import XQSimpleCache from "../shared/caching/XQSimpleCache";
+
+const XMLHttpRequest = require("xhr2");
 
 /**
  * The XQ SDK v3 for Delta API
@@ -20,6 +28,24 @@ export default class XQSDKv3 {
 
   /** The cache instance for storing tokens and profiles */
   cache: XQSimpleCache;
+
+  /** Identifier for the OTP algorithm */
+  OTP_ALGORITHM: string;
+
+  /** Identifier for the AES-GCM algorithm */
+  GCM_ALGORITHM: string;
+
+  /** Identifier for the AES-CTR algorithm */
+  CTR_ALGORITHM: string;
+
+  /** Identifier for the native algorithm */
+  NTV_ALGORITHM: string;
+
+  /** Default algorithm identifier */
+  DEFAULT_ALGORITHM: string;
+
+  /** Map of available encryption algorithms */
+  ALGORITHMS: Record<string, EncryptionAlgorithm>;
 
   /** HTTP header name for API Key */
   static API_KEY: "Api-Key" = "Api-Key";
@@ -62,6 +88,9 @@ export default class XQSDKv3 {
   /** Function to build query parameters */
   buildQueryParams: (paramsObject: Record<string, string>) => string;
 
+  /** Retrieve an encryption algorithm instance */
+  getAlgorithm: (key: string) => EncryptionAlgorithm;
+
   /** Function to assert conditions */
   assert: (condition: boolean, message?: string) => void;
 
@@ -73,6 +102,9 @@ export default class XQSDKv3 {
     maybeArgs: Record<string, any> | null,
     requiredFields: string[]
   ) => Record<string, any>;
+
+  /** Function to validate and retrieve an access token */
+  validateAccessToken: (destination?: string) => string;
 
   /**
    * @param {Object} config - Configuration object
@@ -87,6 +119,19 @@ export default class XQSDKv3 {
     this.DELTA_SERVER_URL =
       config.DELTA_SERVER_URL || "https://delta.xqmsg.dev/v3";
     this.cache = new XQSimpleCache(memoryCache);
+
+    this.OTP_ALGORITHM = "OTP";
+    this.GCM_ALGORITHM = "GCM";
+    this.CTR_ALGORITHM = "CTR";
+    this.NTV_ALGORITHM = "NTV";
+    this.DEFAULT_ALGORITHM = this.GCM_ALGORITHM;
+
+    this.ALGORITHMS = {
+      [this.OTP_ALGORITHM]: new OTPEncryption(this),
+      [this.GCM_ALGORITHM]: new GCMEncryption(this),
+      [this.CTR_ALGORITHM]: new CTREncryption(this),
+      [this.NTV_ALGORITHM]: new NTVEncryption(this),
+    };
 
     this.call = function (
       baseUrl,
@@ -281,6 +326,14 @@ export default class XQSDKv3 {
       return buffer;
     };
 
+    this.getAlgorithm = (key) => {
+      const normalizedKey = key?.toUpperCase?.() ?? this.DEFAULT_ALGORITHM;
+      return (
+        this.ALGORITHMS[normalizedKey] ||
+        this.ALGORITHMS[this.DEFAULT_ALGORITHM]
+      );
+    };
+
     this.assert = (condition, message) => {
       if (!condition) {
         const msg = message || "Assertion failed";
@@ -316,6 +369,28 @@ export default class XQSDKv3 {
       }
 
       return maybeArgs;
+    };
+
+    this.validateAccessToken = (destination = Destination.DELTA) => {
+      const activeProfile = this.cache.getActiveProfile(true);
+
+      if (!activeProfile) {
+        throw new StatusException(401, "No active profile found");
+      }
+
+      switch (destination) {
+        case Destination.DELTA:
+        default: {
+          const token = this.cache.getDeltaAccess(activeProfile, true);
+          if (!token) {
+            throw new StatusException(
+              401,
+              `Access Token not found for ${activeProfile}`
+            );
+          }
+          return token as string;
+        }
+      }
     };
   }
 }

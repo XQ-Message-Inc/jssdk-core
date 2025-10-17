@@ -57,6 +57,13 @@ export enum XQServices {
   LoginExchange = "LoginExchange",
   GetRegisteredTeams = "GetRegisteredTeams",
   SwitchTeam = "SwitchTeam",
+  FetchEntropy = "FetchEntropy",
+  AddPacket = "AddPacket",
+  LookupKey = "LookupKey",
+  DeltaEncrypt = "DeltaEncrypt",
+  DeltaFileEncrypt = "DeltaFileEncrypt",
+  DeltaDecrypt = "DeltaDecrypt",
+  DeltaFileDecrypt = "DeltaFileDecrypt",
 }
 
 export enum XQEncryptionAlgorithms {

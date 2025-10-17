@@ -71,6 +71,13 @@ import LoginVerify from "./com/xqmsg/sdk/v3/services/LoginVerify";
 import LoginExchange from "./com/xqmsg/sdk/v3/services/LoginExchange";
 import GetRegisteredTeams from "./com/xqmsg/sdk/v3/services/GetRegisteredTeams";
 import SwitchTeam from "./com/xqmsg/sdk/v3/services/SwitchTeam";
+import FetchEntropy from "./com/xqmsg/sdk/v3/services/crypto/FetchEntropy";
+import AddPacket from "./com/xqmsg/sdk/v3/services/crypto/AddPacket";
+import LookupKey from "./com/xqmsg/sdk/v3/services/crypto/LookupKey";
+import EncryptV3 from "./com/xqmsg/sdk/v3/services/crypto/Encrypt";
+import DecryptV3 from "./com/xqmsg/sdk/v3/services/crypto/Decrypt";
+import FileEncryptV3 from "./com/xqmsg/sdk/v3/services/crypto/FileEncrypt";
+import FileDecryptV3 from "./com/xqmsg/sdk/v3/services/crypto/FileDecrypt";
 
 export {
   AddApplication,
@@ -109,14 +116,19 @@ export {
   GetEventLogs,
   GetEventTypes,
   GetRegisteredTeams,
+  FetchEntropy,
+  FileDecryptV3,
+  FileEncryptV3,
   GetSettings,
   GetSubscriberInfo,
   GetTrustedRanges,
   GetWorkspaces,
   GrantUserAccess,
+  DecryptV3,
   LoginExchange,
   LoginLink,
   LoginVerify,
+  LookupKey,
   NotificationEnum,
   RemoveApplication,
   RemoveContact,
@@ -126,6 +138,8 @@ export {
   RolesEnum,
   ServerResponse,
   SwitchTeam,
+  EncryptV3,
+  AddPacket,
   UpdateApplication,
   UpdateBusiness,
   UpdateSettings,
