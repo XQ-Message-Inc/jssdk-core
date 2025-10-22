@@ -30,6 +30,7 @@ import ServerResponse from "./com/xqmsg/sdk/v2/ServerResponse";
 import UpdateSettings from "./com/xqmsg/sdk/v2/services/UpdateSettings";
 import XQSDK from "./com/xqmsg/sdk/v2/XQSDK";
 import { CommunicationsEnum } from "./com/xqmsg/sdk/v2/CommunicationsEnum";
+import { XQWebCrypto } from "./com/xqmsg/web-crypto";
 
 /**
  * Dashboard services
@@ -117,4 +118,5 @@ export {
   ValidateSession,
   VerifyAccount,
   XQSDK,
+  XQWebCrypto,
 };
