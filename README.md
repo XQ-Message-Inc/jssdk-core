@@ -32,6 +32,11 @@ If you would like to see the JS SDK in action, please navigate to the [JSSDK exa
         - [Revoking Key Access](#revoking-key-access)
         - [Granting and Revoking User Access](#granting-and-revoking-user-access)
         - [Connect to an alias account](#connect-to-an-alias-account)
+  - [Delta API v3 Backend](#delta-api-v3-backend)
+    - [Prerequisites](#prerequisites)
+    - [Complete Authentication Flow](#complete-authentication-flow)
+    - [Token Management](#token-management)
+    - [Using SDK Services After Switching Teams](#using-sdk-services-after-switching-teams)
     - [Manual key management](#manual-key-management)
         - [1. Get quantum entropy ( Optional )](#1-get-quantum-entropy--optional-)
         - [2. Generate a key packet](#2-generate-a-key-packet)
@@ -55,12 +60,13 @@ npm install @xqmsg/jssdk-core
 
 ### API Keys
 
-In order to utilize the XQ SDK and interact with XQ servers you will need both the **`General`** and **`Dashboard`** API keys. To generate these keys, follow these steps:
+In order to utilize the XQ SDK and interact with XQ servers you will need the **`General`** and **`Dashboard`** API keys. Integrations that target the Delta API v3 backend require an additional **`Delta`** API key. To generate these keys, follow these steps:
 
 1. Go to your [XQ management portal](https://manage.xqmsg.com/applications).
 2. Select or create an application.
 3. Create a **`General`** key for the XQ framework API.
 4. Create a **`Dashboard`** key for the XQ dashboard API.
+5. Create a **`Delta`** key for the Delta v3 authentication services.
 
 ---
 
@@ -455,6 +461,141 @@ new AuthorizeAlias(sdk)
 
     return response;
   });
+```
+
+---
+
+## Delta API v3 Backend
+
+The Delta API v3 backend introduces team-scoped authentication that issues short-lived Delta access tokens. The SDK now ships with helper services that wrap the complete flow so you can request a login link, verify the PIN, select a team, and then call any encryption or decryption pipeline with the active team token.
+
+### Prerequisites
+
+- Enable the Delta backend for your application and generate a **`DELTA`** API key. (The **`General`** and **`Dashboard`** keys are not required unless you also call v2 services.)
+- Initialize `XQSDKv3` with your `DELTA_API_KEY`. Optionally pass `DELTA_SERVER_URL` if you target a custom environment.
+
+```javascript
+import {
+  XQSDKv3,
+  LoginLink,
+  LoginVerify,
+  GetRegisteredTeams,
+  SwitchTeam,
+  ServerResponse,
+} from "@xqmsg/jssdk-core";
+
+const sdk = new XQSDKv3({
+  DELTA_API_KEY: "YOUR_DELTA_API_KEY",
+  // DELTA_SERVER_URL: "https://delta.xqmsg.dev/v3" // optional override
+});
+```
+
+### Complete Authentication Flow
+
+The Delta flow is composed of three service calls. Each stage validates the previous one and caches the resulting tokens automatically so subsequent SDK calls reuse the active team context.
+
+1. **Request a login link** – sends a PIN to the user.
+2. **Verify the PIN** – exchanges it for a guest token and returns the available teams.
+3. **Switch to a team** – retrieves the team-scoped Delta access token used by the core SDK services.
+
+```javascript
+async function requestLoginLink(email) {
+  const response = await new LoginLink(sdk).supplyAsync({
+    email,
+    codetype: "link", // "link", "pin", or "sms"
+  });
+  if (response.status !== ServerResponse.OK) throw response.payload;
+}
+
+async function verifyPinAndGetTeams(pin) {
+  const verification = await new LoginVerify(sdk).supplyAsync({ pin });
+  if (verification.status !== ServerResponse.OK) throw verification.payload;
+  const teams = await new GetRegisteredTeams(sdk).supplyAsync();
+  if (teams.status !== ServerResponse.OK) throw teams.payload;
+  return teams.payload;
+}
+
+async function switchToTeam(teamId) {
+  const response = await new SwitchTeam(sdk).supplyAsync({ id: teamId });
+  if (response.status !== ServerResponse.OK) throw response.payload;
+}
+
+export async function completeAuthenticationFlow(email, pin, teamIndex = 0) {
+  await requestLoginLink(email);
+  const teams = await verifyPinAndGetTeams(pin);
+  await switchToTeam(teams[teamIndex].id);
+}
+```
+
+Each helper above throws the underlying payload on failure, making it easy to surface user-friendly error states in your UI.
+
+### Token Management
+
+After switching teams, tokens are cached per active profile. The snippet below highlights how to inspect or display token metadata.
+
+```javascript
+function logDeltaTokens() {
+  const cache = sdk.getCache();
+  const guest = cache.getDeltaGuestAccess();
+  const profile = cache.getActiveProfile(false);
+
+  if (guest) {
+    console.log("Guest token", guest.substring(0, 20), "...");
+  }
+  if (!profile) return;
+
+  const teamToken = cache.getDeltaAccess(profile);
+  const refreshCode = cache.getDeltaRefreshCode(profile);
+  const expires = cache.getDeltaTokenExpiration(profile);
+
+  if (teamToken) {
+    console.log("Team token", teamToken.substring(0, 20), "...");
+  }
+  if (refreshCode) {
+    console.log("Refresh code", refreshCode);
+  }
+  if (expires) {
+    console.log("Expires", new Date(parseInt(expires, 10) * 1000).toISOString());
+  }
+}
+```
+
+### Using SDK Services After Switching Teams
+
+Once a Delta access token is cached, you can invoke the v3 crypto services (`EncryptV3`, `DecryptV3`, `FileEncryptV3`, `FileDecryptV3`) with no additional configuration—the SDK automatically injects the active team token. The snippet below encrypts a file right after completing authentication:
+
+```javascript
+import { FileEncryptV3, FileDecryptV3, ServerResponse } from "@xqmsg/jssdk-core";
+
+async function encryptFileAfterLogin(file, recipients) {
+  await completeAuthenticationFlow("user@example.com", "123456");
+
+  const algorithm = sdk.getAlgorithm(sdk.GCM_ALGORITHM);
+  const response = await new FileEncryptV3(sdk, algorithm).supplyAsync({
+    [FileEncryptV3.SOURCE_FILE]: file,
+    [FileEncryptV3.RECIPIENTS]: recipients,
+    [FileEncryptV3.EXPIRES_HOURS]: 24,
+    [FileEncryptV3.META]: { title: file.name, type: file.type },
+  });
+
+  if (response.status !== ServerResponse.OK) {
+    throw response.payload;
+  }
+  return response.payload; // File whose contents are encrypted (.xqf)
+}
+
+async function decryptFileAfterLogin(encryptedFile) {
+  // Reuse the same algorithm that was used to encrypt the file
+  const algorithm = sdk.getAlgorithm(sdk.GCM_ALGORITHM);
+  const response = await new FileDecryptV3(sdk, algorithm).supplyAsync({
+    [FileDecryptV3.SOURCE_FILE]: encryptedFile,
+  });
+
+  if (response.status !== ServerResponse.OK) {
+    throw response.payload;
+  }
+  return response.payload; // File restored to its original name and MIME type
+}
 ```
 
 ---
