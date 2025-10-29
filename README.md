@@ -492,7 +492,51 @@ const sdk = new XQSDKv3({
 
 ### Complete Authentication Flow
 
-The Delta flow is composed of three service calls. Each stage validates the previous one and caches the resulting tokens automatically so subsequent SDK calls reuse the active team context.
+```mermaid
+sequenceDiagram
+    autonumber
+    participant User
+    participant App as JS SDK (XQSDKv3)
+    participant Delta as Delta API v3
+
+    Note over User,Delta: Step 1: Request Login Link
+    User->>App: new LoginLink(sdk).supplyAsync({<br/>email: "user@example.com",<br/>codetype: "pin"<br/>})
+    App->>Delta: POST /v3/login/link<br/>Body: {<br/>  email: "user@example.com",<br/>  codetype: "pin" | "link" | "sms"<br/>}
+    Delta-->>App: 200 OK<br/>Response: { code: "login-code-xyz" }
+    Note over App: Cache: loginCode = "login-code-xyz"<br/>Cache: activeProfile = "user@example.com"
+    Delta-->>User: 📧 Email/SMS with PIN: "123456"
+
+    Note over User,Delta: Step 2: Verify PIN
+    User->>App: new LoginVerify(sdk).supplyAsync({<br/>pin: "123456"<br/>})
+    App->>Delta: GET /v3/login/verify<br/>Query: {<br/>  code: "login-code-xyz",<br/>  pin: "123456"<br/>}
+    Delta-->>App: 200 OK<br/>Response: { verified: true }
+    
+    Note over App,Delta: Step 3: Exchange for Guest Token
+    App->>Delta: GET /v3/login/exchange<br/>Query: {<br/>  code: "login-code-xyz"<br/>}
+    Delta-->>App: 200 OK<br/>Response: {<br/>  access_token: "guest-token-abc123"<br/>}
+    Note over App: Cache: guestAccessToken = "guest-token-abc123"<br/>Remove: loginCode
+
+    Note over User,Delta: Step 4: Get Available Teams
+    App->>App: new GetRegisteredTeams(sdk).supplyAsync()
+    App->>Delta: GET /v3/teams/registered<br/>Headers: {<br/>  Authorization: "Bearer guest-token-abc123"<br/>}
+    Delta-->>App: 200 OK<br/>Response: [<br/>  { id: 1, name: "Team A", ... },<br/>  { id: 2, name: "Team B", ... }<br/>]
+    App-->>User: Return available teams array
+
+    Note over User,Delta: Step 5: Switch to Selected Team
+    User->>App: new SwitchTeam(sdk).supplyAsync({<br/>id: 1<br/>})
+    App->>Delta: GET /v3/teams/switch<br/>Headers: {<br/>  Authorization: "Bearer guest-token-abc123"<br/>}<br/>Query: { id: 1 }
+    Delta-->>App: 200 OK<br/>Response: {<br/>  access_token: "team-token-xyz789",<br/>  refresh_token: "refresh-token-def456",<br/>  expires_in: 3600<br/>}
+    Note over App: Cache: teamAccessToken = "team-token-xyz789"<br/>Cache: refreshToken = "refresh-token-def456"<br/>Cache: tokenExpiration = timestamp<br/>Cache: activeTeam = { id: 1, name: "Team A" }<br/>Remove: guestAccessToken
+    App-->>User: Authentication complete!<br/>SDK ready for v3 crypto operations
+
+    Note over User,Delta: Now Ready for Encryption/Decryption
+    User->>App: new EncryptV3(sdk, algorithm).supplyAsync(...)
+    App->>Delta: POST /v3/crypto/encrypt<br/>Headers: {<br/>  Authorization: "Bearer team-token-xyz789"<br/>}
+    Delta-->>App: Encrypted payload
+    App-->>User: Return encrypted result
+```
+
+The Delta flow is composed of five main steps. Each stage validates the previous one and caches the resulting tokens automatically so subsequent SDK calls reuse the active team context.
 
 1. **Request a login link** – sends a PIN to the user.
 2. **Verify the PIN** – exchanges it for a guest token and returns the available teams.
