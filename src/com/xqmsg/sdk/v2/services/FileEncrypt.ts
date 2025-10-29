@@ -3,12 +3,12 @@ import { CommunicationsEnum } from "../CommunicationsEnum";
 import EncryptionAlgorithm from "../algorithms/EncryptionAlgorithm";
 import FetchQuantumEntropy from "../quantum/FetchQuantumEntropy";
 import GeneratePacket from "./GeneratePacket";
-import ServerResponse from "../ServerResponse";
+import ServerResponse from "../../shared/ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-import { XQServices } from "../XQServicesEnum";
+import { XQServices } from "../../shared/XQServicesEnum";
 
-import handleException from "../exceptions/handleException";
+import handleException from "../../shared/exceptions/handleException";
 
 /**
  * @typedef {IFileEncryptParams}

@@ -50,6 +50,20 @@ export enum XQServices {
   UpdateUserGroup = "UpdateUserGroup",
   ValidateSession = "ValidateSession",
   VerifyAccount = "VerifyAccount",
+
+  // Delta API v3 services
+  LoginLink = "LoginLink",
+  LoginVerify = "LoginVerify",
+  LoginExchange = "LoginExchange",
+  GetRegisteredTeams = "GetRegisteredTeams",
+  SwitchTeam = "SwitchTeam",
+  FetchEntropy = "FetchEntropy",
+  AddPacket = "AddPacket",
+  LookupKey = "LookupKey",
+  DeltaEncrypt = "DeltaEncrypt",
+  DeltaFileEncrypt = "DeltaFileEncrypt",
+  DeltaDecrypt = "DeltaDecrypt",
+  DeltaFileDecrypt = "DeltaFileDecrypt",
 }
 
 export enum XQEncryptionAlgorithms {

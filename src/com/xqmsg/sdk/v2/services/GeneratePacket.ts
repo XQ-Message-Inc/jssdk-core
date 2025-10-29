@@ -1,10 +1,10 @@
-import CallMethod from "../CallMethod";
+import CallMethod from "../../shared/CallMethod";
 import { CommunicationsEnum } from "../CommunicationsEnum";
-import ServerResponse from "../ServerResponse";
+import ServerResponse from "../../shared/ServerResponse";
 import XQModule from "./XQModule";
 import XQSDK from "../XQSDK";
-import { XQServices } from "../XQServicesEnum";
-import handleException from "../exceptions/handleException";
+import { XQServices } from "../../shared/XQServicesEnum";
+import handleException from "../../shared/exceptions/handleException";
 
 export interface IGeneratePacketParams {
   key: string;

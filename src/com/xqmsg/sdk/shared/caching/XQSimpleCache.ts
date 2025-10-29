@@ -21,6 +21,9 @@ export default class XQSimpleCache {
   /** A prefix for xq used in various field names for the `storage` object */
   XQ_PREFIX = "xq";
 
+  /** A prefix used for the Delta API v3 */
+  DELTA_PREFIX = "delta";
+
   /** A function which removes all profiles from the `storage` object */
   clearAllProfiles: () => void;
 
@@ -32,6 +35,24 @@ export default class XQSimpleCache {
     user: string,
     required?: boolean
   ) => StatusException | string;
+
+  /** A function which is used to request Delta API access token */
+  getDeltaAccess: (user: string, required?: boolean) => StatusException | string;
+
+  /** A function which is used to request Delta API guest access token */
+  getDeltaGuestAccess: (required?: boolean) => string | null;
+
+  /** A function which is used to request Delta API login code */
+  getDeltaLoginCode: () => string | null;
+
+  /** A function which is used to request Delta API refresh code */
+  getDeltaRefreshCode: (user: string) => string | null;
+
+  /** A function which is used to request Delta API token expiration */
+  getDeltaTokenExpiration: (user: string) => string | null;
+
+  /** A function which is used to retrieve the selected Delta API team identifier */
+  getDeltaTeamId: (user: string) => string | null;
 
   /** A function which is used to request general XQ access */
   getXQAccess: (user: string, required?: boolean) => StatusException | string;
@@ -48,6 +69,24 @@ export default class XQSimpleCache {
   /** A function used to create a dashboard access key for a given user */
   makeDashboardAccessKey: (user: string) => string;
 
+  /** A function used to create a Delta access key for a given user */
+  makeDeltaAccessKey: (user: string) => string;
+
+  /** A function used to create a Delta guest access key */
+  makeDeltaGuestAccessKey: () => string;
+
+  /** A function used to create a Delta login code key */
+  makeDeltaLoginCodeKey: () => string;
+
+  /** A function used to create a Delta refresh code key for a given user */
+  makeDeltaRefreshCodeKey: (user: string) => string;
+
+  /** A function used to create a Delta token expiration key for a given user */
+  makeDeltaTokenExpirationKey: (user: string) => string;
+
+  /** A function used to create a Delta team identifier key for a given user */
+  makeDeltaTeamIdKey: (user: string) => string;
+
   /** A function used to create a exchange access key for a given user */
   makeExchangeKey: () => string;
 
@@ -60,6 +99,24 @@ export default class XQSimpleCache {
   /** A function used to grant a user dashboard access using an associated key and storing it in the `storage` object */
   putDashboardAccess: (user: string, accessToken: string) => void;
 
+  /** A function used to grant a user Delta API access using an associated key and storing it in the `storage` object */
+  putDeltaAccess: (user: string, accessToken: string) => void;
+
+  /** A function used to store Delta API guest access token in the `storage` object */
+  putDeltaGuestAccess: (guestAccessToken: string) => void;
+
+  /** A function used to store Delta API login code in the `storage` object */
+  putDeltaLoginCode: (code: string) => void;
+
+  /** A function used to store Delta API refresh code for a user in the `storage` object */
+  putDeltaRefreshCode: (user: string, refreshCode: string) => void;
+
+  /** A function used to store Delta API token expiration for a user in the `storage` object */
+  putDeltaTokenExpiration: (user: string, expiration: string) => void;
+
+  /** A function used to store the selected Delta API team identifier */
+  putDeltaTeamId: (user: string, teamId: string) => void;
+
   /** A function used to store a user's profile in the `storage` object */
   putPreAuthProfile: (user: string) => void;
 
@@ -71,6 +128,24 @@ export default class XQSimpleCache {
 
   /** A function used to remove a user's access to the dashboard by removing their associated key from the `storage` object */
   removeDashboardAccess: (user: string) => void;
+
+  /** A function used to remove a user's Delta API access by removing their associated key from the `storage` object */
+  removeDeltaAccess: (user: string) => void;
+
+  /** A function used to remove Delta API guest access token from the `storage` object */
+  removeDeltaGuestAccess: () => void;
+
+  /** A function used to remove Delta API login code from the `storage` object */
+  removeDeltaLoginCode: () => void;
+
+  /** A function used to remove Delta API refresh code for a user from the `storage` object */
+  removeDeltaRefreshCode: (user: string) => void;
+
+  /** A function used to remove Delta API token expiration for a user from the `storage` object */
+  removeDeltaTokenExpiration: (user: string) => void;
+
+  /** A function used to remove the selected Delta API team identifier */
+  removeDeltaTeamId: (user: string) => void;
 
   /** A function used to remove a user's profile by removing their associated key from the `storage` object */
   removeProfile: (user: string) => void;
@@ -91,6 +166,7 @@ export default class XQSimpleCache {
     this.storage = storage;
     this.XQ_PREFIX = "xq";
     this.DASHBOARD_PREFIX = "dashboard";
+    this.DELTA_PREFIX = "delta";
     this.EXCHANGE_PREFIX = "exchange";
     this.AVAILABLE_PROFILES_KEY = "available-profiles";
     this.ACTIVE_PROFILE_KEY = "active-profile";
@@ -165,6 +241,117 @@ export default class XQSimpleCache {
       }
     };
 
+    // Delta API v3 cache methods
+    this.putDeltaLoginCode = (code) => {
+      this.storage.put(this.makeDeltaLoginCodeKey(), code);
+    };
+
+    this.getDeltaLoginCode = () => {
+      const loginCode = this.storage.get(this.makeDeltaLoginCodeKey()) || null;
+      return loginCode;
+    };
+
+    this.removeDeltaLoginCode = () => {
+      const loginCode = this.getDeltaLoginCode();
+      if (loginCode) {
+        this.storage.del(this.makeDeltaLoginCodeKey());
+      }
+    };
+
+    this.putDeltaGuestAccess = (guestAccessToken) => {
+      this.storage.put(this.makeDeltaGuestAccessKey(), guestAccessToken);
+    };
+
+    this.getDeltaGuestAccess = (required = false) => {
+      const guestAccessToken = this.storage.get(this.makeDeltaGuestAccessKey()) || null;
+      if (required && !guestAccessToken) {
+        throw new StatusException(401, "Delta guest access token not found");
+      }
+      return guestAccessToken;
+    };
+
+    this.removeDeltaGuestAccess = () => {
+      const guestAccessToken = this.getDeltaGuestAccess();
+      if (guestAccessToken) {
+        this.storage.del(this.makeDeltaGuestAccessKey());
+      }
+    };
+
+    this.putDeltaAccess = (user, accessToken) => {
+      this.storage.put(this.makeDeltaAccessKey(user), accessToken);
+    };
+
+    this.getDeltaAccess = (user, required = false) => {
+      const deltaAccessToken = this.storage.get(this.makeDeltaAccessKey(user));
+      if (required && !deltaAccessToken) {
+        throw new StatusException(401, "Delta access token not found");
+      } else {
+        return deltaAccessToken as string;
+      }
+    };
+
+    this.removeDeltaAccess = (user) => {
+      const deltaAccessToken = this.getDeltaAccess(user);
+      if (deltaAccessToken) {
+        this.storage.del(this.makeDeltaAccessKey(user));
+        this.removeDeltaTeamId(user);
+
+        return new ServerResponse(
+          ServerResponse.ERROR,
+          200,
+          "Success. Removed Delta access."
+        );
+      }
+    };
+
+    this.putDeltaRefreshCode = (user, refreshCode) => {
+      this.storage.put(this.makeDeltaRefreshCodeKey(user), refreshCode);
+    };
+
+    this.getDeltaRefreshCode = (user) => {
+      const refreshCode = this.storage.get(this.makeDeltaRefreshCodeKey(user)) || null;
+      return refreshCode;
+    };
+
+    this.removeDeltaRefreshCode = (user) => {
+      const refreshCode = this.getDeltaRefreshCode(user);
+      if (refreshCode) {
+        this.storage.del(this.makeDeltaRefreshCodeKey(user));
+      }
+    };
+
+    this.putDeltaTokenExpiration = (user, expiration) => {
+      this.storage.put(this.makeDeltaTokenExpirationKey(user), expiration);
+    };
+
+    this.getDeltaTokenExpiration = (user) => {
+      const expiration = this.storage.get(this.makeDeltaTokenExpirationKey(user)) || null;
+      return expiration;
+    };
+
+    this.removeDeltaTokenExpiration = (user) => {
+      const expiration = this.getDeltaTokenExpiration(user);
+      if (expiration) {
+        this.storage.del(this.makeDeltaTokenExpirationKey(user));
+      }
+    };
+
+    this.putDeltaTeamId = (user, teamId) => {
+      this.storage.put(this.makeDeltaTeamIdKey(user), teamId);
+    };
+
+    this.getDeltaTeamId = (user) => {
+      const teamId = this.storage.get(this.makeDeltaTeamIdKey(user)) || null;
+      return teamId;
+    };
+
+    this.removeDeltaTeamId = (user) => {
+      const teamId = this.getDeltaTeamId(user);
+      if (teamId) {
+        this.storage.del(this.makeDeltaTeamIdKey(user));
+      }
+    };
+
     this.hasProfile = (user) => {
       const availableProfiles = this.listProfiles();
 
@@ -226,6 +413,10 @@ export default class XQSimpleCache {
       this.removeXQPreAuthToken();
       this.removeXQAccess(user);
       this.removeDashboardAccess(user);
+      this.removeDeltaAccess(user);
+      this.removeDeltaRefreshCode(user);
+      this.removeDeltaTokenExpiration(user);
+      this.removeDeltaTeamId(user);
     };
 
     this.clearAllProfiles = () => {
@@ -238,10 +429,16 @@ export default class XQSimpleCache {
           this.removeXQPreAuthToken();
           this.removeXQAccess(user);
           this.removeDashboardAccess(user);
+          this.removeDeltaAccess(user);
+          this.removeDeltaRefreshCode(user);
+          this.removeDeltaTokenExpiration(user);
+          this.removeDeltaTeamId(user);
         }
 
         break;
       }
+      this.removeDeltaLoginCode();
+      this.removeDeltaGuestAccess();
       this.storage.del(this.ACTIVE_PROFILE_KEY);
       this.storage.del(this.AVAILABLE_PROFILES_KEY);
     };
@@ -265,6 +462,30 @@ export default class XQSimpleCache {
 
     this.makeDashboardAccessKey = (validatedUser: string) => {
       return `${this.DASHBOARD_PREFIX}-${validatedUser}`;
+    };
+
+    this.makeDeltaLoginCodeKey = () => {
+      return `${this.DELTA_PREFIX}-login-code`;
+    };
+
+    this.makeDeltaGuestAccessKey = () => {
+      return `${this.DELTA_PREFIX}-guest-access`;
+    };
+
+    this.makeDeltaAccessKey = (validatedUser: string) => {
+      return `${this.DELTA_PREFIX}-${validatedUser}`;
+    };
+
+    this.makeDeltaRefreshCodeKey = (validatedUser: string) => {
+      return `${this.DELTA_PREFIX}-refresh-${validatedUser}`;
+    };
+
+    this.makeDeltaTokenExpirationKey = (validatedUser: string) => {
+      return `${this.DELTA_PREFIX}-expiration-${validatedUser}`;
+    };
+
+    this.makeDeltaTeamIdKey = (validatedUser: string) => {
+      return `${this.DELTA_PREFIX}-team-${validatedUser}`;
     };
   }
 }

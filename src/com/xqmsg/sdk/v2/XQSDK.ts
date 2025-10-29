@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/indent */
 /* eslint-disable no-redeclare */
 import CTREncryption from "./algorithms/CTREncryption";
-import CallMethod from "./CallMethod";
-import Destination from "./Destination";
+import CallMethod from "../shared/CallMethod";
+import Destination from "../shared/Destination";
 import EncryptionAlgorithm from "./algorithms/EncryptionAlgorithm";
 import GCMEncryption from "./algorithms/GCMEncryption";
 import NTVEncryption from "./algorithms/NTVEncryption";
 import OTPEncryption from "./algorithms/OTPEncryption";
-import ServerResponse from "./ServerResponse";
-import StatusException from "./exceptions/StatusException";
-import ValidationException from "./exceptions/ValidationException";
-import XQSimpleCache from "./caching/XQSimpleCache";
+import ServerResponse from "../shared/ServerResponse";
+import StatusException from "../shared/exceptions/StatusException";
+import ValidationException from "../shared/exceptions/ValidationException";
+import XQSimpleCache from "../shared/caching/XQSimpleCache";
 
-import handleException from "./exceptions/handleException";
+import handleException from "../shared/exceptions/handleException";
 
 import memoryCache from "memory-cache";
 

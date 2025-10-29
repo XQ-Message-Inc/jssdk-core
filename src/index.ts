@@ -26,7 +26,7 @@ import NotificationEnum from "./com/xqmsg/sdk/v2/NotificationEnum";
 import RevokeKeyAccess from "./com/xqmsg/sdk/v2/services/RevokeKeyAccess";
 import RevokeUserAccess from "./com/xqmsg/sdk/v2/services/RevokeUserAccess";
 import RolesEnum from "./com/xqmsg/sdk/v2/RolesEnum";
-import ServerResponse from "./com/xqmsg/sdk/v2/ServerResponse";
+import ServerResponse from "./com/xqmsg/sdk/shared/ServerResponse";
 import UpdateSettings from "./com/xqmsg/sdk/v2/services/UpdateSettings";
 import XQSDK from "./com/xqmsg/sdk/v2/XQSDK";
 import { CommunicationsEnum } from "./com/xqmsg/sdk/v2/CommunicationsEnum";
@@ -61,6 +61,23 @@ import UpdateBusiness from "./com/xqmsg/sdk/v2/services/dashboard/UpdateBusiness
 import UpdateUserGroup from "./com/xqmsg/sdk/v2/services/dashboard/UpdateUserGroup";
 import ValidateSession from "./com/xqmsg/sdk/v2/services/dashboard/ValidateSession";
 import VerifyAccount from "./com/xqmsg/sdk/v2/services/dashboard/VerifyAccount";
+
+/**
+ * Delta API v3 - New v3 SDK and services
+ */
+import XQSDKv3 from "./com/xqmsg/sdk/v3/XQSDKv3";
+import LoginLink from "./com/xqmsg/sdk/v3/services/LoginLink";
+import LoginVerify from "./com/xqmsg/sdk/v3/services/LoginVerify";
+import LoginExchange from "./com/xqmsg/sdk/v3/services/LoginExchange";
+import GetRegisteredTeams from "./com/xqmsg/sdk/v3/services/GetRegisteredTeams";
+import SwitchTeam from "./com/xqmsg/sdk/v3/services/SwitchTeam";
+import FetchEntropy from "./com/xqmsg/sdk/v3/services/crypto/FetchEntropy";
+import AddPacket from "./com/xqmsg/sdk/v3/services/crypto/AddPacket";
+import LookupKey from "./com/xqmsg/sdk/v3/services/crypto/LookupKey";
+import EncryptV3 from "./com/xqmsg/sdk/v3/services/crypto/Encrypt";
+import DecryptV3 from "./com/xqmsg/sdk/v3/services/crypto/Decrypt";
+import FileEncryptV3 from "./com/xqmsg/sdk/v3/services/crypto/FileEncrypt";
+import FileDecryptV3 from "./com/xqmsg/sdk/v3/services/crypto/FileDecrypt";
 
 export {
   AddApplication,
@@ -98,11 +115,20 @@ export {
   GetCurrentUser,
   GetEventLogs,
   GetEventTypes,
+  GetRegisteredTeams,
+  FetchEntropy,
+  FileDecryptV3,
+  FileEncryptV3,
   GetSettings,
   GetSubscriberInfo,
   GetTrustedRanges,
   GetWorkspaces,
   GrantUserAccess,
+  DecryptV3,
+  LoginExchange,
+  LoginLink,
+  LoginVerify,
+  LookupKey,
   NotificationEnum,
   RemoveApplication,
   RemoveContact,
@@ -111,6 +137,9 @@ export {
   RevokeUserAccess,
   RolesEnum,
   ServerResponse,
+  SwitchTeam,
+  EncryptV3,
+  AddPacket,
   UpdateApplication,
   UpdateBusiness,
   UpdateSettings,
@@ -119,4 +148,5 @@ export {
   VerifyAccount,
   XQSDK,
   XQWebCrypto,
+  XQSDKv3,
 };
