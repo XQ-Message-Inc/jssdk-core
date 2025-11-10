@@ -132,7 +132,7 @@ new Encrypt(sdk, algorithm).supplyAsync(payload).then((response) => {
 To decrypt a message, the encrypted payload must be provided, along with the locator token received from XQ during encryption. The authenticated user must be one of the recipients that the message was originally sent to ( or the sender themselves).
 
 ```javascript
-import { Decrypt, ServerResponse, XQSDK } from "@xqmsg/jssdk-core";
+import { Decrypt, ServerResponse, XQSDK, EncryptionAlgorithm } from "@xqmsg/jssdk-core";
 
 const sdk = new XQSDK({
   XQ_API_KEY: "YOUR_XQ_API_KEY"
