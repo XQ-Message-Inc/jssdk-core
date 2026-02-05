@@ -6,7 +6,7 @@ import {
   ServerResponse,
 } from "../src";
 import { ensureCredentialsPresent, sdk, testEmail } from "./utils/setupFiles";
-import { IGeneratePacketParams } from "../src/com/xqmsg/sdk/v2/services/GeneratePacket";
+import { IGeneratePacketParams } from "../src/com/xqmsg/sdk/v3/services/GeneratePacket";
 
 describe("Testing manual key management", () => {
   const authorizeUser = (user: string) =>
