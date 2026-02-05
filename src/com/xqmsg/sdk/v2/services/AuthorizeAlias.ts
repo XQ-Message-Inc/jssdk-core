@@ -62,13 +62,7 @@ export default class AuthorizeAlias extends XQModule {
           "";
 
         return this.sdk
-          .call(
-            this.serviceName,
-            CallMethod.POST,
-            null,
-            maybePayload,
-            true
-          )
+          .call(this.serviceName, CallMethod.POST, null, maybePayload, true)
           .then((response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {

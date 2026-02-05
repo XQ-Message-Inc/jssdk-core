@@ -7,33 +7,32 @@ import XQException from "./XQException";
 const handleException = (
   e: unknown,
   serviceName?: XQServices | XQEncryptionAlgorithms,
-  customInput?: string
+  customInput?: string,
 ) => {
   const serviceErrorMessage =
     customInput || serviceName
       ? `${customInput || serviceName} failed`
       : "operation failed";
-  if("string" === typeof e){
-    const message = e as String;
+  if ("string" === typeof e) {
+    const message = e as string;
     return new ServerResponse(
       ServerResponse.ERROR,
       500,
-      `${serviceErrorMessage}, reason: ${message}`
+      `${serviceErrorMessage}, reason: ${message}`,
     );
-  }
-  else if (e instanceof Object) {
-    const error = e as Object;
+  } else if (e instanceof Object) {
+    const error = e as object;
     switch (error.constructor) {
       case ServerResponse: {
         const serverResponseError = error as ServerResponse;
         console.error(
-          `${serviceErrorMessage}, code: ${serverResponseError.statusCode}, reason: ${serverResponseError.payload}`
+          `${serviceErrorMessage}, code: ${serverResponseError.statusCode}, reason: ${serverResponseError.payload}`,
         );
 
         return new ServerResponse(
           ServerResponse.ERROR,
           serverResponseError.statusCode,
-          serverResponseError.payload
+          serverResponseError.payload,
         );
       }
       case ValidationException:
@@ -43,7 +42,7 @@ const handleException = (
         return new ServerResponse(
           ServerResponse.ERROR,
           xqException.code,
-          xqException.reason
+          xqException.reason,
         );
       }
 
@@ -51,15 +50,14 @@ const handleException = (
         return new ServerResponse(
           ServerResponse.ERROR,
           500,
-          `${serviceName} failed`
+          `${serviceName} failed`,
         );
     }
-  }
-  else {
+  } else {
     return new ServerResponse(
       ServerResponse.ERROR,
       500,
-      `${serviceName} failed`
+      `${serviceName} failed`,
     );
   }
 };

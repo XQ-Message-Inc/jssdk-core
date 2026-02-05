@@ -31,7 +31,10 @@ export default class CodeValidator extends XQModule {
    *
    * @returns {Promise<ServerResponse<{payload:String}>>} a `ServerResponse` containing the access token
    */
-  supplyAsync: (maybePayload: { pin: string; teamId?: number }) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: {
+    pin: string;
+    teamId?: number;
+  }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -57,12 +60,14 @@ export default class CodeValidator extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             codeValidationPayload,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
-                return new ExchangeForAccessToken(self.sdk).supplyAsync(maybePayload.teamId);
+                return new ExchangeForAccessToken(self.sdk).supplyAsync(
+                  maybePayload.teamId,
+                );
               }
               case ServerResponse.ERROR: {
                 return handleException(response, XQServices.CodeValidator);
@@ -71,7 +76,7 @@ export default class CodeValidator extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.CodeValidator))
+          resolve(handleException(exception, XQServices.CodeValidator)),
         );
       }
     };

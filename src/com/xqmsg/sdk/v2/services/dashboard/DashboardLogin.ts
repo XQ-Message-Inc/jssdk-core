@@ -1,4 +1,4 @@
-import jwtDecode, { JwtPayload } from "jwt-decode";
+import { JwtPayload, jwtDecode } from "jwt-decode";
 
 import CallMethod from "../../CallMethod";
 import ServerResponse from "../../ServerResponse";
@@ -53,19 +53,13 @@ export default class DashboardLogin extends XQModule {
         };
 
         return this.sdk
-          .call(
-            this.serviceName,
-            CallMethod.POST,
-            null,
-            loginRequest,
-            true
-          )
+          .call(this.serviceName, CallMethod.POST, null, loginRequest, true)
           .then(async (response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
                 const accessToken = response.payload;
                 const decodedJWTPayload: JwtPayload = jwtDecode(
-                  response.payload
+                  response.payload,
                 );
 
                 const profile = decodedJWTPayload.sub;
@@ -85,7 +79,7 @@ export default class DashboardLogin extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.DashboardLogin))
+          resolve(handleException(exception, XQServices.DashboardLogin)),
         );
       }
     };

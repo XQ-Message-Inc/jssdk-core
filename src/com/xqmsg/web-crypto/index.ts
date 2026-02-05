@@ -1,3 +1,3 @@
-import { XQWebCrypto } from './webcrypto.js';
+import { XQWebCrypto } from "./webcrypto.js";
 
 export { XQWebCrypto };

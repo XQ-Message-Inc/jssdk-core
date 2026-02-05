@@ -62,7 +62,7 @@ export default class UpdateApplication extends XQModule {
             CallMethod.PATCH,
             additionalHeaderProperties,
             maybePayload,
-            true
+            true,
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
@@ -76,7 +76,7 @@ export default class UpdateApplication extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.UpdateApplication))
+          resolve(handleException(exception, XQServices.UpdateApplication)),
         );
       }
     };

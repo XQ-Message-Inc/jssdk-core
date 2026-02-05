@@ -22,7 +22,7 @@ export default class NTVEncryption extends EncryptionAlgorithm {
    */
   decryptFile: (
     sourceFile: File,
-    locateFn: (aLocatorToken: string) => Promise<string>
+    locateFn: (aLocatorToken: string) => Promise<string>,
   ) => Promise<ServerResponse>;
 
   /**
@@ -42,7 +42,7 @@ export default class NTVEncryption extends EncryptionAlgorithm {
   encryptFile: (
     sourceFile: File,
     expandedKey: string | void,
-    locatorKey: string
+    locatorKey: string,
   ) => Promise<ServerResponse>;
 
   /**
@@ -90,8 +90,8 @@ export default class NTVEncryption extends EncryptionAlgorithm {
               new ServerResponse(
                 ServerResponse.ERROR,
                 500,
-                "NTV Source Key cannot be empty."
-              )
+                "NTV Source Key cannot be empty.",
+              ),
             );
           }
           const expandedKey = skipKeyExpansion
@@ -103,8 +103,8 @@ export default class NTVEncryption extends EncryptionAlgorithm {
               new ServerResponse(
                 ServerResponse.ERROR,
                 500,
-                "Key could not be UTF8 encoded."
-              )
+                "Key could not be UTF8 encoded.",
+              ),
             );
           }
           const prefixedKey = `${this.prefix}${expandedKey}`;
@@ -114,20 +114,20 @@ export default class NTVEncryption extends EncryptionAlgorithm {
                 new ServerResponse(ServerResponse.OK, 200, {
                   [EncryptionAlgorithm.ENCRYPTED_TEXT]: encryptedText,
                   [EncryptionAlgorithm.KEY]: expandedKey,
-                })
+                }),
               );
             },
             (reason) => {
               resolve(
-                handleException(reason, XQEncryptionAlgorithms.NTVEncryption)
+                handleException(reason, XQEncryptionAlgorithms.NTVEncryption),
               );
-            }
+            },
           );
         });
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            handleException(exception, XQEncryptionAlgorithms.NTVEncryption)
+            handleException(exception, XQEncryptionAlgorithms.NTVEncryption),
           );
         });
       }
@@ -145,40 +145,42 @@ export default class NTVEncryption extends EncryptionAlgorithm {
               locatorKey,
               prefixedKey,
               new Uint8Array(fileArrayBuffer),
-              (success: boolean, rawContentOrError: Uint8Array|string) => {
+              (success: boolean, rawContentOrError: Uint8Array | string) => {
                 if (success) {
-                  const rawContent = rawContentOrError as Uint8Array
+                  const rawContent = rawContentOrError as Uint8Array;
                   // Send the processed data to the user.
-                  const blob = new Blob([rawContent], {
+                  const blob = new Blob([rawContent.buffer as ArrayBuffer], {
                     type: "application/octet-stream",
                   });
                   resolve(
                     new ServerResponse(
                       ServerResponse.OK,
                       200,
-                      new File([blob], `${file.name}.xqf`)
-                    )
+                      new File([blob], `${file.name}.xqf`),
+                    ),
                   );
                 } else {
-                  const error = rawContentOrError as string
+                  const error = rawContentOrError as string;
 
-                  console.error(`failed to encrypt file ${file.name}, reason: ${error}`);
+                  console.error(
+                    `failed to encrypt file ${file.name}, reason: ${error}`,
+                  );
                   resolve(
                     new ServerResponse(
                       ServerResponse.ERROR,
                       500,
-                      `failed to encrypt file ${file.name}, reason: ${error}`
-                    )
+                      `failed to encrypt file ${file.name}, reason: ${error}`,
+                    ),
                   );
                 }
-              }
+              },
             );
           });
         });
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            handleException(exception, XQEncryptionAlgorithms.NTVEncryption)
+            handleException(exception, XQEncryptionAlgorithms.NTVEncryption),
           );
         });
       }
@@ -197,7 +199,7 @@ export default class NTVEncryption extends EncryptionAlgorithm {
                 resolve(
                   new ServerResponse(ServerResponse.OK, 200, {
                     [EncryptionAlgorithm.DECRYPTED_TEXT]: decryptedText,
-                  })
+                  }),
                 );
               },
               (reason) => {
@@ -205,16 +207,19 @@ export default class NTVEncryption extends EncryptionAlgorithm {
                   resolve(
                     handleException(
                       reason,
-                      XQEncryptionAlgorithms.NTVEncryption
-                    )
+                      XQEncryptionAlgorithms.NTVEncryption,
+                    ),
                   );
                 });
-              }
+              },
             );
           } catch (exception) {
             return new Promise((resolve) => {
               resolve(
-                handleException(exception, XQEncryptionAlgorithms.NTVEncryption)
+                handleException(
+                  exception,
+                  XQEncryptionAlgorithms.NTVEncryption,
+                ),
               );
             });
           }
@@ -222,7 +227,7 @@ export default class NTVEncryption extends EncryptionAlgorithm {
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            handleException(exception, XQEncryptionAlgorithms.NTVEncryption)
+            handleException(exception, XQEncryptionAlgorithms.NTVEncryption),
           );
         });
       }
@@ -238,7 +243,7 @@ export default class NTVEncryption extends EncryptionAlgorithm {
           return `${this.filePrefix}${key}`;
         });
         const fileDataArrayBuffer = await new Response(
-          sourceFile
+          sourceFile,
         ).arrayBuffer();
 
         return new Promise<ServerResponse>((resolve) => {
@@ -250,16 +255,16 @@ export default class NTVEncryption extends EncryptionAlgorithm {
             function (
               status: string,
               filename: string,
-              rawContent: Uint8Array
+              rawContent: Uint8Array,
             ) {
               const file = new File([Uint8Array.from(rawContent)], filename);
               return resolve(new ServerResponse(ServerResponse.OK, 200, file));
-            }
+            },
           );
         });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.FileDecrypt))
+          resolve(handleException(exception, XQServices.FileDecrypt)),
         );
       }
     };
@@ -274,20 +279,20 @@ export default class NTVEncryption extends EncryptionAlgorithm {
       const locatorSize = new Uint32Array(fileDataBytes.slice(start, end))[0];
       if (locatorSize > 256) {
         throw new Error(
-          "Unable to parse file, check that the file is valid and not damaged"
+          "Unable to parse file, check that the file is valid and not damaged",
         );
       }
       start = end;
       end = start + locatorSize - 1;
       const locator = new TextDecoder().decode(
-        new Uint8Array(fileDataBytes.slice(start, end))
+        new Uint8Array(fileDataBytes.slice(start, end)),
       );
       start = end;
       end = start + 4;
       const fileNameSize = new Uint32Array(fileDataBytes.slice(start, end))[0];
       if (fileNameSize < 2 || fileNameSize > 2000) {
         throw new Error(
-          "Unable to parse file, check that the file is valid and not damaged"
+          "Unable to parse file, check that the file is valid and not damaged",
         );
       }
       start = end;

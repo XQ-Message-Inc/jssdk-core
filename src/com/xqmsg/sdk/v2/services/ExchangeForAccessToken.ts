@@ -1,4 +1,4 @@
-import jwtDecode, { JwtPayload } from "jwt-decode";
+import { JwtPayload, jwtDecode } from "jwt-decode";
 
 import CallMethod from "../CallMethod";
 import ServerResponse from "../ServerResponse";
@@ -7,8 +7,6 @@ import XQSDK from "../XQSDK";
 import { XQServices } from "../XQServicesEnum";
 
 import handleException from "../exceptions/handleException";
-
-
 
 /**
  *  A service which is utilized to exchange a temporary access token with a real access token used in all secured XQ Message interactions
@@ -43,7 +41,8 @@ export default class ExchangeForAccessToken extends XQModule {
           Authorization: "Bearer " + preAuthToken,
         };
 
-        const payload = teamId !== undefined ? { team: teamId.toString() } : null;
+        const payload =
+          teamId !== undefined ? { team: teamId.toString() } : null;
 
         return this.sdk
           .call(
@@ -51,7 +50,7 @@ export default class ExchangeForAccessToken extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             payload,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -74,14 +73,16 @@ export default class ExchangeForAccessToken extends XQModule {
               case ServerResponse.ERROR: {
                 return handleException(
                   response,
-                  XQServices.ExchangeForAccessToken
+                  XQServices.ExchangeForAccessToken,
                 );
               }
             }
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.ExchangeForAccessToken))
+          resolve(
+            handleException(exception, XQServices.ExchangeForAccessToken),
+          ),
         );
       }
     };

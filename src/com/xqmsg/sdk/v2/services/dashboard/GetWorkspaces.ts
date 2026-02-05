@@ -48,7 +48,7 @@ export default class GetWorkspaces extends XQModule {
             CallMethod.GET,
             null,
             null,
-            true
+            true,
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
@@ -62,7 +62,7 @@ export default class GetWorkspaces extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GetWorkspaces))
+          resolve(handleException(exception, XQServices.GetWorkspaces)),
         );
       }
     };

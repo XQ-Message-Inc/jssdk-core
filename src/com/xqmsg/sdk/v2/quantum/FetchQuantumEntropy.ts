@@ -49,7 +49,7 @@ export default class FetchQuantumEntropy extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             maybePayload,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -59,7 +59,7 @@ export default class FetchQuantumEntropy extends XQModule {
               case ServerResponse.ERROR: {
                 return handleException(
                   response,
-                  XQServices.FetchQuantumEntropy
+                  XQServices.FetchQuantumEntropy,
                 );
               }
             }

@@ -46,7 +46,7 @@ export default class GetEventTypes extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             null,
-            true
+            true,
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
@@ -60,7 +60,7 @@ export default class GetEventTypes extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GetEventTypes))
+          resolve(handleException(exception, XQServices.GetEventTypes)),
         );
       }
     };

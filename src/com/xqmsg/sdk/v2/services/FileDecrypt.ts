@@ -41,7 +41,7 @@ export default class FileDecrypt extends XQModule {
         this.sdk.validateInput(maybePayload, this.requiredFields);
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.FileDecrypt))
+          resolve(handleException(exception, XQServices.FileDecrypt)),
         );
       }
       const algorithm = this.algorithm;
@@ -63,11 +63,11 @@ export default class FileDecrypt extends XQModule {
                 throw response;
               }
             }
-          }
+          },
         );
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.FileDecrypt))
+          resolve(handleException(exception, XQServices.FileDecrypt)),
         );
       }
     };

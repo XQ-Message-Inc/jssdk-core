@@ -106,19 +106,13 @@ export default class Authorize extends XQModule {
               new ServerResponse(ServerResponse.OK, 200, {
                 accessToken: existingAccessToken,
                 user,
-              })
+              }),
             );
           });
         }
 
         return this.sdk
-          .call(
-            this.serviceName,
-            CallMethod.POST,
-            null,
-            maybePayload,
-            true
-          )
+          .call(this.serviceName, CallMethod.POST, null, maybePayload, true)
           .then((response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
@@ -135,7 +129,7 @@ export default class Authorize extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.Authorize))
+          resolve(handleException(exception, XQServices.Authorize)),
         );
       }
     };

@@ -115,7 +115,7 @@ export default class FileEncrypt extends XQModule {
                   initialKey,
                   sourceFile.size > 4096
                     ? 4096
-                    : Math.max(2048, sourceFile.size)
+                    : Math.max(2048, sourceFile.size),
                 ) as string;
 
                 return new GeneratePacket(sdk)
@@ -134,12 +134,12 @@ export default class FileEncrypt extends XQModule {
                         return algorithm.encryptFile(
                           sourceFile,
                           expandedKey,
-                          locatorToken
+                          locatorToken,
                         );
                       }
                       default: {
                         return Promise.resolve(
-                          handleException(response, XQServices.FileEncrypt)
+                          handleException(response, XQServices.FileEncrypt),
                         );
                       }
                     }
@@ -147,18 +147,18 @@ export default class FileEncrypt extends XQModule {
               }
               case ServerResponse.ERROR: {
                 return Promise.resolve(
-                  handleException(response, XQServices.FileEncrypt)
+                  handleException(response, XQServices.FileEncrypt),
                 );
               }
             }
 
             return Promise.resolve(
-              handleException(response, XQServices.FileEncrypt)
+              handleException(response, XQServices.FileEncrypt),
             );
           });
       } catch (exception) {
         return Promise.resolve(
-          handleException(exception, XQServices.FileEncrypt)
+          handleException(exception, XQServices.FileEncrypt),
         );
       }
     };

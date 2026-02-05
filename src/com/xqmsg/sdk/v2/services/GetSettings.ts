@@ -52,7 +52,7 @@ export default class GetSettings extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             maybePayload,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -66,7 +66,7 @@ export default class GetSettings extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GetSettings))
+          resolve(handleException(exception, XQServices.GetSettings)),
         );
       }
     };

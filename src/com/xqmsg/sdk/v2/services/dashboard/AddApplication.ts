@@ -57,7 +57,7 @@ export default class AddApplication extends XQModule {
             CallMethod.POST,
             additionalHeaderProperties,
             maybePayload,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -71,7 +71,7 @@ export default class AddApplication extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.AddApplication))
+          resolve(handleException(exception, XQServices.AddApplication)),
         );
       }
     };

@@ -48,7 +48,7 @@ export default class GetTrustedRanges extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             null,
-            true
+            true,
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
@@ -62,7 +62,7 @@ export default class GetTrustedRanges extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GetTrustedRanges))
+          resolve(handleException(exception, XQServices.GetTrustedRanges)),
         );
       }
     };

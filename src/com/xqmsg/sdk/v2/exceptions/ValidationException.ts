@@ -1,7 +1,6 @@
 import XQException from "./XQException";
 
-export default class ValidationException  extends XQException{
-
+export default class ValidationException extends XQException {
   /**
    * @param {Number} code
    * @param {String} reason

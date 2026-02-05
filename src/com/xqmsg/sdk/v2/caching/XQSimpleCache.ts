@@ -139,7 +139,7 @@ export default class XQSimpleCache {
         return new ServerResponse(
           ServerResponse.ERROR,
           200,
-          "Success. Removed XQ access."
+          "Success. Removed XQ access.",
         );
       }
     };
@@ -226,11 +226,11 @@ export default class XQSimpleCache {
     this.removeProfile = (user) => {
       const availableProfiles = this.listProfiles();
       const profilesSansUser = availableProfiles.filter(
-        (profile) => profile != user
+        (profile) => profile != user,
       );
       this.storage.put(
         this.AVAILABLE_PROFILES_KEY,
-        JSON.stringify(profilesSansUser)
+        JSON.stringify(profilesSansUser),
       );
       this.removeXQPreAuthToken();
       this.removeXQAccess(user);

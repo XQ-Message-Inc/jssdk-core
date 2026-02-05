@@ -127,7 +127,7 @@ export default class AddBusiness extends XQModule {
             CallMethod.POST,
             additionalHeaderProperties,
             maybePayload,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -141,7 +141,7 @@ export default class AddBusiness extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.AddBusiness))
+          resolve(handleException(exception, XQServices.AddBusiness)),
         );
       }
     };

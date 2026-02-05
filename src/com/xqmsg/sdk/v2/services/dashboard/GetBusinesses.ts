@@ -49,7 +49,7 @@ export default class GetBusinesses extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             null,
-            true
+            true,
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
@@ -63,7 +63,7 @@ export default class GetBusinesses extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GetBusinesses))
+          resolve(handleException(exception, XQServices.GetBusinesses)),
         );
       }
     };

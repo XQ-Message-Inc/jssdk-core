@@ -53,7 +53,7 @@ export default class CheckApiKey extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             maybePayload,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -67,7 +67,7 @@ export default class CheckApiKey extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.CheckApiKey))
+          resolve(handleException(exception, XQServices.CheckApiKey)),
         );
       }
     };

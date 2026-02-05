@@ -52,7 +52,7 @@ export default class RemoveContact extends XQModule {
             CallMethod.DELETE,
             additionalHeaderProperties,
             null,
-            true
+            true,
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
@@ -66,7 +66,7 @@ export default class RemoveContact extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.RemoveContact))
+          resolve(handleException(exception, XQServices.RemoveContact)),
         );
       }
     };

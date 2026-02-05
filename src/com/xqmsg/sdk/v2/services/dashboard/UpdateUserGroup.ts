@@ -67,7 +67,7 @@ export default class UpdateUserGroup extends XQModule {
             CallMethod.PATCH,
             additionalHeaderProperties,
             payload,
-            true
+            true,
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
@@ -81,7 +81,7 @@ export default class UpdateUserGroup extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.UpdateUserGroup))
+          resolve(handleException(exception, XQServices.UpdateUserGroup)),
         );
       }
     };

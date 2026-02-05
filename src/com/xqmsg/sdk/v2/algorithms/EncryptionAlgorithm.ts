@@ -26,12 +26,12 @@ export default class EncryptionAlgorithm {
   encryptFile: (
     sourceFile: File,
     expandedKey: string | void,
-    locatorToken: string
+    locatorToken: string,
   ) => Promise<ServerResponse>;
 
   decryptFile: (
     sourceFile: File,
-    locateFn: (aLocatorToken: string) => Promise<string>
+    locateFn: (aLocatorToken: string) => Promise<string>,
   ) => Promise<ServerResponse>;
 
   /**
@@ -45,7 +45,7 @@ export default class EncryptionAlgorithm {
   encryptText: (
     text: string,
     key: string,
-    skipKeyExpansion?: boolean
+    skipKeyExpansion?: boolean,
   ) => Promise<ServerResponse>;
 
   /**

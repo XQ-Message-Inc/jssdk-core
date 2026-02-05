@@ -47,7 +47,7 @@ export default class DeleteSubscriber extends XQModule {
             CallMethod.DELETE,
             additionalHeaderProperties,
             maybePayload,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -61,7 +61,7 @@ export default class DeleteSubscriber extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.DeleteSubscriber))
+          resolve(handleException(exception, XQServices.DeleteSubscriber)),
         );
       }
     };

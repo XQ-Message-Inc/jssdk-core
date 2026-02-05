@@ -53,7 +53,7 @@ export default class FindUserGroups extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             maybePayload,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -67,7 +67,7 @@ export default class FindUserGroups extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.FindUserGroups))
+          resolve(handleException(exception, XQServices.FindUserGroups)),
         );
       }
     };

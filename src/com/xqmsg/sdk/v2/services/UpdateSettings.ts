@@ -41,7 +41,10 @@ export default class UpdateSettings extends XQModule {
     super(sdk);
 
     this.serviceName = "settings";
-    this.requiredFields = [UpdateSettings.NEWSLETTER, UpdateSettings.NOTIFICATIONS];
+    this.requiredFields = [
+      UpdateSettings.NEWSLETTER,
+      UpdateSettings.NOTIFICATIONS,
+    ];
 
     this.supplyAsync = (maybePayload) => {
       try {
@@ -59,7 +62,7 @@ export default class UpdateSettings extends XQModule {
             CallMethod.PATCH,
             additionalHeaderProperties,
             maybePayload,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -73,7 +76,7 @@ export default class UpdateSettings extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.UpdateSettings))
+          resolve(handleException(exception, XQServices.UpdateSettings)),
         );
       }
     };

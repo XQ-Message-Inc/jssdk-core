@@ -49,7 +49,7 @@ export default class GetApplications extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             maybePayload,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -63,7 +63,7 @@ export default class GetApplications extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GetApplications))
+          resolve(handleException(exception, XQServices.GetApplications)),
         );
       }
     };

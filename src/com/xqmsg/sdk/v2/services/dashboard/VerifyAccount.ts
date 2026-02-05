@@ -1,4 +1,4 @@
-import jwtDecode, { JwtPayload } from "jwt-decode";
+import { JwtPayload, jwtDecode } from "jwt-decode";
 
 import CallMethod from "../../CallMethod";
 import ServerResponse from "../../ServerResponse";
@@ -60,14 +60,14 @@ export default class VerifyAccount extends XQModule {
             resolve(
               new ServerResponse(ServerResponse.ERROR, 401, {
                 payload: "access token expired",
-              })
+              }),
             );
           });
         }
 
         const validateSession = async (
           profile: string,
-          tokenToValidate: string
+          tokenToValidate: string,
         ) => {
           // Verify that the session is valid before proceeding
           const response = await new ValidateSession(this.sdk).supplyAsync({
@@ -113,14 +113,14 @@ export default class VerifyAccount extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             null,
-            true
+            true,
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
                 const newAccessToken = response.payload;
                 const decodedJWTPayload: JwtPayload = jwtDecode(
-                  response.payload
+                  response.payload,
                 );
 
                 const profile = decodedJWTPayload.sub || "";
@@ -139,7 +139,7 @@ export default class VerifyAccount extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.VerifyAccount))
+          resolve(handleException(exception, XQServices.VerifyAccount)),
         );
       }
     };

@@ -78,7 +78,7 @@ export default class AddContact extends XQModule {
             CallMethod.POST,
             additionalHeaderProperties,
             maybePayload,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -92,7 +92,7 @@ export default class AddContact extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.AddContact))
+          resolve(handleException(exception, XQServices.AddContact)),
         );
       }
     };

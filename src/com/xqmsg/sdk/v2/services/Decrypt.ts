@@ -68,7 +68,7 @@ export default class Decrypt extends XQModule {
                       }
                       case ServerResponse.ERROR: {
                         console.error(
-                          `${algorithm.constructor.name}.decryptText(...) failed, code: ${decryptResponse.statusCode}, reason: ${decryptResponse.payload}`
+                          `${algorithm.constructor.name}.decryptText(...) failed, code: ${decryptResponse.statusCode}, reason: ${decryptResponse.payload}`,
                         );
                         return decryptResponse;
                       }
@@ -78,14 +78,14 @@ export default class Decrypt extends XQModule {
               case ServerResponse.ERROR: {
                 return handleException(
                   keyRetrievalResponse,
-                  XQServices.Decrypt
+                  XQServices.Decrypt,
                 );
               }
             }
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.Decrypt))
+          resolve(handleException(exception, XQServices.Decrypt)),
         );
       }
     };

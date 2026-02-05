@@ -30,7 +30,10 @@ interface XQSDKProps {
   NTV_ALGORITHM: string;
 
   /** A object which contains encryption algorithm instances */
-  ALGORITHMS: Record<string, OTPEncryption | CTREncryption | GCMEncryption | NTVEncryption>;
+  ALGORITHMS: Record<
+    string,
+    OTPEncryption | CTREncryption | GCMEncryption | NTVEncryption
+  >;
 
   /** A string representing the OTP encryption algorithm */
   OTP_ALGORITHM: string;
@@ -65,7 +68,7 @@ interface XQSDKProps {
     method: "POST" | "PATCH",
     maybeHeaderProperties: Record<string, string>,
     maybePayload: Record<string, string>,
-    requiresAPIKey: boolean
+    requiresAPIKey: boolean,
   ) => Promise<unknown>;
 
   /**
@@ -103,7 +106,7 @@ interface XQSDKProps {
     maybeService: string,
     maybeHeaderProperties: Record<string, string>,
     maybePayload: Record<string, string>,
-    requiresAPIKey: boolean
+    requiresAPIKey: boolean,
   ) => Promise<unknown>;
 
   /**
@@ -120,7 +123,7 @@ interface XQSDKProps {
    */
   validateInput: (
     maybeArgs: Record<string, string>,
-    requiredFields: string[]
+    requiredFields: string[],
   ) => Record<string, string>;
 
   validatePreAuthToken: () => string;
@@ -158,7 +161,7 @@ class XQSDK {
     credentials: { API_KEY: string },
     serverConfig?: {
       DELTA_SERVER_URL?: string;
-    }
+    },
   ) {
     this.API_KEY = credentials.API_KEY;
     this.DELTA_SERVER_URL = serverConfig?.DELTA_SERVER_URL || DELTA_SERVER_URL;
@@ -180,7 +183,7 @@ class XQSDK {
       method,
       maybeHeaderProperties,
       maybePayload,
-      requiresAPIKey
+      requiresAPIKey,
     ) {
       this.assert(method != null, "method cannot be null");
 
@@ -198,7 +201,7 @@ class XQSDK {
           maybeService,
           maybeHeaderProperties,
           maybePayload,
-          requiresAPIKey
+          requiresAPIKey,
         );
       } else {
         var URL =
@@ -212,7 +215,7 @@ class XQSDK {
           maybeService,
           maybeHeaderProperties,
           maybePayload,
-          requiresAPIKey
+          requiresAPIKey,
         );
       }
     };
@@ -223,7 +226,7 @@ class XQSDK {
       maybeService,
       maybeHeaderProperties,
       maybePayload,
-      requiresAPIKey
+      requiresAPIKey,
     ) => {
       const self = this;
 
@@ -234,10 +237,7 @@ class XQSDK {
         xhttp.timeout = 60000;
         if (requiresAPIKey) {
           xhttp.setRequestHeader(XQSDK.API_KEY_HEADER, self.API_KEY);
-          xhttp.setRequestHeader(
-            XQSDK.ACCESS_CONTROL_ALLOW_ORIGIN,
-            XQSDK.ANY
-          );
+          xhttp.setRequestHeader(XQSDK.ACCESS_CONTROL_ALLOW_ORIGIN, XQSDK.ANY);
           // Add X-Team-ID header if team ID is set in cache
           const teamId = self.cache.getTeamId();
           if (teamId) {
@@ -260,8 +260,8 @@ class XQSDK {
             new ServerResponse(
               ServerResponse.ERROR,
               this.status,
-              this.statusText
-            )
+              this.statusText,
+            ),
           );
         };
         xhttp.onerror = function () {
@@ -269,8 +269,8 @@ class XQSDK {
             new ServerResponse(
               ServerResponse.ERROR,
               this.status,
-              this.statusText
-            )
+              this.statusText,
+            ),
           );
         };
         xhttp.onreadystatechange = function () {
@@ -283,8 +283,8 @@ class XQSDK {
                     new ServerResponse(
                       ServerResponse.OK,
                       this.status,
-                      "No Content"
-                    )
+                      "No Content",
+                    ),
                   );
                 default: {
                   if (responseString.includes("status")) {
@@ -293,23 +293,23 @@ class XQSDK {
                       dataMap = JSON.parse(responseString.replace(/\n/g, ""));
                     } catch (e) {
                       return new Promise((resolve) =>
-                        resolve(handleException(e))
+                        resolve(handleException(e)),
                       );
                     }
                     return resolve(
                       new ServerResponse(
                         ServerResponse.OK,
                         this.status,
-                        dataMap
-                      )
+                        dataMap,
+                      ),
                     );
                   } else {
                     return resolve(
                       new ServerResponse(
                         ServerResponse.OK,
                         this.status,
-                        responseString
-                      )
+                        responseString,
+                      ),
                     );
                   }
                 }
@@ -319,8 +319,8 @@ class XQSDK {
                 new ServerResponse(
                   ServerResponse.ERROR,
                   this.status,
-                  this.responseText
-                )
+                  this.responseText,
+                ),
               );
             }
           }
@@ -328,7 +328,7 @@ class XQSDK {
         if (
           maybePayload &&
           [CallMethod.POST, CallMethod.PATCH, CallMethod.DELETE].includes(
-            method
+            method,
           )
         ) {
           if (
@@ -384,7 +384,7 @@ class XQSDK {
       if (maybeArgs == null) {
         throw new ValidationException(
           500,
-          `Missing input parameters: [${requiredFields}]`
+          `Missing input parameters: [${requiredFields}]`,
         );
       }
       const input = Object.getOwnPropertyNames(maybeArgs);
@@ -396,7 +396,10 @@ class XQSDK {
       if (missing.length > 0) {
         const msg = "missing [" + missing + "] !";
         console.error(msg);
-        throw new ValidationException(500, `Missing input parameters: [${missing}]`);
+        throw new ValidationException(
+          500,
+          `Missing input parameters: [${missing}]`,
+        );
       }
       return maybeArgs;
     };
@@ -423,7 +426,7 @@ class XQSDK {
       if (accessToken == null) {
         throw new StatusException(
           401,
-          `Access Token not found for ${activeProfile}`
+          `Access Token not found for ${activeProfile}`,
         );
       }
       return accessToken;

@@ -22,7 +22,7 @@ export default class OTPEncryption extends EncryptionAlgorithm {
    */
   decryptFile: (
     sourceFile: File,
-    locateFn: (aLocatorToken: string) => Promise<string>
+    locateFn: (aLocatorToken: string) => Promise<string>,
   ) => Promise<ServerResponse>;
 
   /**
@@ -42,7 +42,7 @@ export default class OTPEncryption extends EncryptionAlgorithm {
   encryptFile: (
     sourceFile: File,
     expandedKey: string | void,
-    locatorKey: string
+    locatorKey: string,
   ) => Promise<ServerResponse>;
 
   /**
@@ -90,8 +90,8 @@ export default class OTPEncryption extends EncryptionAlgorithm {
               new ServerResponse(
                 ServerResponse.ERROR,
                 500,
-                "OTP Source Key cannot be empty."
-              )
+                "OTP Source Key cannot be empty.",
+              ),
             );
           }
           const expandedKey = skipKeyExpansion
@@ -103,8 +103,8 @@ export default class OTPEncryption extends EncryptionAlgorithm {
               new ServerResponse(
                 ServerResponse.ERROR,
                 500,
-                "Key could not be UTF8 encoded."
-              )
+                "Key could not be UTF8 encoded.",
+              ),
             );
           }
           const prefixedKey = `${this.prefix}${expandedKey}`;
@@ -114,22 +114,22 @@ export default class OTPEncryption extends EncryptionAlgorithm {
                 new ServerResponse(ServerResponse.OK, 200, {
                   [EncryptionAlgorithm.ENCRYPTED_TEXT]: encryptedText,
                   [EncryptionAlgorithm.KEY]: expandedKey,
-                })
+                }),
               );
             },
             (reason) => {
               return new Promise((resolve) => {
                 resolve(
-                  handleException(reason, XQEncryptionAlgorithms.OTPEncryption)
+                  handleException(reason, XQEncryptionAlgorithms.OTPEncryption),
                 );
               });
-            }
+            },
           );
         });
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            handleException(exception, XQEncryptionAlgorithms.OTPEncryption)
+            handleException(exception, XQEncryptionAlgorithms.OTPEncryption),
           );
         });
       }
@@ -146,35 +146,37 @@ export default class OTPEncryption extends EncryptionAlgorithm {
             locatorKey,
             prefixedKey,
             file,
-            (success: boolean, rawContentOrError: Blob|string) => {
-                if (success) {
-                  const blob = rawContentOrError as Blob
-                  resolve(
-                    new ServerResponse(
-                      ServerResponse.OK,
-                      200,
-                      new File([blob], `${file.name}.xqf`)
-                    )
-                  );
-                } else {
-                  const error = rawContentOrError as string
+            (success: boolean, rawContentOrError: Blob | string) => {
+              if (success) {
+                const blob = rawContentOrError as Blob;
+                resolve(
+                  new ServerResponse(
+                    ServerResponse.OK,
+                    200,
+                    new File([blob], `${file.name}.xqf`),
+                  ),
+                );
+              } else {
+                const error = rawContentOrError as string;
 
-                  console.error(`failed to encrypt file ${file.name}, reason: ${error}`);
-                  resolve(
-                    new ServerResponse(
-                      ServerResponse.ERROR,
-                      500,
-                      `failed to encrypt file ${file.name}, reason: ${error}`
-                    )
-                  );
-                }
+                console.error(
+                  `failed to encrypt file ${file.name}, reason: ${error}`,
+                );
+                resolve(
+                  new ServerResponse(
+                    ServerResponse.ERROR,
+                    500,
+                    `failed to encrypt file ${file.name}, reason: ${error}`,
+                  ),
+                );
               }
-            );
-          });
+            },
+          );
+        });
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            handleException(exception, XQEncryptionAlgorithms.OTPEncryption)
+            handleException(exception, XQEncryptionAlgorithms.OTPEncryption),
           );
         });
       }
@@ -193,7 +195,7 @@ export default class OTPEncryption extends EncryptionAlgorithm {
                 resolve(
                   new ServerResponse(ServerResponse.OK, 200, {
                     [EncryptionAlgorithm.DECRYPTED_TEXT]: decryptedText,
-                  })
+                  }),
                 );
               },
               (reason) => {
@@ -201,16 +203,19 @@ export default class OTPEncryption extends EncryptionAlgorithm {
                   resolve(
                     handleException(
                       reason,
-                      XQEncryptionAlgorithms.OTPEncryption
-                    )
+                      XQEncryptionAlgorithms.OTPEncryption,
+                    ),
                   );
                 });
-              }
+              },
             );
           } catch (exception) {
             return new Promise((resolve) => {
               resolve(
-                handleException(exception, XQEncryptionAlgorithms.OTPEncryption)
+                handleException(
+                  exception,
+                  XQEncryptionAlgorithms.OTPEncryption,
+                ),
               );
             });
           }
@@ -218,7 +223,7 @@ export default class OTPEncryption extends EncryptionAlgorithm {
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            handleException(exception, XQEncryptionAlgorithms.OTPEncryption)
+            handleException(exception, XQEncryptionAlgorithms.OTPEncryption),
           );
         });
       }
@@ -243,26 +248,28 @@ export default class OTPEncryption extends EncryptionAlgorithm {
             function (
               success: boolean,
               filenameOrError: string,
-              rawContent?: Blob
+              rawContent?: Blob,
             ) {
               if (success && rawContent) {
                 const file = new File([rawContent], filenameOrError);
-                return resolve(new ServerResponse(ServerResponse.OK, 200, file));
+                return resolve(
+                  new ServerResponse(ServerResponse.OK, 200, file),
+                );
               } else {
                 return resolve(
                   new ServerResponse(
                     ServerResponse.ERROR,
                     500,
-                    `Failed to decrypt file: ${filenameOrError}`
-                  )
+                    `Failed to decrypt file: ${filenameOrError}`,
+                  ),
                 );
               }
-            }
+            },
           );
         });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.FileDecrypt))
+          resolve(handleException(exception, XQServices.FileDecrypt)),
         );
       }
     };
@@ -277,27 +284,27 @@ export default class OTPEncryption extends EncryptionAlgorithm {
       const locatorSize = new Uint32Array(headerBytes.slice(start, end))[0];
       if (locatorSize > 256) {
         throw new Error(
-          "Unable to parse file, check that the file is valid and not damaged"
+          "Unable to parse file, check that the file is valid and not damaged",
         );
       }
       start = end;
       end = start + locatorSize - 1;
       const locator = new TextDecoder().decode(
-        new Uint8Array(headerBytes.slice(start, end))
+        new Uint8Array(headerBytes.slice(start, end)),
       );
       start = end;
       end = start + 4;
       const fileNameSize = new Uint32Array(headerBytes.slice(start, end))[0];
       if (fileNameSize < 2 || fileNameSize > 2000) {
         throw new Error(
-          "Unable to parse file, check that the file is valid and not damaged"
+          "Unable to parse file, check that the file is valid and not damaged",
         );
       }
       start = end;
       end = start + fileNameSize - 1;
       const nameEncrypted = new Uint8Array(headerBytes.slice(start, end));
       start = end;
-      const contentEncrypted = headerBytes.slice(start);
+      const _contentEncrypted = headerBytes.slice(start);
       return {
         locator,
         nameEncrypted,

@@ -22,7 +22,7 @@ export default class CTREncryption extends EncryptionAlgorithm {
    */
   decryptFile: (
     sourceFile: File,
-    locateFn: (aLocatorToken: string) => Promise<string>
+    locateFn: (aLocatorToken: string) => Promise<string>,
   ) => Promise<ServerResponse>;
 
   /**
@@ -33,7 +33,6 @@ export default class CTREncryption extends EncryptionAlgorithm {
    */
   decryptText: (text: string, key: string) => Promise<ServerResponse>;
 
-
   /**
    * @param {File} file - the file to be encrypted
    * @param {String} expandedKey - a key expanded to the length to that of the text that needs encryption.
@@ -43,7 +42,7 @@ export default class CTREncryption extends EncryptionAlgorithm {
   encryptFile: (
     sourceFile: File,
     expandedKey: string | void,
-    locatorKey: string
+    locatorKey: string,
   ) => Promise<ServerResponse>;
 
   /**
@@ -91,8 +90,8 @@ export default class CTREncryption extends EncryptionAlgorithm {
               new ServerResponse(
                 ServerResponse.ERROR,
                 500,
-                "CTR Source Key cannot be empty."
-              )
+                "CTR Source Key cannot be empty.",
+              ),
             );
           }
           const expandedKey = skipKeyExpansion
@@ -104,8 +103,8 @@ export default class CTREncryption extends EncryptionAlgorithm {
               new ServerResponse(
                 ServerResponse.ERROR,
                 500,
-                "Key could not be UTF8 encoded."
-              )
+                "Key could not be UTF8 encoded.",
+              ),
             );
           }
           const prefixedKey = `${this.prefix}${expandedKey}`;
@@ -115,25 +114,22 @@ export default class CTREncryption extends EncryptionAlgorithm {
                 new ServerResponse(ServerResponse.OK, 200, {
                   [EncryptionAlgorithm.ENCRYPTED_TEXT]: encryptedText,
                   [EncryptionAlgorithm.KEY]: expandedKey,
-                })
+                }),
               );
             },
             (reason) => {
               return new Promise((resolve) => {
                 resolve(
-                  handleException(
-                    reason,
-                    XQEncryptionAlgorithms.CTREncryption
-                  )
+                  handleException(reason, XQEncryptionAlgorithms.CTREncryption),
                 );
               });
-            }
+            },
           );
         });
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            handleException(exception, XQEncryptionAlgorithms.CTREncryption)
+            handleException(exception, XQEncryptionAlgorithms.CTREncryption),
           );
         });
       }
@@ -150,35 +146,37 @@ export default class CTREncryption extends EncryptionAlgorithm {
             locatorKey,
             prefixedKey,
             file,
-            (success: boolean, rawContentOrError: Blob|string) => {
-                if (success) {
-                  const blob = rawContentOrError as Blob
-                  resolve(
-                    new ServerResponse(
-                      ServerResponse.OK,
-                      200,
-                      new File([blob], `${file.name}.xqf`)
-                    )
-                  );
-                } else {
-                  const error = rawContentOrError as string
+            (success: boolean, rawContentOrError: Blob | string) => {
+              if (success) {
+                const blob = rawContentOrError as Blob;
+                resolve(
+                  new ServerResponse(
+                    ServerResponse.OK,
+                    200,
+                    new File([blob], `${file.name}.xqf`),
+                  ),
+                );
+              } else {
+                const error = rawContentOrError as string;
 
-                  console.error(`failed to encrypt file ${file.name}, reason: ${error}`);
-                  resolve(
-                    new ServerResponse(
-                      ServerResponse.ERROR,
-                      500,
-                      `failed to encrypt file ${file.name}, reason: ${error}`
-                    )
-                  );
-                }
+                console.error(
+                  `failed to encrypt file ${file.name}, reason: ${error}`,
+                );
+                resolve(
+                  new ServerResponse(
+                    ServerResponse.ERROR,
+                    500,
+                    `failed to encrypt file ${file.name}, reason: ${error}`,
+                  ),
+                );
               }
-            );
-          });
+            },
+          );
+        });
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            handleException(exception, XQEncryptionAlgorithms.CTREncryption)
+            handleException(exception, XQEncryptionAlgorithms.CTREncryption),
           );
         });
       }
@@ -197,7 +195,7 @@ export default class CTREncryption extends EncryptionAlgorithm {
                 resolve(
                   new ServerResponse(ServerResponse.OK, 200, {
                     [EncryptionAlgorithm.DECRYPTED_TEXT]: decryptedText,
-                  })
+                  }),
                 );
               },
               (reason) => {
@@ -205,19 +203,19 @@ export default class CTREncryption extends EncryptionAlgorithm {
                   resolve(
                     handleException(
                       reason,
-                      XQEncryptionAlgorithms.CTREncryption
-                    )
+                      XQEncryptionAlgorithms.CTREncryption,
+                    ),
                   );
                 });
-              }
+              },
             );
           } catch (exception) {
             return new Promise((resolve) => {
               resolve(
                 handleException(
                   exception,
-                  XQEncryptionAlgorithms.CTREncryption
-                )
+                  XQEncryptionAlgorithms.CTREncryption,
+                ),
               );
             });
           }
@@ -225,7 +223,7 @@ export default class CTREncryption extends EncryptionAlgorithm {
       } catch (exception) {
         return new Promise((resolve) => {
           resolve(
-            handleException(exception, XQEncryptionAlgorithms.CTREncryption)
+            handleException(exception, XQEncryptionAlgorithms.CTREncryption),
           );
         });
       }
@@ -250,30 +248,32 @@ export default class CTREncryption extends EncryptionAlgorithm {
             function (
               success: boolean,
               filenameOrError: string,
-              rawContent?: Blob
+              rawContent?: Blob,
             ) {
               if (success && rawContent) {
                 const file = new File([rawContent], filenameOrError);
-                return resolve(new ServerResponse(ServerResponse.OK, 200, file));
+                return resolve(
+                  new ServerResponse(ServerResponse.OK, 200, file),
+                );
               } else {
                 return resolve(
                   new ServerResponse(
                     ServerResponse.ERROR,
                     500,
-                    `Failed to decrypt file: ${filenameOrError}`
-                  )
+                    `Failed to decrypt file: ${filenameOrError}`,
+                  ),
                 );
               }
-            }
+            },
           );
         });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.FileDecrypt))
+          resolve(handleException(exception, XQServices.FileDecrypt)),
         );
       }
     };
-    
+
     this.parseFileForDecrypt = async (file) => {
       // Only read the header portion of the file instead of loading the entire file into memory
       const headerSlice = file.slice(0, 1024);
@@ -284,20 +284,20 @@ export default class CTREncryption extends EncryptionAlgorithm {
       const locatorSize = new Uint32Array(fileDataBytes.slice(start, end))[0];
       if (locatorSize > 256) {
         throw new Error(
-          "Unable to parse file, check that the file is valid and not damaged"
+          "Unable to parse file, check that the file is valid and not damaged",
         );
       }
       start = end;
       end = start + locatorSize - 1;
       const locator = new TextDecoder().decode(
-        new Uint8Array(fileDataBytes.slice(start, end))
+        new Uint8Array(fileDataBytes.slice(start, end)),
       );
       start = end;
       end = start + 4;
       const fileNameSize = new Uint32Array(fileDataBytes.slice(start, end))[0];
       if (fileNameSize < 2 || fileNameSize > 2000) {
         throw new Error(
-          "Unable to parse file, check that the file is valid and not damaged"
+          "Unable to parse file, check that the file is valid and not damaged",
         );
       }
       start = end;

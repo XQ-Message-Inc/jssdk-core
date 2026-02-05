@@ -55,7 +55,7 @@ export default class DashboardLoginVerify extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             { request: "sub" },
-            true
+            true,
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
@@ -77,7 +77,7 @@ export default class DashboardLoginVerify extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.DashboardLogin))
+          resolve(handleException(exception, XQServices.DashboardLogin)),
         );
       }
     };

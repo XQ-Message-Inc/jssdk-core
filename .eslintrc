@@ -1,23 +1,32 @@
 {
     "plugins": ["@typescript-eslint", "prettier"],
     "parser": "@typescript-eslint/parser",
-    "extends": ["eslint:recommended", "prettier"],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended"
+    ],
     "parserOptions": {
-      "sourceType": "module"
+      "sourceType": "module",
+      "ecmaVersion": 2020
     },
     "env": {
       "browser": true,
       "es6": true,
       "jest": true,
-      "jquery": true,
       "node": true
     },
     "rules": {
       "prettier/prettier": "warn",
-      "@typescript-eslint/indent": ["error", 2],
       "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
       "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/prefer-as-const": "off",
+      "@typescript-eslint/no-var-requires": "off",
+      "@typescript-eslint/no-this-alias": "off",
+      "@typescript-eslint/no-unsafe-declaration-merging": "off",
+      "@typescript-eslint/no-require-imports": "off",
       "prefer-const": "error",
+      "no-var": "off",
       "sort-imports": ["error", {
         "ignoreCase": false,
         "ignoreDeclarationSort": false,
@@ -35,4 +44,3 @@
       }
     ]
 }
-  

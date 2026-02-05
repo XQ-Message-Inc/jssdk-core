@@ -49,7 +49,7 @@ export default class RemoveUserGroup extends XQModule {
             CallMethod.DELETE,
             additionalHeaderProperties,
             null,
-            true
+            true,
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
@@ -63,7 +63,7 @@ export default class RemoveUserGroup extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.RemoveUserGroup))
+          resolve(handleException(exception, XQServices.RemoveUserGroup)),
         );
       }
     };

@@ -75,7 +75,7 @@ export default class Encrypt extends XQModule {
    * @returns {Promise<ServerResponse<{payload:{locatorKey:string, encryptedText:string}}>>}
    */
   supplyAsync: (
-    maybePayload: IEncryptParams
+    maybePayload: IEncryptParams,
   ) => Promise<ServerResponse | undefined>;
 
   constructor(sdk: XQSDK, algorithm: EncryptionAlgorithm) {
@@ -179,7 +179,7 @@ export default class Encrypt extends XQModule {
 
                 const expandedKey = algorithm.expandKey(
                   initialKey,
-                  message.length > 4096 ? 4096 : Math.max(2048, message.length)
+                  message.length > 4096 ? 4096 : Math.max(2048, message.length),
                 ) as string;
 
                 return encryptText(expandedKey);
@@ -191,7 +191,7 @@ export default class Encrypt extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.Encrypt))
+          resolve(handleException(exception, XQServices.Encrypt)),
         );
       }
     };

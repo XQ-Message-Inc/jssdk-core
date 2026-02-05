@@ -95,7 +95,7 @@ export default class GeneratePacket extends XQModule {
             CallMethod.POST,
             additionalHeaderProperties,
             payload,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -109,7 +109,7 @@ export default class GeneratePacket extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GeneratePacket))
+          resolve(handleException(exception, XQServices.GeneratePacket)),
         );
       }
     };

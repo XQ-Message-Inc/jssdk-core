@@ -49,7 +49,7 @@ export default class GetContacts extends XQModule {
       [GetContacts.LIMIT]?: number;
       [GetContacts.PAGE]?: number;
       [GetContacts.ROLE]?: UserRole;
-    } | null
+    } | null,
   ) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
@@ -73,7 +73,7 @@ export default class GetContacts extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             null,
-            true
+            true,
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
@@ -87,7 +87,7 @@ export default class GetContacts extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GetContacts))
+          resolve(handleException(exception, XQServices.GetContacts)),
         );
       }
     };

@@ -99,7 +99,7 @@ export default class UpdateBusiness extends XQModule {
             CallMethod.PATCH,
             additionalHeaderProperties,
             maybePayload,
-            true
+            true,
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
@@ -113,7 +113,7 @@ export default class UpdateBusiness extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.UpdateBusiness))
+          resolve(handleException(exception, XQServices.UpdateBusiness)),
         );
       }
     };

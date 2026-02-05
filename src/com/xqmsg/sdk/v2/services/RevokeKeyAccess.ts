@@ -30,7 +30,7 @@ export default class RevokeKeyAccess extends XQModule {
    * @see #encodeURIComponent function encodeURIComponent (built-in since ES-5)
    * @returns {Promise<ServerResponse<{}>>}
    */
-  supplyAsync: (maybePayload: { tokens:  string[] }) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: { tokens: string[] }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
@@ -48,7 +48,7 @@ export default class RevokeKeyAccess extends XQModule {
           Authorization: "Bearer " + accessToken,
         };
 
-        const payload = {[RevokeKeyAccess.LOCATOR_TOKENS]:locatorTokens}
+        const payload = { [RevokeKeyAccess.LOCATOR_TOKENS]: locatorTokens };
 
         return this.sdk
           .call(
@@ -56,7 +56,7 @@ export default class RevokeKeyAccess extends XQModule {
             CallMethod.DELETE,
             additionalHeaderProperties,
             payload,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -70,7 +70,7 @@ export default class RevokeKeyAccess extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.RevokeKeyAccess))
+          resolve(handleException(exception, XQServices.RevokeKeyAccess)),
         );
       }
     };

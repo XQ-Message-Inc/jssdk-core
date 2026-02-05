@@ -48,7 +48,7 @@ export default class DeleteAuthorization extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             maybePayload,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -60,14 +60,14 @@ export default class DeleteAuthorization extends XQModule {
               case ServerResponse.ERROR: {
                 return handleException(
                   response,
-                  XQServices.DeleteAuthorization
+                  XQServices.DeleteAuthorization,
                 );
               }
             }
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.DeleteAuthorization))
+          resolve(handleException(exception, XQServices.DeleteAuthorization)),
         );
       }
     };

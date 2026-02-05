@@ -46,7 +46,7 @@ export default class GetCurrentBusiness extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             maybePayload,
-            true
+            true,
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
@@ -60,7 +60,7 @@ export default class GetCurrentBusiness extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GetCurrentBusiness))
+          resolve(handleException(exception, XQServices.GetCurrentBusiness)),
         );
       }
     };

@@ -72,7 +72,7 @@ export default class GetCommunications extends XQModule {
       [GetCommunications.TYPE]?: number[];
       [GetCommunications.TZ]?: number;
       [GetCommunications.USERS]?: string[];
-    } | null
+    } | null,
   ) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
@@ -96,7 +96,7 @@ export default class GetCommunications extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             maybePayload,
-            true
+            true,
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
@@ -110,7 +110,7 @@ export default class GetCommunications extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GetCommunications))
+          resolve(handleException(exception, XQServices.GetCommunications)),
         );
       }
     };

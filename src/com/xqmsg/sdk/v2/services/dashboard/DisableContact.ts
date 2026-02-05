@@ -49,7 +49,7 @@ export default class DisableContact extends XQModule {
             CallMethod.DELETE,
             additionalHeaderProperties,
             null,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -63,7 +63,7 @@ export default class DisableContact extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.DisableContact))
+          resolve(handleException(exception, XQServices.DisableContact)),
         );
       }
     };

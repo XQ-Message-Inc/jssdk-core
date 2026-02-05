@@ -56,7 +56,7 @@ export default class TeamSwitch extends XQModule {
             CallMethod.POST,
             additionalHeaderProperties,
             payload,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -79,7 +79,7 @@ export default class TeamSwitch extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.TeamSwitch))
+          resolve(handleException(exception, XQServices.TeamSwitch)),
         );
       }
     };

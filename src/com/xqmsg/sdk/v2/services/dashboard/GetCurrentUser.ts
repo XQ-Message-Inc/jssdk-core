@@ -53,18 +53,19 @@ export default class GetCurrentUser extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             null,
-            true
+            true,
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
                 // There should only be 1 user per email address, so let's just grab the first one no matter what.
-                const contact = response.payload.contacts?.[0] || response.payload;
+                const contact =
+                  response.payload.contacts?.[0] || response.payload;
                 if (!contact) {
                   throw new ServerResponse(
                     ServerResponse.ERROR,
                     404,
-                    `Could not find a user with that email address: ${activeProfile}`
+                    `Could not find a user with that email address: ${activeProfile}`,
                   );
                 }
                 return new ServerResponse(ServerResponse.OK, 200, { contact });
@@ -76,7 +77,7 @@ export default class GetCurrentUser extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GetCurrentUser))
+          resolve(handleException(exception, XQServices.GetCurrentUser)),
         );
       }
     };

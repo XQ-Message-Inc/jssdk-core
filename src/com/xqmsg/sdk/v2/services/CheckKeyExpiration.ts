@@ -57,7 +57,7 @@ export default class CheckKeyExpiration extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             null,
-            true
+            true,
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -71,7 +71,7 @@ export default class CheckKeyExpiration extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.CheckKeyExpiration))
+          resolve(handleException(exception, XQServices.CheckKeyExpiration)),
         );
       }
     };

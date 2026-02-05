@@ -76,7 +76,7 @@ export default class GetEventLogs extends XQModule {
       [GetEventLogs.THREAT]?: number[];
       [GetEventLogs.TO]?: number;
       [GetEventLogs.USER]?: number[];
-    } | null
+    } | null,
   ) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
@@ -100,7 +100,7 @@ export default class GetEventLogs extends XQModule {
             CallMethod.GET,
             additionalHeaderProperties,
             maybePayload,
-            true
+            true,
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
@@ -114,7 +114,7 @@ export default class GetEventLogs extends XQModule {
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.GetEventLogs))
+          resolve(handleException(exception, XQServices.GetEventLogs)),
         );
       }
     };
