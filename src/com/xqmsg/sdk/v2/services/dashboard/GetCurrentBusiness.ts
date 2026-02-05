@@ -1,5 +1,4 @@
 import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
@@ -8,8 +7,9 @@ import { XQServices } from "../../XQServicesEnum";
 import handleException from "../../exceptions/handleException";
 
 /**
- * A service which is utilized to fetch the current business of the logged in user
+ * A service which is utilized to fetch the current team of the logged in user
  *
+ * Delta API: GET /v3/team
  * @class [GetCurrentBusiness]
  */
 export default class GetCurrentBusiness extends XQModule {
@@ -27,30 +27,26 @@ export default class GetCurrentBusiness extends XQModule {
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "business";
+    this.serviceName = "team";
     this.requiredFields = [];
 
     this.supplyAsync = (maybePayload) => {
       try {
         this.sdk.validateInput(maybePayload, this.requiredFields);
 
-        const dashboardAccessToken = this.sdk.validateAccessToken(
-          Destination.DASHBOARD
-        );
+        const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
-          Authorization: "Bearer " + dashboardAccessToken,
+          Authorization: "Bearer " + accessToken,
         };
 
         return this.sdk
           .call(
-            this.sdk.DASHBOARD_SERVER_URL,
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
             maybePayload,
-            true,
-            Destination.DASHBOARD
+            true
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {

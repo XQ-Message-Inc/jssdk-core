@@ -1,5 +1,4 @@
 import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
@@ -12,6 +11,7 @@ import handleException from "../../exceptions/handleException";
  * Devices that are within a trusted range can choose to be onboarded based off of their IP alone,
  * without needing additional email confirmation.
  *
+ * Delta API: GET /v3/trusted
  * @class [GetTrustedRanges]
  */
 export default class GetTrustedRanges extends XQModule {
@@ -32,28 +32,23 @@ export default class GetTrustedRanges extends XQModule {
     this.serviceName = "trusted";
     this.requiredFields = [];
 
-    // TODO(worstestes - 3.21.22): add filter capabilities
     this.supplyAsync = (maybePayload) => {
       try {
         this.sdk.validateInput(maybePayload, this.requiredFields);
 
-        const dashboardAccessToken = this.sdk.validateAccessToken(
-          Destination.DASHBOARD
-        );
+        const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
-          Authorization: "Bearer " + dashboardAccessToken,
+          Authorization: "Bearer " + accessToken,
         };
 
         return this.sdk
           .call(
-            this.sdk.DASHBOARD_SERVER_URL,
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
             null,
-            true,
-            Destination.DASHBOARD
+            true
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {

@@ -7,9 +7,9 @@ import { XQServices } from "../XQServicesEnum";
 import handleException from "../exceptions/handleException";
 
 /**
- * A service which is utilized to revoke a key using its token.
- * Only the user who sent the message will be able to revoke it.
+ * A service which is utilized to log out the current user and invalidate their session.
  *
+ * Delta API: GET /v3/logout
  * @class [DeleteAuthorization]
  */
 export default class DeleteAuthorization extends XQModule {
@@ -29,7 +29,7 @@ export default class DeleteAuthorization extends XQModule {
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "authorization";
+    this.serviceName = "logout";
     this.requiredFields = [];
 
     this.supplyAsync = (maybePayload) => {
@@ -44,9 +44,8 @@ export default class DeleteAuthorization extends XQModule {
 
         return this.sdk
           .call(
-            this.sdk.SUBSCRIPTION_SERVER_URL,
             this.serviceName,
-            CallMethod.DELETE,
+            CallMethod.GET,
             additionalHeaderProperties,
             maybePayload,
             true
@@ -54,6 +53,8 @@ export default class DeleteAuthorization extends XQModule {
           .then((response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
+                // Clear cached tokens on successful logout
+                this.cache.clearAllProfiles();
                 return response;
               }
               case ServerResponse.ERROR: {

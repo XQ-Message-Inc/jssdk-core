@@ -9,6 +9,7 @@ import handleException from "../exceptions/handleException";
 /**
  * A service which is utilized to revoke access to keys for specific recipients without revoking the entire token.
  *
+ * Delta API: DELETE /v3/key/{token}/recipients
  * @class [RevokeUserAccess]
  */
 export default class RevokeUserAccess extends XQModule {
@@ -63,9 +64,8 @@ export default class RevokeUserAccess extends XQModule {
 
         return this.sdk
           .call(
-            this.sdk.VALIDATION_SERVER_URL,
-            this.serviceName + "/" + encodeURIComponent(locatorKey),
-            CallMethod.PATCH,
+            "key/" + encodeURIComponent(locatorKey) + "/recipients",
+            CallMethod.DELETE,
             additionalHeaderProperties,
             payload,
             true

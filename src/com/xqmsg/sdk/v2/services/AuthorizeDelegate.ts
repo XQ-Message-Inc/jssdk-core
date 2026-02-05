@@ -10,6 +10,7 @@ import handleException from "../exceptions/handleException";
  * A service which is utilized to allow a user to create a very short-lived version of their access token in order to access certain
  * services such as file encryption/decryption on the XQ websie without having to transmit their main access token.
  *
+ * Delta API: GET /v3/login/delegate
  * @class [AuthorizeDelegate]
  */
 export default class AuthorizeDelegate extends XQModule {
@@ -29,7 +30,7 @@ export default class AuthorizeDelegate extends XQModule {
   constructor(sdk: XQSDK) {
     super(sdk);
 
-    this.serviceName = "delegate";
+    this.serviceName = "login/delegate";
     this.requiredFields = [];
 
     this.supplyAsync = (maybePayload) => {
@@ -44,7 +45,6 @@ export default class AuthorizeDelegate extends XQModule {
 
         return this.sdk
           .call(
-            this.sdk.SUBSCRIPTION_SERVER_URL,
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,

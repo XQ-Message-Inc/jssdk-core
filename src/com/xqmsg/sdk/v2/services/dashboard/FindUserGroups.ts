@@ -1,5 +1,4 @@
 import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
@@ -8,9 +7,10 @@ import { XQServices } from "../../XQServicesEnum";
 import handleException from "../../exceptions/handleException";
 
 /**
- * A service which is utilized to find a grouping of dashboard users.
+ * A service which is utilized to find a grouping of users.
  * Can be optionally filtered by regex on ID
  *
+ * Delta API: GET /v3/groups
  * @class [FindUserGroups]
  */
 export default class FindUserGroups extends XQModule {
@@ -20,7 +20,7 @@ export default class FindUserGroups extends XQModule {
   /** Specified name of the service */
   serviceName: string;
 
-  /** The field name representing the dashboard user groups */
+  /** The field name representing the user groups */
   static GROUPS: "groups" = "groups";
 
   /** The field name representing the id of a user group */
@@ -34,30 +34,26 @@ export default class FindUserGroups extends XQModule {
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "usergroup";
+    this.serviceName = "groups";
     this.requiredFields = [];
 
     this.supplyAsync = (maybePayload) => {
       try {
         this.sdk.validateInput(maybePayload, this.requiredFields);
 
-        const dashboardAccessToken = this.sdk.validateAccessToken(
-          Destination.DASHBOARD
-        );
+        const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
-          Authorization: "Bearer " + dashboardAccessToken,
+          Authorization: "Bearer " + accessToken,
         };
 
         return this.sdk
           .call(
-            this.sdk.DASHBOARD_SERVER_URL,
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
             maybePayload,
-            true,
-            Destination.DASHBOARD
+            true
           )
           .then((response: ServerResponse) => {
             switch (response.status) {
@@ -77,6 +73,3 @@ export default class FindUserGroups extends XQModule {
     };
   }
 }
-
-FindUserGroups.ID = "id";
-FindUserGroups.GROUPS = "groups";

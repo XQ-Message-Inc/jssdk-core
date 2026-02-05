@@ -11,6 +11,7 @@ import handleException from "../exceptions/handleException";
  * A service which is utilized to authenticate the two-factor PIN which resulted from the preceding {@link Authorize} service call.
  * If successful this service returns a `ServerResponse` containing the access token.
  *
+ * Delta API: GET /v3/login/verify
  * @class [CodeValidator]
  */
 export default class CodeValidator extends XQModule {
@@ -35,7 +36,7 @@ export default class CodeValidator extends XQModule {
   constructor(sdk: XQSDK) {
     super(sdk);
 
-    this.serviceName = "codevalidation";
+    this.serviceName = "login/verify";
     this.requiredFields = [CodeValidator.PIN];
 
     this.supplyAsync = (maybePayload) => {
@@ -52,7 +53,6 @@ export default class CodeValidator extends XQModule {
 
         return this.sdk
           .call(
-            this.sdk.SUBSCRIPTION_SERVER_URL,
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,

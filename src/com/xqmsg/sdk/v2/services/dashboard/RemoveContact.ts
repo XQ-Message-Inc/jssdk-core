@@ -1,5 +1,4 @@
 import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
@@ -8,8 +7,9 @@ import { XQServices } from "../../XQServicesEnum";
 import handleException from "../../exceptions/handleException";
 
 /**
- * A service which is utilized to remove an existing Contact
+ * A service which is utilized to remove an existing Contact (team member)
  *
+ * Delta API: DELETE /v3/team/member/{id}
  * @class [RemoveContact]
  */
 export default class RemoveContact extends XQModule {
@@ -33,30 +33,26 @@ export default class RemoveContact extends XQModule {
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "contact";
+    this.serviceName = "team/member";
     this.requiredFields = [RemoveContact.ID];
 
     this.supplyAsync = (maybePayload) => {
       try {
         this.sdk.validateInput(maybePayload, this.requiredFields);
 
-        const dashboardAccessToken = this.sdk.validateAccessToken(
-          Destination.DASHBOARD
-        );
+        const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
-          Authorization: "Bearer " + dashboardAccessToken,
+          Authorization: "Bearer " + accessToken,
         };
 
         return this.sdk
           .call(
-            this.sdk.DASHBOARD_SERVER_URL,
             `${this.serviceName}/${maybePayload[RemoveContact.ID]}?delete=true`,
             CallMethod.DELETE,
             additionalHeaderProperties,
             null,
-            true,
-            Destination.DASHBOARD
+            true
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {

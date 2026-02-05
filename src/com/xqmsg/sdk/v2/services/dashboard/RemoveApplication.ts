@@ -1,5 +1,4 @@
 import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
@@ -10,6 +9,7 @@ import handleException from "../../exceptions/handleException";
 /**
  * A service which is utilized to remove an existing developer application.
  *
+ * Delta API: DELETE /v3/devapp/{id}
  * @class [RemoveApplication]
  */
 export default class RemoveApplication extends XQModule {
@@ -40,23 +40,19 @@ export default class RemoveApplication extends XQModule {
       try {
         this.sdk.validateInput(maybePayload, this.requiredFields);
 
-        const dashboardAccessToken = this.sdk.validateAccessToken(
-          Destination.DASHBOARD
-        );
+        const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
-          Authorization: "Bearer " + dashboardAccessToken,
+          Authorization: "Bearer " + accessToken,
         };
 
         return this.sdk
           .call(
-            this.sdk.DASHBOARD_SERVER_URL,
             this.serviceName + "/" + maybePayload[RemoveApplication.ID],
             CallMethod.DELETE,
             additionalHeaderProperties,
             null,
-            true,
-            Destination.DASHBOARD
+            true
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {

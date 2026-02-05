@@ -1,7 +1,6 @@
 import jwtDecode, { JwtPayload } from "jwt-decode";
 
 import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
@@ -11,6 +10,8 @@ import handleException from "../../exceptions/handleException";
 
 /**
  * A service utilized to log-in a user and allow access to Dashboard services.
+ *
+ * Delta API: POST /v3/login
  * @class [DashboardLogin]
  */
 export default class DashboardLogin extends XQModule {
@@ -53,18 +54,16 @@ export default class DashboardLogin extends XQModule {
 
         return this.sdk
           .call(
-            this.sdk.DASHBOARD_SERVER_URL,
             this.serviceName,
             CallMethod.POST,
             null,
             loginRequest,
-            true,
-            Destination.DASHBOARD
+            true
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
-                const dashboardAccessToken = response.payload;
+                const accessToken = response.payload;
                 const decodedJWTPayload: JwtPayload = jwtDecode(
                   response.payload
                 );
@@ -72,16 +71,11 @@ export default class DashboardLogin extends XQModule {
                 const profile = decodedJWTPayload.sub;
 
                 await self.cache.putActiveProfile(profile);
+                self.cache.putXQAccess(profile, accessToken);
 
-                const activeProfile = self.cache.getActiveProfile(true);
-
-                self.cache.putDashboardAccess(
-                  activeProfile,
-                  dashboardAccessToken
-                );
                 return new ServerResponse(ServerResponse.OK, 200, {
                   user: profile,
-                  dashboardAccessToken,
+                  accessToken,
                 });
               }
               case ServerResponse.ERROR: {

@@ -1,5 +1,4 @@
 import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
@@ -12,6 +11,7 @@ import handleException from "../../exceptions/handleException";
  *
  * NOTE: this requires an enterprise level API key, not a user generated API key
  *
+ * Delta API: POST /v3/team
  * @class [AddBusiness]
  */
 export default class AddBusiness extends XQModule {
@@ -115,23 +115,19 @@ export default class AddBusiness extends XQModule {
       try {
         this.sdk.validateInput(maybePayload, this.requiredFields);
 
-        const dashboardAccessToken = this.sdk.validateAccessToken(
-          Destination.DASHBOARD
-        );
+        const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
-          Authorization: "Bearer " + dashboardAccessToken,
+          Authorization: "Bearer " + accessToken,
         };
 
         return this.sdk
           .call(
-            this.sdk.DASHBOARD_SERVER_URL,
-            this.serviceName,
+            "team",
             CallMethod.POST,
             additionalHeaderProperties,
             maybePayload,
-            true,
-            Destination.DASHBOARD
+            true
           )
           .then((response: ServerResponse) => {
             switch (response.status) {

@@ -8,6 +8,8 @@ import handleException from "../exceptions/handleException";
 
 /**
  * A service which is utilized to update settings of the current user
+ *
+ * Delta API: PATCH /v3/settings
  * @class [UpdateSettings]
  */
 export default class UpdateSettings extends XQModule {
@@ -53,7 +55,6 @@ export default class UpdateSettings extends XQModule {
 
         return this.sdk
           .call(
-            this.sdk.SUBSCRIPTION_SERVER_URL,
             this.serviceName,
             CallMethod.PATCH,
             additionalHeaderProperties,

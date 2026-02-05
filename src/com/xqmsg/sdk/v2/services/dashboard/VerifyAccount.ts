@@ -1,7 +1,6 @@
 import jwtDecode, { JwtPayload } from "jwt-decode";
 
 import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import ValidateSession from "./ValidateSession";
 import XQModule from "../XQModule";
@@ -11,14 +10,16 @@ import { XQServices } from "../../XQServicesEnum";
 import handleException from "../../exceptions/handleException";
 import verifyJWTExpiration from "../../utils/verifyJWTExpiration";
 
-enum DashboardAccessToken {
-  preAuth = "preauth-dashboard",
-  auth = "dashboard",
+enum AccessTokenType {
+  preAuth = "preauth",
+  auth = "auth",
 }
 
 /**
- * A service utilized to verify a user via their `accessToken` saved in-memory and allow access to Dashboard services.
- * @class [DashboardLogin]
+ * A service utilized to verify a user via their `accessToken` saved in-memory and allow access to services.
+ *
+ * Delta API: GET /v3/login/verify
+ * @class [VerifyAccount]
  */
 export default class VerifyAccount extends XQModule {
   /** The required fields of the payload needed to utilize the service */
@@ -66,22 +67,22 @@ export default class VerifyAccount extends XQModule {
 
         const validateSession = async (
           profile: string,
-          dashboardAccessToken: string
+          tokenToValidate: string
         ) => {
           // Verify that the session is valid before proceeding
           const response = await new ValidateSession(this.sdk).supplyAsync({
-            accessToken: dashboardAccessToken,
+            accessToken: tokenToValidate,
           });
 
           switch (response.status) {
             case ServerResponse.OK: {
               return new ServerResponse(ServerResponse.OK, 200, {
                 user: profile,
-                dashboardAccessToken,
+                accessToken: tokenToValidate,
               });
             }
             case ServerResponse.ERROR: {
-              self.cache.removeDashboardAccess(profile);
+              self.cache.removeXQAccess(profile);
               self.cache.removeProfile(profile);
 
               return handleException(response, XQServices.VerifyAccount);
@@ -95,31 +96,29 @@ export default class VerifyAccount extends XQModule {
 
         const decodedIncomingAccessToken: JwtPayload = jwtDecode(accessToken);
 
-        // if user has an already existing dashboard token
-        // skip pre-auth dashboard token exchange process
-        if (decodedIncomingAccessToken.iss === DashboardAccessToken.auth) {
+        // if user has an already existing auth token
+        // skip pre-auth token exchange process
+        if (decodedIncomingAccessToken.iss === AccessTokenType.auth) {
           const profile = decodedIncomingAccessToken.sub || "";
 
           self.cache.putActiveProfile(profile);
-          self.cache.putDashboardAccess(profile, accessToken);
+          self.cache.putXQAccess(profile, accessToken);
 
           return validateSession(profile, accessToken);
         }
 
         return this.sdk
           .call(
-            this.sdk.DASHBOARD_SERVER_URL,
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
             null,
-            true,
-            Destination.DASHBOARD
+            true
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
-                const dashboardAccessToken = response.payload;
+                const newAccessToken = response.payload;
                 const decodedJWTPayload: JwtPayload = jwtDecode(
                   response.payload
                 );
@@ -127,7 +126,7 @@ export default class VerifyAccount extends XQModule {
                 const profile = decodedJWTPayload.sub || "";
 
                 self.cache.putActiveProfile(profile);
-                self.cache.putDashboardAccess(profile, dashboardAccessToken);
+                self.cache.putXQAccess(profile, newAccessToken);
 
                 await validateSession(profile, accessToken);
 

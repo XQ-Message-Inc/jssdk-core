@@ -9,10 +9,7 @@ export default class XQSimpleCache {
   /** The field name for `storage` object representing the current active profile */
   ACTIVE_PROFILE_KEY = "active-profile";
 
-  /** The prefix used for the dashboard application used in the `makeDashboardAccessKey` method. The prefix is prepended to the `user` and the result is used as a field name for the `storage` object */
-  DASHBOARD_PREFIX = "dashboard";
-
-  /** A prefix used for the dashboard application used in the `makeXQAccessKey` method. The prefix is prepended to the `XQ_PREFIX` and `user` string and the result is used as a field name for the `storage` object */
+  /** A prefix used for the application used in the `makeXQAccessKey` method. The prefix is prepended to the `XQ_PREFIX` and `user` string and the result is used as a field name for the `storage` object */
   EXCHANGE_PREFIX = "exchange";
 
   /** The field name for `storage` object representing the lists of available profiles */
@@ -21,17 +18,17 @@ export default class XQSimpleCache {
   /** A prefix for xq used in various field names for the `storage` object */
   XQ_PREFIX = "xq";
 
+  /** The field name for storing the identity token */
+  IDENTITY_TOKEN_KEY = "identity-token";
+
+  /** The field name for storing the current team ID */
+  TEAM_ID_KEY = "team-id";
+
   /** A function which removes all profiles from the `storage` object */
   clearAllProfiles: () => void;
 
   /** A function which retrieves the active profile from the `storage` object */
   getActiveProfile: (required: boolean) => string | null;
-
-  /** A function which is used to request dashboard access */
-  getDashboardAccess: (
-    user: string,
-    required?: boolean
-  ) => StatusException | string;
 
   /** A function which is used to request general XQ access */
   getXQAccess: (user: string, required?: boolean) => StatusException | string;
@@ -45,9 +42,6 @@ export default class XQSimpleCache {
   /** A function used to list all available profiles stored in the `storage` object */
   listProfiles: () => string[];
 
-  /** A function used to create a dashboard access key for a given user */
-  makeDashboardAccessKey: (user: string) => string;
-
   /** A function used to create a exchange access key for a given user */
   makeExchangeKey: () => string;
 
@@ -57,9 +51,6 @@ export default class XQSimpleCache {
   /** A function used to store a user as an active profile in the `storage` object */
   putActiveProfile: (user: string) => void;
 
-  /** A function used to grant a user dashboard access using an associated key and storing it in the `storage` object */
-  putDashboardAccess: (user: string, accessToken: string) => void;
-
   /** A function used to store a user's profile in the `storage` object */
   putPreAuthProfile: (user: string) => void;
 
@@ -67,10 +58,7 @@ export default class XQSimpleCache {
   putXQAccess: (user: string, accessToken: string) => void;
 
   /** A function used to store a user's pre-authentication token in the `storage` object */
-  putXQPreAuthToken: (user: string, preAuthToken: string) => void;
-
-  /** A function used to remove a user's access to the dashboard by removing their associated key from the `storage` object */
-  removeDashboardAccess: (user: string) => void;
+  putXQPreAuthToken: (preAuthToken: string) => void;
 
   /** A function used to remove a user's profile by removing their associated key from the `storage` object */
   removeProfile: (user: string) => void;
@@ -81,6 +69,24 @@ export default class XQSimpleCache {
   /** A function used to remove a user's XQ pre-authentication token by removing their associated key from the `storage` object */
   removeXQPreAuthToken: () => void;
 
+  /** A function used to store the identity token */
+  putIdentityToken: (identityToken: string) => void;
+
+  /** A function used to retrieve the identity token */
+  getIdentityToken: () => string | null;
+
+  /** A function used to remove the identity token */
+  removeIdentityToken: () => void;
+
+  /** A function used to store the current team ID */
+  putTeamId: (teamId: string) => void;
+
+  /** A function used to retrieve the current team ID */
+  getTeamId: () => string | null;
+
+  /** A function used to remove the current team ID */
+  removeTeamId: () => void;
+
   /** The local storage object */
   storage: CacheClass<string, string>;
 
@@ -90,10 +96,11 @@ export default class XQSimpleCache {
   constructor(storage: CacheClass<string, string>) {
     this.storage = storage;
     this.XQ_PREFIX = "xq";
-    this.DASHBOARD_PREFIX = "dashboard";
     this.EXCHANGE_PREFIX = "exchange";
     this.AVAILABLE_PROFILES_KEY = "available-profiles";
     this.ACTIVE_PROFILE_KEY = "active-profile";
+    this.IDENTITY_TOKEN_KEY = "identity-token";
+    this.TEAM_ID_KEY = "team-id";
 
     this.putXQPreAuthToken = (preAuthToken) => {
       this.storage.put(this.makeExchangeKey(), preAuthToken);
@@ -137,31 +144,33 @@ export default class XQSimpleCache {
       }
     };
 
-    this.putDashboardAccess = (user, accessToken) => {
-      this.storage.put(this.makeDashboardAccessKey(user), accessToken);
+    this.putIdentityToken = (identityToken) => {
+      this.storage.put(this.IDENTITY_TOKEN_KEY, identityToken);
     };
 
-    this.getDashboardAccess = (user, required = false) => {
-      const dashboardAccessToken = this.storage.get(
-        this.makeDashboardAccessKey(user)
-      );
-      if (required && !dashboardAccessToken) {
-        throw new StatusException(401, "401 Unauthorized");
-      } else {
-        return dashboardAccessToken as string;
+    this.getIdentityToken = () => {
+      return this.storage.get(this.IDENTITY_TOKEN_KEY) || null;
+    };
+
+    this.removeIdentityToken = () => {
+      const identityToken = this.getIdentityToken();
+      if (identityToken) {
+        this.storage.del(this.IDENTITY_TOKEN_KEY);
       }
     };
 
-    this.removeDashboardAccess = (user) => {
-      const dashboardAccessToken = this.getDashboardAccess(user);
-      if (dashboardAccessToken) {
-        this.storage.del(this.makeDashboardAccessKey(user));
+    this.putTeamId = (teamId) => {
+      this.storage.put(this.TEAM_ID_KEY, teamId);
+    };
 
-        return new ServerResponse(
-          ServerResponse.ERROR,
-          200,
-          "Success. Removed Dashboard access."
-        );
+    this.getTeamId = () => {
+      return this.storage.get(this.TEAM_ID_KEY) || null;
+    };
+
+    this.removeTeamId = () => {
+      const teamId = this.getTeamId();
+      if (teamId) {
+        this.storage.del(this.TEAM_ID_KEY);
       }
     };
 
@@ -225,7 +234,8 @@ export default class XQSimpleCache {
       );
       this.removeXQPreAuthToken();
       this.removeXQAccess(user);
-      this.removeDashboardAccess(user);
+      this.removeIdentityToken();
+      this.removeTeamId();
     };
 
     this.clearAllProfiles = () => {
@@ -237,7 +247,8 @@ export default class XQSimpleCache {
         if (user) {
           this.removeXQPreAuthToken();
           this.removeXQAccess(user);
-          this.removeDashboardAccess(user);
+          this.removeIdentityToken();
+          this.removeTeamId();
         }
 
         break;
@@ -261,10 +272,6 @@ export default class XQSimpleCache {
 
     this.makeXQAccessKey = (validatedUser: string) => {
       return `${this.XQ_PREFIX}-${validatedUser}`;
-    };
-
-    this.makeDashboardAccessKey = (validatedUser: string) => {
-      return `${this.DASHBOARD_PREFIX}-${validatedUser}`;
     };
   }
 }

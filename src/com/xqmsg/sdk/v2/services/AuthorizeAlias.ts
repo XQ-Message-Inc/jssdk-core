@@ -15,6 +15,8 @@ interface IAuthorizeAliasParams {
  * A service which is utilized to add new users to XQ system.
  * It is a variant of `Authorize` which adds the user without validating a given email via PIN.
  * However, its use is limited to basic encryption and decryption.
+ *
+ * Delta API: POST /v3/login/alias
  * @class [AuthorizeAlias]
  */
 export default class AuthorizeAlias extends XQModule {
@@ -46,7 +48,7 @@ export default class AuthorizeAlias extends XQModule {
   constructor(sdk: XQSDK) {
     super(sdk);
 
-    this.serviceName = "authorizealias";
+    this.serviceName = "login/alias";
     this.requiredFields = [AuthorizeAlias.USER];
 
     this.supplyAsync = (maybePayload) => {
@@ -61,7 +63,6 @@ export default class AuthorizeAlias extends XQModule {
 
         return this.sdk
           .call(
-            this.sdk.SUBSCRIPTION_SERVER_URL,
             this.serviceName,
             CallMethod.POST,
             null,

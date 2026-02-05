@@ -15,6 +15,8 @@ import handleException from "../exceptions/handleException";
  * While the hex string itself can be used as entropy, to retrieve the actual bits ( if required ),
  * the string should be decoded from base-64, and each hex character in the sequence converted to its
  * 4-bit binary representation.
+ *
+ * Delta API: GET /v3/qrng
  */
 export default class FetchQuantumEntropy extends XQModule {
   /** Kolmogorov-Sinai entropy */
@@ -43,12 +45,11 @@ export default class FetchQuantumEntropy extends XQModule {
 
         return this.sdk
           .call(
-            this.sdk.KEY_SERVER_URL,
-            null,
+            "qrng",
             CallMethod.GET,
             additionalHeaderProperties,
             maybePayload,
-            false
+            true
           )
           .then((response: ServerResponse) => {
             switch (response.status) {

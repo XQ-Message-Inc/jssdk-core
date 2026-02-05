@@ -18,10 +18,8 @@ export interface IGeneratePacketParams {
 /**
  * A service which is utilized to generate an encrypted packet containing the encryption key that you want to
  * protect along with a list of the identities that are allowed to access it and how long it is allowed to be used.
- * Internally, 2 service calls are performed:
- *  1 generate the packet
- *  2 after validation, add it to the server,
  *
+ * Delta API: POST /v3/packet/add
  * @class [GeneratePacket]
  */
 
@@ -91,50 +89,24 @@ export default class GeneratePacket extends XQModule {
           [GeneratePacket.RECIPIENTS]: flattenedRecipientList,
         };
 
-        const c = this.sdk.call(
-          this.sdk.SUBSCRIPTION_SERVER_URL,
-          this.serviceName,
-          CallMethod.POST,
-          additionalHeaderProperties,
-          payload,
-          true
-        );
-
-        const x = c.then((response: ServerResponse) => {
-          switch (response.status) {
-            case ServerResponse.OK: {
-              return this.sdk
-                .call(
-                  this.sdk.VALIDATION_SERVER_URL,
-                  this.serviceName,
-                  CallMethod.POST,
-                  {
-                    ...additionalHeaderProperties,
-                    [XQSDK.CONTENT_TYPE]: XQSDK.TEXT_PLAIN_UTF_8,
-                  },
-                  { data: response.payload },
-                  true
-                )
-                .then((response: ServerResponse) => {
-                  switch (response.status) {
-                    case ServerResponse.OK: {
-                      return response;
-                    }
-                    default: {
-                      return handleException(
-                        response,
-                        XQServices.GeneratePacket
-                      );
-                    }
-                  }
-                });
+        return this.sdk
+          .call(
+            this.serviceName + "/add",
+            CallMethod.POST,
+            additionalHeaderProperties,
+            payload,
+            true
+          )
+          .then((response: ServerResponse) => {
+            switch (response.status) {
+              case ServerResponse.OK: {
+                return response;
+              }
+              case ServerResponse.ERROR: {
+                return handleException(response, XQServices.GeneratePacket);
+              }
             }
-            case ServerResponse.ERROR: {
-              return handleException(response, XQServices.GeneratePacket);
-            }
-          }
-        });
-        return x;
+          });
       } catch (exception) {
         return new Promise((resolve) =>
           resolve(handleException(exception, XQServices.GeneratePacket))

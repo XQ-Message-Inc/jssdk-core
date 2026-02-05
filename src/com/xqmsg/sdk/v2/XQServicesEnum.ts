@@ -22,6 +22,7 @@ export enum XQServices {
   GrantUserAccess = "GrantUserAccess",
   RevokeKeyAccess = "RevokeKeyAccess",
   RevokeUserAccess = "RevokeUserAccess",
+  TeamSwitch = "TeamSwitch",
   UpdateSettings = "UpdateSettings",
 
   // Dashboard services

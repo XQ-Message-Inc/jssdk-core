@@ -10,6 +10,7 @@ import handleException from "../exceptions/handleException";
  * A service which is utilized to grant access for a particular user to a specified key. The
  * person granting access must be the one who owns the key.
  *
+ * Delta API: POST /v3/key/{token}/recipients
  * @class [GrantUserAccess]
  */
 export default class GrantUserAccess extends XQModule {
@@ -63,10 +64,9 @@ export default class GrantUserAccess extends XQModule {
 
         return this.sdk
           .call(
-            this.sdk.VALIDATION_SERVER_URL,
-            this.serviceName +
-              "/" +
-              encodeURIComponent(maybePayload[GrantUserAccess.LOCATOR_TOKEN]),
+            "key/" +
+              encodeURIComponent(maybePayload[GrantUserAccess.LOCATOR_TOKEN]) +
+              "/recipients",
             CallMethod.POST,
             additionalHeaderProperties,
             payload,
@@ -90,6 +90,3 @@ export default class GrantUserAccess extends XQModule {
     };
   }
 }
-
-GrantUserAccess.RECIPIENTS = "recipients";
-GrantUserAccess.LOCATOR_TOKEN = "locatorToken";

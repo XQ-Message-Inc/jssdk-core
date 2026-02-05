@@ -16,6 +16,7 @@ import handleException from "../exceptions/handleException";
  * * The key is either not geofenced, or is being accessed from an authorized location.
  * If any of these is not true, an error will be returned instead.
  *
+ * Delta API: GET /v3/key/{token}
  * @class [FetchKey]
  */
 export default class FetchKey extends XQModule {
@@ -56,7 +57,6 @@ export default class FetchKey extends XQModule {
 
         return this.sdk
           .call(
-            this.sdk.VALIDATION_SERVER_URL,
             this.serviceName + "/" + encodeURIComponent(locatorKey),
             CallMethod.GET,
             additionalHeaderProperties,

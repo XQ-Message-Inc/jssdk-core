@@ -12,6 +12,8 @@ import handleException from "../exceptions/handleException";
 
 /**
  *  A service which is utilized to exchange a temporary access token with a real access token used in all secured XQ Message interactions
+ *
+ *  Delta API: GET /v3/login/exchange
  *  @class [ExchangeForAccessToken]
  */
 export default class ExchangeForAccessToken extends XQModule {
@@ -26,7 +28,7 @@ export default class ExchangeForAccessToken extends XQModule {
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "exchange";
+    this.serviceName = "login/exchange";
     this.requiredFields = [];
 
     this.supplyAsync = (teamId) => {
@@ -41,11 +43,10 @@ export default class ExchangeForAccessToken extends XQModule {
           Authorization: "Bearer " + preAuthToken,
         };
 
-        const payload = teamId !== undefined ? { b: teamId.toString() } : null;
-        
+        const payload = teamId !== undefined ? { team: teamId.toString() } : null;
+
         return this.sdk
           .call(
-            this.sdk.SUBSCRIPTION_SERVER_URL,
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
@@ -62,6 +63,12 @@ export default class ExchangeForAccessToken extends XQModule {
 
                 self.cache.putXQAccess(profile, accessToken);
                 self.cache.removeXQPreAuthToken();
+
+                // Store team ID if provided
+                if (teamId !== undefined) {
+                  self.cache.putTeamId(teamId.toString());
+                }
+
                 return response;
               }
               case ServerResponse.ERROR: {

@@ -27,6 +27,7 @@ import RevokeKeyAccess from "./com/xqmsg/sdk/v2/services/RevokeKeyAccess";
 import RevokeUserAccess from "./com/xqmsg/sdk/v2/services/RevokeUserAccess";
 import RolesEnum from "./com/xqmsg/sdk/v2/RolesEnum";
 import ServerResponse from "./com/xqmsg/sdk/v2/ServerResponse";
+import TeamSwitch from "./com/xqmsg/sdk/v2/services/TeamSwitch";
 import UpdateSettings from "./com/xqmsg/sdk/v2/services/UpdateSettings";
 import XQSDK from "./com/xqmsg/sdk/v2/XQSDK";
 import { CommunicationsEnum } from "./com/xqmsg/sdk/v2/CommunicationsEnum";
@@ -111,6 +112,7 @@ export {
   RevokeUserAccess,
   RolesEnum,
   ServerResponse,
+  TeamSwitch,
   UpdateApplication,
   UpdateBusiness,
   UpdateSettings,

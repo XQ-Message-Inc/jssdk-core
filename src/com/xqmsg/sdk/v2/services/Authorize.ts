@@ -19,7 +19,9 @@ import handleException from "../exceptions/handleException";
  * The pin servers as the input parameter of the `CodeValidator` service
  *
  * Optionally, a user may pass an existing `accessToken` which will allow them to skip the `CodeValidator` step.
- *  @class [Authorize]
+ *
+ * Delta API: POST /v3/login/link
+ * @class [Authorize]
  */
 
 export default class Authorize extends XQModule {
@@ -85,7 +87,7 @@ export default class Authorize extends XQModule {
   constructor(sdk: XQSDK) {
     super(sdk);
 
-    this.serviceName = "authorize";
+    this.serviceName = "login/link";
     this.requiredFields = [Authorize.USER];
 
     this.supplyAsync = (maybePayload) => {
@@ -111,7 +113,6 @@ export default class Authorize extends XQModule {
 
         return this.sdk
           .call(
-            this.sdk.SUBSCRIPTION_SERVER_URL,
             this.serviceName,
             CallMethod.POST,
             null,

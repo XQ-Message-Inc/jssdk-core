@@ -1,5 +1,4 @@
 import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import { UserRole } from "../../types/dashboard";
 import XQModule from "../XQModule";
@@ -9,8 +8,9 @@ import { XQServices } from "../../XQServicesEnum";
 import handleException from "../../exceptions/handleException";
 
 /**
- * A service which is utilized to return all contacts of the current user
+ * A service which is utilized to return all contacts (team members) of the current user
  *
+ * Delta API: GET /v3/team/members
  * @class [GetContacts]
  */
 export default class GetContacts extends XQModule {
@@ -54,31 +54,26 @@ export default class GetContacts extends XQModule {
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = GetContacts.CONTACT;
+    this.serviceName = "team/members";
     this.requiredFields = [];
 
-    // TODO(worstestes - 3.21.22): add filter capabilities
     this.supplyAsync = (maybePayload) => {
       try {
         this.sdk.validateInput(maybePayload, this.requiredFields);
 
-        const dashboardAccessToken = this.sdk.validateAccessToken(
-          Destination.DASHBOARD
-        );
+        const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
-          Authorization: "Bearer " + dashboardAccessToken,
+          Authorization: "Bearer " + accessToken,
         };
 
         return this.sdk
           .call(
-            this.sdk.DASHBOARD_SERVER_URL,
-            this.serviceName + "/all",
+            this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
             null,
-            true,
-            Destination.DASHBOARD
+            true
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {

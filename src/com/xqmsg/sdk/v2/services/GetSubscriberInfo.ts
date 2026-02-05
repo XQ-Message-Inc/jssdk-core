@@ -7,8 +7,9 @@ import { XQServices } from "../XQServicesEnum";
 import handleException from "../exceptions/handleException";
 
 /**
- * A service which is utilized to retrieve the current subscriber's information.
+ * A service which is utilized to retrieve the current subscriber's information (team info).
  *
+ * Delta API: GET /v3/team
  * @class [GetSubscriberInfo]
  */
 export default class GetSubscriberInfo extends XQModule {
@@ -48,7 +49,7 @@ export default class GetSubscriberInfo extends XQModule {
   constructor(sdk: XQSDK) {
     super(sdk);
 
-    this.serviceName = "subscriber";
+    this.serviceName = "team";
     this.requiredFields = [];
 
     this.supplyAsync = (maybePayload) => {
@@ -63,7 +64,6 @@ export default class GetSubscriberInfo extends XQModule {
 
         return this.sdk
           .call(
-            this.sdk.SUBSCRIPTION_SERVER_URL,
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,

@@ -7,53 +7,53 @@ import { XQServices } from "../XQServicesEnum";
 import handleException from "../exceptions/handleException";
 
 /**
- * A service which is utilized to revoke a key using a locator token.
- * Only the user who sent the message will be able to revoke it.
+ * A service which is utilized to switch the current user's active team.
+ * This returns a new team access token for the specified team.
  *
- * Delta API: DELETE /v3/key/{token}
- * @class [RevokeKeyAccess]
+ * Delta API: POST /v3/teams/switch
+ * @class [TeamSwitch]
  */
-export default class RevokeKeyAccess extends XQModule {
+export default class TeamSwitch extends XQModule {
   /** The required fields of the payload needed to utilize the service */
   requiredFields: string[];
 
   /** Specified name of the service */
   serviceName: string;
 
-  /** The field name representing the locator key */
-  static LOCATOR_TOKENS: "tokens" = "tokens";
+  /** The field name representing the team ID to switch to */
+  static TEAM_ID: "teamId" = "teamId";
 
   /**
    * @param {Map} maybePayload - the container for the request parameters supplied to this method.
-   * @param {[String]} maybePayload.tokens - the tokens used to discover the key on the server.
-   * The URL encoding part is handled internally in the service itself
-   * @see #encodeURIComponent function encodeURIComponent (built-in since ES-5)
-   * @returns {Promise<ServerResponse<{}>>}
+   * @param {number} maybePayload.teamId - The ID of the team to switch to
+   *
+   * @returns {Promise<ServerResponse<{payload:string}>>} a `ServerResponse` containing the new team access token
    */
-  supplyAsync: (maybePayload: { tokens:  string[] }) => Promise<ServerResponse>;
+  supplyAsync: (maybePayload: { teamId: number }) => Promise<ServerResponse>;
 
   constructor(sdk: XQSDK) {
     super(sdk);
 
-    this.serviceName = "key";
-    this.requiredFields = [RevokeKeyAccess.LOCATOR_TOKENS];
+    this.serviceName = "teams/switch";
+    this.requiredFields = [TeamSwitch.TEAM_ID];
 
     this.supplyAsync = (maybePayload) => {
       try {
         this.sdk.validateInput(maybePayload, this.requiredFields);
+        const self = this;
+
         const accessToken = this.sdk.validateAccessToken();
-        const locatorTokens = maybePayload[RevokeKeyAccess.LOCATOR_TOKENS];
 
         const additionalHeaderProperties = {
           Authorization: "Bearer " + accessToken,
         };
 
-        const payload = {[RevokeKeyAccess.LOCATOR_TOKENS]:locatorTokens}
+        const payload = { team: maybePayload.teamId };
 
         return this.sdk
           .call(
             this.serviceName,
-            CallMethod.DELETE,
+            CallMethod.POST,
             additionalHeaderProperties,
             payload,
             true
@@ -61,16 +61,25 @@ export default class RevokeKeyAccess extends XQModule {
           .then((response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
+                // Store the new team ID and access token
+                const newAccessToken = response.payload;
+                const activeProfile = self.cache.getActiveProfile(true);
+
+                if (activeProfile) {
+                  self.cache.putXQAccess(activeProfile, newAccessToken);
+                }
+                self.cache.putTeamId(maybePayload.teamId.toString());
+
                 return response;
               }
               case ServerResponse.ERROR: {
-                return handleException(response, XQServices.RevokeKeyAccess);
+                return handleException(response, XQServices.TeamSwitch);
               }
             }
           });
       } catch (exception) {
         return new Promise((resolve) =>
-          resolve(handleException(exception, XQServices.RevokeKeyAccess))
+          resolve(handleException(exception, XQServices.TeamSwitch))
         );
       }
     };

@@ -9,6 +9,7 @@ import handleException from "../exceptions/handleException";
 /**
  * A service which is utilized to check whether a particular key is expired or not without actually fetching it.
  *
+ * Delta API: GET /v3/expiration/{token}
  * @class [CheckKeyExpiration]
  */
 export default class CheckKeyExpiration extends XQModule {
@@ -52,7 +53,6 @@ export default class CheckKeyExpiration extends XQModule {
 
         return this.sdk
           .call(
-            this.sdk.VALIDATION_SERVER_URL,
             this.serviceName + "/" + encodeURIComponent(locatorKey),
             CallMethod.GET,
             additionalHeaderProperties,

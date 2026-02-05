@@ -1,5 +1,4 @@
 import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
@@ -10,6 +9,7 @@ import handleException from "../../exceptions/handleException";
 /**
  * A service which is utilized to return the currently logged in user's data
  *
+ * Delta API: GET /v3/user
  * @class [GetCurrentUser]
  */
 export default class GetCurrentUser extends XQModule {
@@ -30,7 +30,7 @@ export default class GetCurrentUser extends XQModule {
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = GetCurrentUser.CONTACT;
+    this.serviceName = "user";
     this.requiredFields = [];
 
     this.supplyAsync = (maybePayload) => {
@@ -39,35 +39,28 @@ export default class GetCurrentUser extends XQModule {
 
         const self = this;
 
-        const dashboardAccessToken = this.sdk.validateAccessToken(
-          Destination.DASHBOARD
-        );
+        const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
-          Authorization: "Bearer " + dashboardAccessToken,
+          Authorization: "Bearer " + accessToken,
         };
 
         const activeProfile = self.cache.getActiveProfile(true);
 
         return this.sdk
           .call(
-            this.sdk.DASHBOARD_SERVER_URL,
             this.serviceName + `?filter=${activeProfile}`,
             CallMethod.GET,
             additionalHeaderProperties,
             null,
-            true,
-            Destination.DASHBOARD
+            true
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
               case ServerResponse.OK: {
                 // There should only be 1 user per email address, so let's just grab the first one no matter what.
-                const contact = response.payload.contacts[0];
+                const contact = response.payload.contacts?.[0] || response.payload;
                 if (!contact) {
-                  // We couldn't wind a user with this email address. This should never happen but
-                  // we need to account for the possibility. Throwing here will trigger the same error handling as
-                  // if the request failed.
                   throw new ServerResponse(
                     ServerResponse.ERROR,
                     404,

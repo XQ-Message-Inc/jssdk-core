@@ -2,7 +2,6 @@
 /* eslint-disable no-redeclare */
 import CTREncryption from "./algorithms/CTREncryption";
 import CallMethod from "./CallMethod";
-import Destination from "./Destination";
 import EncryptionAlgorithm from "./algorithms/EncryptionAlgorithm";
 import GCMEncryption from "./algorithms/GCMEncryption";
 import NTVEncryption from "./algorithms/NTVEncryption";
@@ -18,10 +17,7 @@ import memoryCache from "memory-cache";
 
 var XMLHttpRequest = require("xhr2");
 
-const DASHBOARD_SERVER_URL = "https://dashboard.xqmsg.net/v2";
-const KEY_SERVER_URL = "https://quantum.xqmsg.net/v2/";
-const SUBSCRIPTION_SERVER_URL = "https://subscription.xqmsg.net/v2";
-const VALIDATION_SERVER_URL = "https://validation.xqmsg.net/v2";
+const DELTA_SERVER_URL = "https://delta.xqmsg.net/v3";
 
 interface XQSDKProps {
   /** A string representing the AES 256 GCM encryption algorithm */
@@ -36,26 +32,14 @@ interface XQSDKProps {
   /** A object which contains encryption algorithm instances */
   ALGORITHMS: Record<string, OTPEncryption | CTREncryption | GCMEncryption | NTVEncryption>;
 
-  /** A string representing the Dashboard API key*/
-  DASHBOARD_API_KEY: string;
-
-  /** A string representing the Dashboard server URL */
-  DASHBOARD_SERVER_URL: string;
-
-  /** A string representing the key server URL */
-  KEY_SERVER_URL: string;
-
   /** A string representing the OTP encryption algorithm */
   OTP_ALGORITHM: string;
 
-  /** A string representing the subscription server URL*/
-  SUBSCRIPTION_SERVER_URL: string;
+  /** A string representing the Delta server URL */
+  DELTA_SERVER_URL: string;
 
-  /** A string representing the validation server URL*/
-  VALIDATION_SERVER_URL: string;
-
-  /** A string representing the XQ General API key */
-  XQ_API_KEY: string;
+  /** A string representing the API key */
+  API_KEY: string;
 
   /** The XQ Cache */
   cache: XQSimpleCache;
@@ -69,23 +53,19 @@ interface XQSDKProps {
 
   /**
    * Wrapper method whose purpose is to construct the complete URL before it is passing its args to the underlying {@link makeRequest}
-   * @param {String} baseUrl
    * @param {String} maybeService
    * @param {CallMethod#String} method
    * @param {{}}maybeHeaderProperties
    * @param {{}}maybePayload
    * @param {boolean}requiresAPIKey
-   * @param {Destination}destination
    * @returns {Promise<ServerResponse<{}>>}
    */
   call: (
-    baseUrl: string,
     maybeService: string,
     method: "POST" | "PATCH",
     maybeHeaderProperties: Record<string, string>,
     maybePayload: Record<string, string>,
-    requiresAPIKey: boolean,
-    destination?: string
+    requiresAPIKey: boolean
   ) => Promise<unknown>;
 
   /**
@@ -115,7 +95,6 @@ interface XQSDKProps {
    * @param {{}} maybeHeaderProperties
    * @param {{}} maybePayload
    * @param {boolean} requiresAPIKey
-   * @param {Destination}destination
    * @returns {Promise<ServerResponse<{}>>}
    */
   makeRequest: (
@@ -124,16 +103,13 @@ interface XQSDKProps {
     maybeService: string,
     maybeHeaderProperties: Record<string, string>,
     maybePayload: Record<string, string>,
-    requiresAPIKey: boolean,
-    destination: string
+    requiresAPIKey: boolean
   ) => Promise<unknown>;
 
   /**
-   *
-   * @param {Destination}destination
    * @returns {string}
    */
-  validateAccessToken: (destination?: string) => StatusException | string;
+  validateAccessToken: () => StatusException | string;
 
   /**
    * @method validateInput
@@ -163,8 +139,11 @@ class XQSDK {
   /** A field name representing the any (wildcard) request header */
   static ANY: "*" = "*";
 
-  /** A field name representing the api-key request header */
-  static API_KEY: "api-key" = "api-key";
+  /** A field name representing the Api-Key request header */
+  static API_KEY_HEADER: "Api-Key" = "Api-Key";
+
+  /** A field name representing the X-Team-ID request header */
+  static TEAM_ID_HEADER: "X-Team-ID" = "X-Team-ID";
 
   /** A field name representing the application/json request header */
   static APPLICATION_JSON: "application/json" = "application/json";
@@ -176,51 +155,19 @@ class XQSDK {
     "text/plain;charset=UTF-8";
 
   constructor(
-    credentials: { XQ_API_KEY: string; DASHBOARD_API_KEY: string },
+    credentials: { API_KEY: string },
     serverConfig?: {
-      DASHBOARD_SERVER_URL?: string;
-      KEY_SERVER_URL?: string;
-      SUBSCRIPTION_SERVER_URL?: string;
-      VALIDATION_SERVER_URL?: string;
+      DELTA_SERVER_URL?: string;
     }
   ) {
-    /** The required API keys to utilize XQ Services */
-    const credentialConfiguration = {
-      XQ_API_KEY: credentials.XQ_API_KEY,
-      DASHBOARD_API_KEY: credentials.DASHBOARD_API_KEY,
-    };
-
-    /** The parameterized server URLs */
-    const serverConfiguration = {
-      SUBSCRIPTION_SERVER_URL:
-        serverConfig?.SUBSCRIPTION_SERVER_URL || SUBSCRIPTION_SERVER_URL,
-      DASHBOARD_SERVER_URL:
-        serverConfig?.DASHBOARD_SERVER_URL || DASHBOARD_SERVER_URL,
-      KEY_SERVER_URL: serverConfig?.KEY_SERVER_URL || KEY_SERVER_URL,
-      VALIDATION_SERVER_URL:
-        serverConfig?.VALIDATION_SERVER_URL || VALIDATION_SERVER_URL,
-    };
-
-    const config = {
-      application: {
-        ...credentialConfiguration,
-        ...serverConfiguration,
-      },
-    };
-
-    this.XQ_API_KEY = config.application.XQ_API_KEY;
-    this.DASHBOARD_API_KEY = config.application.DASHBOARD_API_KEY;
+    this.API_KEY = credentials.API_KEY;
+    this.DELTA_SERVER_URL = serverConfig?.DELTA_SERVER_URL || DELTA_SERVER_URL;
 
     this.cache = new XQSimpleCache(memoryCache);
     this.OTP_ALGORITHM = "OTP";
     this.GCM_ALGORITHM = "GCM";
     this.CTR_ALGORITHM = "CTR";
     this.NTV_ALGORITHM = "NTV";
-
-    this.SUBSCRIPTION_SERVER_URL = config.application.SUBSCRIPTION_SERVER_URL;
-    this.DASHBOARD_SERVER_URL = config.application.DASHBOARD_SERVER_URL;
-    this.VALIDATION_SERVER_URL = config.application.VALIDATION_SERVER_URL;
-    this.KEY_SERVER_URL = config.application.KEY_SERVER_URL;
 
     this.ALGORITHMS = {};
     this.ALGORITHMS[this.OTP_ALGORITHM] = new OTPEncryption(this);
@@ -229,16 +176,15 @@ class XQSDK {
     this.ALGORITHMS[this.NTV_ALGORITHM] = new NTVEncryption(this);
 
     this.call = function (
-      baseUrl,
       maybeService,
       method,
       maybeHeaderProperties,
       maybePayload,
-      requiresAPIKey,
-      destination = Destination.XQ
+      requiresAPIKey
     ) {
-      this.assert(baseUrl != null, "baseUrl cannot be null");
       this.assert(method != null, "method cannot be null");
+
+      const baseUrl = this.DELTA_SERVER_URL;
 
       if (
         maybePayload &&
@@ -252,8 +198,7 @@ class XQSDK {
           maybeService,
           maybeHeaderProperties,
           maybePayload,
-          requiresAPIKey,
-          destination
+          requiresAPIKey
         );
       } else {
         var URL =
@@ -267,8 +212,7 @@ class XQSDK {
           maybeService,
           maybeHeaderProperties,
           maybePayload,
-          requiresAPIKey,
-          destination
+          requiresAPIKey
         );
       }
     };
@@ -279,8 +223,7 @@ class XQSDK {
       maybeService,
       maybeHeaderProperties,
       maybePayload,
-      requiresAPIKey,
-      destination
+      requiresAPIKey
     ) => {
       const self = this;
 
@@ -290,23 +233,15 @@ class XQSDK {
         xhttp.open(method, url, ASYNC);
         xhttp.timeout = 60000;
         if (requiresAPIKey) {
-          switch (destination) {
-            case Destination.XQ: {
-              xhttp.setRequestHeader(XQSDK.API_KEY, self.XQ_API_KEY);
-              xhttp.setRequestHeader(
-                XQSDK.ACCESS_CONTROL_ALLOW_ORIGIN,
-                XQSDK.ANY
-              );
-              break;
-            }
-            case Destination.DASHBOARD: {
-              xhttp.setRequestHeader(XQSDK.API_KEY, self.DASHBOARD_API_KEY);
-              xhttp.setRequestHeader(
-                XQSDK.ACCESS_CONTROL_ALLOW_ORIGIN,
-                XQSDK.ANY
-              );
-              break;
-            }
+          xhttp.setRequestHeader(XQSDK.API_KEY_HEADER, self.API_KEY);
+          xhttp.setRequestHeader(
+            XQSDK.ACCESS_CONTROL_ALLOW_ORIGIN,
+            XQSDK.ANY
+          );
+          // Add X-Team-ID header if team ID is set in cache
+          const teamId = self.cache.getTeamId();
+          if (teamId) {
+            xhttp.setRequestHeader(XQSDK.TEAM_ID_HEADER, teamId);
           }
         }
         if (maybeHeaderProperties) {
@@ -476,25 +411,15 @@ class XQSDK {
       return preAuthToken;
     };
 
-    this.validateAccessToken = (destination = Destination.XQ) => {
+    this.validateAccessToken = () => {
       // Ensure that there is an active profile.
       const activeProfile = this.cache.getActiveProfile(true);
-      let accessToken = null;
 
       if (activeProfile == null) {
         throw new StatusException(401, `No active profile found`);
       }
 
-      switch (destination) {
-        case Destination.XQ: {
-          accessToken = this.cache.getXQAccess(activeProfile, true);
-          break;
-        }
-        case Destination.DASHBOARD: {
-          accessToken = this.cache.getDashboardAccess(activeProfile, true);
-          break;
-        }
-      }
+      const accessToken = this.cache.getXQAccess(activeProfile, true);
       if (accessToken == null) {
         throw new StatusException(
           401,

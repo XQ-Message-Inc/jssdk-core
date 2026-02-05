@@ -1,5 +1,4 @@
 import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
@@ -8,8 +7,9 @@ import { XQServices } from "../../XQServicesEnum";
 import handleException from "../../exceptions/handleException";
 
 /**
- * A service which is utilized to create a new Contact for the dashboard
+ * A service which is utilized to create a new Contact (team member)
  *
+ * Delta API: POST /v3/team/member
  * @class [AddContact]
  */
 export default class AddContact extends XQModule {
@@ -55,7 +55,7 @@ export default class AddContact extends XQModule {
 
   constructor(sdk: XQSDK) {
     super(sdk);
-    this.serviceName = "contact";
+    this.serviceName = "team/member";
     this.requiredFields = [
       AddContact.EMAIL,
       AddContact.ROLE,
@@ -66,23 +66,19 @@ export default class AddContact extends XQModule {
       try {
         this.sdk.validateInput(maybePayload, this.requiredFields);
 
-        const dashboardAccessToken = this.sdk.validateAccessToken(
-          Destination.DASHBOARD
-        );
+        const accessToken = this.sdk.validateAccessToken();
 
         const additionalHeaderProperties = {
-          Authorization: "Bearer " + dashboardAccessToken,
+          Authorization: "Bearer " + accessToken,
         };
 
         return this.sdk
           .call(
-            this.sdk.DASHBOARD_SERVER_URL,
             this.serviceName,
             CallMethod.POST,
             additionalHeaderProperties,
             maybePayload,
-            true,
-            Destination.DASHBOARD
+            true
           )
           .then((response: ServerResponse) => {
             switch (response.status) {

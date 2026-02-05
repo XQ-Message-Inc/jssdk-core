@@ -9,6 +9,7 @@ import handleException from "../exceptions/handleException";
 /**
  * A service which is utilized to retrieve the notification and newsletter settings for the current user.
  *
+ * Delta API: GET /v3/settings
  * @class [GetSettings]
  */
 export default class GetSettings extends XQModule {
@@ -47,7 +48,6 @@ export default class GetSettings extends XQModule {
 
         return this.sdk
           .call(
-            this.sdk.SUBSCRIPTION_SERVER_URL,
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,

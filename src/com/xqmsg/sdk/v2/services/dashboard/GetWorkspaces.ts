@@ -1,5 +1,4 @@
 import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
@@ -10,6 +9,7 @@ import handleException from "../../exceptions/handleException";
 /**
  * A service which is utilized to fetch the workspaces that a user belongs to.
  *
+ * Delta API: GET /v3/workspaces/{email}
  * @class [GetWorkspaces]
  */
 export default class GetWorkspaces extends XQModule {
@@ -44,13 +44,11 @@ export default class GetWorkspaces extends XQModule {
 
         return this.sdk
           .call(
-            this.sdk.DASHBOARD_SERVER_URL,
             this.serviceName + `/${maybePayload[GetWorkspaces.EMAIL]}`,
             CallMethod.GET,
             null,
             null,
-            true,
-            Destination.DASHBOARD
+            true
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {

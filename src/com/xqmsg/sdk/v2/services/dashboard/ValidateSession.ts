@@ -1,5 +1,4 @@
 import CallMethod from "../../CallMethod";
-import Destination from "../../Destination";
 import ServerResponse from "../../ServerResponse";
 import XQModule from "../XQModule";
 import XQSDK from "../../XQSDK";
@@ -8,7 +7,9 @@ import { XQServices } from "../../XQServicesEnum";
 import handleException from "../../exceptions/handleException";
 
 /**
- * A service which is utilized to validate the current dashboard session
+ * A service which is utilized to validate the current session
+ *
+ * Delta API: GET /v3/session
  * @class [ValidateSession]
  */
 export default class ValidateSession extends XQModule {
@@ -39,33 +40,28 @@ export default class ValidateSession extends XQModule {
       try {
         this.sdk.validateInput(maybePayload, this.requiredFields);
 
-        // the `suppliedDashboardAccessToken` is the (optional) provided access token to test against
-        const suppliedDashboardAccessToken =
-          maybePayload[ValidateSession.ACCESS_TOKEN];
+        // the `suppliedAccessToken` is the (optional) provided access token to test against
+        const suppliedAccessToken = maybePayload[ValidateSession.ACCESS_TOKEN];
 
-        // the `savedDashboardAccessToken` is the dashboard access token that may be saved in-memory
-        const savedDashboardAccessToken = this.sdk.validateAccessToken(
-          Destination.DASHBOARD
-        );
+        // the `savedAccessToken` is the access token that may be saved in-memory
+        const savedAccessToken = this.sdk.validateAccessToken();
 
         // we default to the supplied access token if provided, else we test against the saved, in-memory access token
-        const dashboardAccessToken = suppliedDashboardAccessToken
-          ? suppliedDashboardAccessToken
-          : savedDashboardAccessToken;
+        const accessToken = suppliedAccessToken
+          ? suppliedAccessToken
+          : savedAccessToken;
 
         const additionalHeaderProperties = {
-          Authorization: "Bearer " + dashboardAccessToken,
+          Authorization: "Bearer " + accessToken,
         };
 
         return this.sdk
           .call(
-            this.sdk.DASHBOARD_SERVER_URL,
             this.serviceName,
             CallMethod.GET,
             additionalHeaderProperties,
             null,
-            true,
-            Destination.DASHBOARD
+            true
           )
           .then(async (response: ServerResponse) => {
             switch (response.status) {
